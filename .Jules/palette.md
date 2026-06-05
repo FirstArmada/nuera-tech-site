@@ -1,0 +1,3 @@
+## 2024-06-05 - Add Empty State for Search/Filter Results
+**Learning:** Dynamic lists and grids that rely on filtering or searching can unexpectedly leave the user staring at a completely blank screen when no results match their criteria. This violates the heuristic of "visibility of system status". Without feedback, users may think the application is broken or still loading.
+**Action:** Always provide a helpful "empty state" component or message when a dynamic list's results become zero. Include instructions on what to do next (e.g., "Try adjusting your search or filters").
