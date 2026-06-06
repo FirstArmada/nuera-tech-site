@@ -27,7 +27,7 @@ _headers                   # Cloudflare: per-path cache + security headers (mirr
 assets/
   js/app.js                # ES module: fetch → group → render → filter/search → modal → WA
   fonts/inter-var-latin.woff2   # Self-hosted Inter (variable, latin subset, 48 KB)
-  icons/                   # PWA icons, favicons, OG image (generated neon "N" mark)
+  icons/                   # logo.svg (wordmark lockup) + neon "N" mark, PWA icons, favicons, OG image
 ```
 
 ## The two hard rules

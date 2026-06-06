@@ -98,8 +98,11 @@
     /* Header */
     .header{position:sticky;top:0;z-index:60;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(7,7,12,.62);border-bottom:1px solid var(--border)}
     .header-in{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:var(--header-h)}
-    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .brand img{height:34px;width:auto;display:block}
+    .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1}
+    .brand-sprite{position:absolute;width:0;height:0;overflow:hidden}
+    .brand-mark{height:1.6em;width:1.6em;flex:none;display:block}
+    .brand-name{font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+    .brand-name .t{color:var(--cyan)}
     .brand-meta{color:var(--muted);font-size:.82rem;display:none}
     @media (min-width:760px){.brand-meta{display:block}}
     .header .btn{padding:10px 16px;min-height:40px;font-size:.92rem}
@@ -222,7 +225,7 @@
     /* Footer */
     footer{border-top:1px solid var(--border);margin-top:40px;padding:40px 0 120px;color:var(--muted)}
     .foot-grid{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-start}
-    .foot-brand img{height:30px;margin-bottom:10px}
+    .foot-brand .brand{font-size:1.08rem;margin-bottom:10px}
     footer a{color:#cdd6e8;text-decoration:none}
     footer a:hover{color:#fff;text-decoration:underline}
     .foot-links{display:flex;flex-direction:column;gap:8px;font-size:.92rem}
@@ -324,7 +327,7 @@
     "url":"https://nuera.talha-k.com/",
     "telephone":"+12269784666",
     "image":"https://nuera.talha-k.com/assets/icons/og-image.png",
-    "logo":"https://talha-k.com/nuera-logo.png",
+    "logo":"https://nuera.talha-k.com/assets/icons/icon-512.png",
     "priceRange":"$$",
     "currenciesAccepted":"CAD",
     "address":{"@type":"PostalAddress","addressLocality":"Guelph","addressRegion":"ON","addressCountry":"CA"},
@@ -359,6 +362,22 @@
   <script type="module" src="/assets/js/app.js"></script>
 </head>
 <body>
+  <!-- Reusable brand mark — scalable vector "N", themed with the site gradient -->
+  <svg class="brand-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="nueraMarkGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#c4b5fd"/>
+        <stop offset=".45" stop-color="#8b5cf6"/>
+        <stop offset="1" stop-color="#22d3ee"/>
+      </linearGradient>
+    </defs>
+    <symbol id="nuera-mark" viewBox="0 0 40 40">
+      <rect width="40" height="40" rx="11" fill="#0f0d18"/>
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="none" stroke="#fff" stroke-opacity=".1"/>
+      <path d="M12 28V12L28 28V12" fill="none" stroke="url(#nueraMarkGrad)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="12" r="2.4" fill="#22d3ee"/>
+    </symbol>
+  </svg>
   <div class="aurora" aria-hidden="true"></div>
   <a class="skip" href="#finder">Skip to repair pricing</a>
   <noscript><div class="noscript">This site uses JavaScript to load live repair pricing. Please enable JavaScript, or message us on WhatsApp at +1 226 978 4666.</div></noscript>
@@ -366,7 +385,8 @@
   <header class="header">
     <div class="wrap header-in">
       <a class="brand" href="/" aria-label="Nuera Tech home">
-        <img src="https://talha-k.com/nuera-logo.png" alt="Nuera Tech" width="148" height="34" fetchpriority="high" />
+        <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
+        <span class="brand-name">Nuera <span class="t">Tech</span></span>
       </a>
       <span class="brand-meta">Guelph, ON · Same-day repairs · 90-day warranty</span>
       <a class="btn btn-wa" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener">
@@ -513,7 +533,10 @@
   <footer>
     <div class="wrap foot-grid">
       <div class="foot-brand">
-        <img src="https://talha-k.com/nuera-logo.png" alt="Nuera Tech" width="130" height="30" loading="lazy" />
+        <span class="brand">
+          <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
+          <span class="brand-name">Nuera <span class="t">Tech</span></span>
+        </span>
         <p class="lead-muted">Honest, same-day phone &amp; tablet repair in Guelph, Ontario.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
