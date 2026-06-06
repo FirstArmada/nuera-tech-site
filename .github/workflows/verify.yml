@@ -10,6 +10,10 @@ on:
   push:
     branches: [main]
 
+# Least privilege: this gate only checks out the repo and runs tests.
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest

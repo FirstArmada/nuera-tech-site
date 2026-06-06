@@ -40,7 +40,7 @@ function startServer() {
       }
       res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream' });
       fs.createReadStream(file).pipe(res);
-    } catch (e) { res.writeHead(500); res.end(String(e)); }
+    } catch (e) { console.error(e); res.writeHead(500); res.end('server error'); }
   });
   return new Promise((rs, rj) => { server.once('error', rj); server.listen(PORT, '127.0.0.1', () => rs(server)); });
 }
