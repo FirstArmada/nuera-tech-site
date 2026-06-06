@@ -11,7 +11,7 @@ story obvious and turn visitors into booked repairs over WhatsApp.
 Intentionally **build-less**: hand-crafted static files served straight from the
 repo root. No framework, no bundler, no `node_modules` to ship. This is the most
 robust option for a live site that fans out to multiple deploy targets (Vercel,
-the self-hosted OpenResty mirror, GitHub Pages) and it's plenty fast for a
+the self-hosted OpenResty mirror) and it's plenty fast for a
 single-page experience — native ES modules + edge compression do the rest.
 
 ```
@@ -70,15 +70,18 @@ npx serve .            # or: python3 -m http.server 8000
 
 ## Deploy
 
-The same static files fan out to several targets — all build-less, no build step:
+Push to `main` → Vercel builds (static, no build command) and deploys to
+`nuera.talha-k.com`. `vercel.json` sets caching + a strict Content-Security-Policy.
+The `.github/workflows/deploy.yml` mirror copies the full site to the OpenResty box.
 
-- **Vercel** (primary) — push to `main` → deploys to `nuera.talha-k.com`.
-  `vercel.json` sets caching + a strict Content-Security-Policy.
-- **Cloudflare Workers** — an assets-only Worker (`wrangler.jsonc`) serves the
-  repo root from Cloudflare's edge. Deploy with `npx wrangler deploy` (leave the
-  build command empty). `_headers` mirrors the cache + security headers from
-  `vercel.json`; `.assetsignore` keeps non-site files (docs, CI config) out of
-  the upload.
-- **OpenResty mirror** — `.github/workflows/deploy.yml` copies the full site to
-  the self-hosted box on every push to `main`.
-- **GitHub Pages** — `.github/workflows/static.yml` publishes the repo to Pages.
+**Production topology.** `nuera.talha-k.com` is proxied through **Cloudflare**
+(orange-cloud) and gated by a **Cloudflare Access** policy — auth is required to view
+the site (intentional). Cloudflare's origin is **Vercel**, so a request flows:
+Cloudflare DNS → Cloudflare Access login → Vercel → static files from this repo.
+
+**Troubleshooting.** A Google Cloud Storage *"Error 404 — Object not found / Is this
+your bucket?"* page means Cloudflare's origin (or the `nuera` DNS record) is pointed at
+a GCS bucket instead of Vercel. Fix it in Cloudflare: point `nuera` at Vercel
+(`CNAME → cname.vercel-dns.com`), add the domain to the Vercel project, and remove any
+Origin Rule / Worker / record routing to GCS. (The Access login wall is separate and
+intentional — leave it.)

@@ -21,5 +21,6 @@
 - Made all prices and savings stats runtime-derived (Rule 1); structured data is static + a runtime AggregateOffer.
 - Verified: headless render/interaction tests + 0 axe-core WCAG 2.1 A/AA violations.
 
-## Cycle 5
-- Added Cloudflare Workers as a build-less deploy target: an assets-only Worker (`wrangler.jsonc`) serves the repo root from Cloudflare's edge, with `_headers` mirroring the `vercel.json` cache + CSP/security headers and `.assetsignore` keeping non-site files out of the deploy. Deploys via `npx wrangler deploy`.
+## Cycle 5 — Deploy hygiene
+- Removed the unused GitHub Pages workflow (`.github/workflows/static.yml`); it failed on every push to `main` and Vercel is the canonical host.
+- Documented the real production topology in the README — Cloudflare (proxied) → Cloudflare Access (intentional auth gate) → Vercel origin — plus a troubleshooting note for the Google Cloud Storage "Object not found / Is this your bucket?" 404 (origin/DNS pointed at a GCS bucket instead of Vercel).
