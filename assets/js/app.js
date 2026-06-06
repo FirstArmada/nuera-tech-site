@@ -238,13 +238,13 @@ function buildFilters() {
   const brandWrap = $('#brand-filters');
   brandWrap.innerHTML = BRANDS
     .filter((b) => b.id === 'all' || state.devices.some((d) => d.brand === b.id))
-    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-pressed="${b.id === 'all'}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${counts('brand', b.id)}</span></button>`)
+    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${counts('brand', b.id)}</span></button>`)
     .join('');
 
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
     .filter((t) => t.id === 'all' || state.devices.some((d) => d.types.has(t.id)))
-    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-pressed="${t.id === 'all'}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
+    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
     .join('');
 
   brandWrap.addEventListener('click', (e) => {
@@ -285,8 +285,7 @@ function buildFilters() {
 function setPressed(wrap, active) {
   $$('.pill', wrap).forEach((p) => {
     const on = p === active;
-    p.setAttribute('aria-pressed', String(on)); // visual hook (CSS) — kept
-    p.setAttribute('aria-checked', String(on)); // radio semantics
+    p.setAttribute('aria-checked', String(on)); // radio semantics + CSS visual hook
     p.tabIndex = on ? 0 : -1;                    // roving tabindex
   });
 }
