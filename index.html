@@ -26,6 +26,7 @@
 #repair-modal::backdrop { background: rgba(0,0,0,.7); backdrop-filter: blur(4px); }
 .modal-close { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; line-height: 1; }
 .modal-repair-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--panel-border); }
+.modal-repair-row:hover{background:rgba(139,92,246,.06);border-radius:8px;margin:0 -8px;padding:12px 8px}
 .modal-repair-row:last-child { border-bottom: none; }
 .repair-type { font-weight: 600; }
 .mk-price { color: var(--muted); font-size: .85rem; }
@@ -101,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="repair-actions">
             <span class="nuera-price">$${entry.price}</span>
-            <a href="https://wa.me/12269784666" target="_blank" rel="noopener"
+            <a href="https://wa.me/12269784666?text=${encodeURIComponent('Hi, I would like to book a '+entry.repair_type+' for my '+entry.model)}" target="_blank" rel="noopener"
                class="card-cta" aria-label="Book ${entry.model} ${entry.repair_type} via WhatsApp" style="margin-top:0;">
               📲 Book
             </a>
