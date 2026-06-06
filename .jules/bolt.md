@@ -20,6 +20,19 @@ Codebase: nuera-tech-site. Build-less static site (no package.json shipped).
 1. `pricing-data.json` is fetched at runtime; no prices in any static HTML.
 2. WhatsApp = `+1 226 978 4666` → `wa.me/12269784666` (const `WA` in app.js).
 
+## Deploy / production topology
+- Canonical host is **Vercel** (push to `main` → static deploy, no build command).
+  `.github/workflows/deploy.yml` mirrors the full site to a self-hosted
+  1Panel/OpenResty box. There is **no GitHub Pages** target — that workflow only
+  ever failed and was removed.
+- Live request path: `nuera.talha-k.com` → **Cloudflare** (proxied / orange-cloud)
+  → **Cloudflare Access** login (intentional auth gate, leave it) → **Vercel** origin.
+- Gotcha: a Google Cloud Storage *"Object not found / Is this your bucket?"* 404
+  means Cloudflare's origin (or the `nuera` DNS record) points at a GCS bucket, not
+  Vercel. Fix in Cloudflare (`CNAME nuera → cname.vercel-dns.com` + add the domain in
+  Vercel; drop any Origin Rule/Worker routing to GCS). The repo has no GCS config and
+  never deployed there.
+
 ## Verify
 No test suite shipped. During the rehaul, verification = `node --check` on the
 JS + a headless puppeteer run (render 153 cards, filters/search, modal, WhatsApp
