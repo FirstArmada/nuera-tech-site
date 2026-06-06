@@ -6,3 +6,8 @@ package-lock.json
 .wrangler/
 .DS_Store
 *.log
+
+# Server code under cloud/ has its own manifests and must be tracked, even
+# though the root site stays build-less. (node_modules stays ignored below.)
+!cloud/**/package.json
+!cloud/**/package-lock.json

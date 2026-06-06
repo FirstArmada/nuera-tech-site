@@ -14,6 +14,10 @@ node_modules
 .claude
 .jules
 
+# Google Cloud server code (Cloud Run chat proxy + scheduled sync job).
+# Deployed to Cloud Run via its own workflow — never part of the static site.
+cloud
+
 # Wrangler + ignore config (consumed at deploy time, never served)
 wrangler.jsonc
 .assetsignore

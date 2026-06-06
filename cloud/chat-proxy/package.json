@@ -1,0 +1,16 @@
+{
+  "name": "nuera-chat-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloud Run proxy: Vertex AI (Gemini) repair-pricing assistant for the Nuera Tech site. Grounded in pricing-data.json via function calling. Auth via ADC — no API key.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.9.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}
