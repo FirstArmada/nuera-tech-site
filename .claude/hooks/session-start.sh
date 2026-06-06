@@ -98,7 +98,20 @@ if (fs.existsSync("index.html")) {
     if (!EXEC_TYPES.has(type)) continue;                    // e.g. application/ld+json
     if (!body.trim()) continue;
     const label = "index.html inline <script> #" + (++n);
-    try { new vm.Script(body); ok(label); } catch (e) { bad(label, e); }
+    // Module scripts (type=module or static import/export) aren't parseable by
+    // vm.Script (CommonJS); route them through `node --check` on a temp .mjs.
+    const isModule = type === "module" || /^[ \t]*(import|export)\b/m.test(body);
+    try {
+      if (isModule) {
+        if (!tmpDir) tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "nuera-lint-"));
+        const mjs = path.join(tmpDir, "inline.mjs");
+        fs.writeFileSync(mjs, body);
+        execFileSync(process.execPath, ["--check", mjs], { stdio: "pipe" });
+      } else {
+        new vm.Script(body);
+      }
+      ok(label);
+    } catch (e) { bad(label, e.stderr ? e.stderr.toString() : e); }
   }
 }
 

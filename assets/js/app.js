@@ -21,18 +21,22 @@ const TYPES = [
   { id: 'chargeport', label: 'Charge Port' },
 ];
 const CHIP_LABEL = { screen: 'Screen', battery: 'Battery', backglass: 'Back Glass', chargeport: 'Charge Port' };
+// Sort weight per repair type, derived from TYPES so the order lives in one place.
+const TYPE_ORDER = Object.fromEntries(TYPES.filter((t) => t.id !== 'all').map((t, i) => [t.id, i]));
 
 // ---- tiny DOM helpers ----
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const money = (n) => '$' + Number(n).toFixed(Number.isInteger(n) ? 0 : 2);
 const moneyExact = (n) => '$' + Number(n).toFixed(2);
+// Percent cheaper than the compared (Mobile Klinik) price. Callers guard base > 0.
+const pctLess = (saved, base) => Math.round((saved / base) * 100);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') ? '' : v.trim();
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
 
 // ---- state ----
-const state = { devices: [], filtered: [], byModel: new Map(), brand: 'all', type: 'all', q: '' };
+const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '' };
 
 // ===========================================================================
 // Boot
@@ -59,9 +63,10 @@ async function loadData() {
     if (!repairs.length) throw new Error('No repairs in data');
 
     buildModel(repairs);
-    renderStats(repairs);
+    const stats = computeSavingsStats(repairs);
+    renderStats(stats);
     buildFilters();
-    buildSpotlight();
+    buildSpotlight(stats);
     renderGrid();
     injectPriceSchema(repairs);
   } catch (err) {
@@ -102,27 +107,28 @@ function buildModel(repairs) {
 // Hero stats (runtime) + CTA copy + spotlight source
 // ===========================================================================
 function computeSavingsStats(repairs) {
-  const withMk = repairs.filter((r) => r.mk_price != null && r.savings != null);
+  const withMk = repairs.filter((r) => r.mk_price != null && r.mk_price > 0 && r.savings != null);
   const maxSaving = withMk.length ? Math.max(...withMk.map((r) => r.savings)) : 0;
   const avgPct = withMk.length
-    ? Math.round(withMk.reduce((a, r) => a + (r.savings / r.mk_price) * 100, 0) / withMk.length)
+    ? Math.round(withMk.reduce((a, r) => a + pctLess(r.savings, r.mk_price), 0) / withMk.length)
     : 0;
   const top = [...withMk].sort((a, b) => b.savings - a.savings);
   return { withMk, maxSaving, avgPct, top };
 }
 
-function renderStats(repairs) {
-  const { maxSaving, avgPct } = computeSavingsStats(repairs);
+function renderStats(stats) {
+  const { maxSaving, avgPct, top } = stats;
   const set = (k, v) => { const el = $(`[data-stat="${k}"]`); if (el) el.textContent = v; };
   set('devices', state.devices.length);
   set('maxSaving', maxSaving ? money(Math.round(maxSaving)) : '—');
   set('avgPct', avgPct ? avgPct + '% less' : '—');
 
   // CTA headline uses the single best real comparison, computed at runtime
-  const best = computeSavingsStats(repairs).top[0];
+  const best = top[0];
   if (best) {
+    const what = (CHIP_LABEL[best.chip] || best.repair_type).toLowerCase();
     $('#cta-headline').textContent =
-      `Why pay Mobile Klinik ${moneyExact(best.mk_price)} for a ${best.model} screen?`;
+      `Why pay Mobile Klinik ${moneyExact(best.mk_price)} for a ${best.model} ${what}?`;
     $('#cta-sub').textContent =
       `Nuera does it for ${moneyExact(best.price)} — that's ${money(Math.round(best.savings))} back in your pocket, same quality parts. Find your device and book in under a minute.`;
   }
@@ -191,7 +197,6 @@ function renderGrid() {
     (brand === 'all' || d.brand === brand) &&
     (type === 'all' || d.types.has(type)) &&
     (!q || d.search.includes(q)));
-  state.filtered = list;
 
   grid.setAttribute('aria-busy', 'false');
   if (!list.length) {
@@ -259,9 +264,9 @@ function openDevice(model, trigger) {
   const cnt = d.repairs.length;
   $('#detail-sub').textContent = `${cnt} repair${cnt === 1 ? '' : 's'} · ${brandLabel(d.brand)} · from ${moneyExact(d.minPrice)}`;
 
-  // order: screen, battery, backglass, chargeport, then price
-  const order = { screen: 0, battery: 1, backglass: 2, chargeport: 3 };
-  const rows = [...d.repairs].sort((a, b) => (order[a.chip] - order[b.chip]) || (a.price - b.price));
+  // order: screen, battery, backglass, chargeport, then price (unknown chips last)
+  const rows = [...d.repairs].sort((a, b) =>
+    ((TYPE_ORDER[a.chip] ?? 99) - (TYPE_ORDER[b.chip] ?? 99)) || (a.price - b.price));
 
   $('#detail-body').innerHTML = rows.map((r) => rowHTML(r, d.model)).join('');
 
@@ -274,12 +279,10 @@ function openDevice(model, trigger) {
 
 function rowHTML(r, model) {
   const v = cleanVariant(r.variant);
-  const hasSave = r.mk_price != null && r.savings != null && r.savings > 0;
+  const hasSave = r.mk_price != null && r.mk_price > 0 && r.savings != null && r.savings > 0;
   const compare = hasSave
-    ? `<div class="compare"><span class="mk">MK ${moneyExact(r.mk_price)}</span><span class="save">Save ${money(Math.round(r.savings))} · ${Math.round((r.savings / r.mk_price) * 100)}% less</span></div>`
+    ? `<div class="compare"><span class="mk">MK ${moneyExact(r.mk_price)}</span><span class="save">Save ${money(Math.round(r.savings))} · ${pctLess(r.savings, r.mk_price)}% less</span></div>`
     : '';
-  const parts = [`${r.repair_type}${v ? ' — ' + v : ''}`, `Nuera price ${moneyExact(r.price)}`];
-  if (hasSave) parts.push(`Mobile Klinik ${moneyExact(r.mk_price)} — I save ${money(Math.round(r.savings))}`);
   const msg = `Hi Nuera Tech! I'd like to book:\n• ${r.repair_type}${v ? ' (' + v + ')' : ''} for my ${model}\n• Your price: ${moneyExact(r.price)}` + (hasSave ? `\n• (Mobile Klinik: ${moneyExact(r.mk_price)} — I save ${money(Math.round(r.savings))})` : '');
   return `<div class="rrow">
     <div class="info">
@@ -300,9 +303,8 @@ function rowHTML(r, model) {
 // ===========================================================================
 // Savings spotlight (interactive bar comparison)
 // ===========================================================================
-function buildSpotlight() {
-  const repairs = state.devices.flatMap((d) => d.repairs);
-  const { top } = computeSavingsStats(repairs);
+function buildSpotlight(stats) {
+  const { top } = stats;
   if (!top.length) return;
 
   const picks = top.slice(0, 6);
@@ -316,7 +318,7 @@ function buildSpotlight() {
     const r = picks[i];
     $('#spot-device').textContent = `${r.model} — ${r.repair_type}`;
     $('#spot-sub').textContent = 'Same quality parts. Same repair. One honest price.';
-    $('#spot-save').innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> You save ${money(Math.round(r.savings))} · ${Math.round((r.savings / r.mk_price) * 100)}% less`;
+    $('#spot-save').innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> You save ${money(Math.round(r.savings))} · ${pctLess(r.savings, r.mk_price)}% less`;
     const max = r.mk_price;
     $('#spot-bars').innerHTML = `
       <div class="bar-row"><span class="bar-name">Mobile Klinik</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100">${moneyExact(r.mk_price)}</div></div></div>

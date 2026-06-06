@@ -12,8 +12,10 @@ const PRECACHE = [
   '/assets/js/app.js',
   '/assets/fonts/inter-var-latin.woff2',
   '/assets/icons/favicon.svg',
+  '/assets/icons/favicon-32.png',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
+  '/assets/icons/maskable-512.png',
   '/assets/icons/apple-touch-icon.png',
   '/manifest.webmanifest',
   '/pricing-data.json',
@@ -43,7 +45,7 @@ self.addEventListener('fetch', (e) => {
 
   // Live pricing: stale-while-revalidate
   if (url.pathname === '/pricing-data.json') {
-    e.respondWith(staleWhileRevalidate(request));
+    e.respondWith(staleWhileRevalidate(e));
     return;
   }
 
@@ -51,7 +53,7 @@ self.addEventListener('fetch', (e) => {
   if (request.mode === 'navigate') {
     e.respondWith(
       fetch(request)
-        .then((res) => { cachePut(SHELL, '/index.html', res.clone()); return res; })
+        .then((res) => { e.waitUntil(cachePut(SHELL, '/index.html', res.clone())); return res; })
         .catch(() => caches.match('/index.html').then((r) => r || caches.match('/')))
     );
     return;
@@ -59,22 +61,28 @@ self.addEventListener('fetch', (e) => {
 
   // Static assets: cache-first with background refresh
   if (url.pathname.startsWith('/assets/')) {
-    e.respondWith(staleWhileRevalidate(request));
+    e.respondWith(staleWhileRevalidate(e));
     return;
   }
 });
 
-function staleWhileRevalidate(request) {
+function staleWhileRevalidate(event) {
+  const request = event.request;
   return caches.open(RUNTIME).then((cache) =>
     cache.match(request).then((cached) => {
       const network = fetch(request)
         .then((res) => { if (res && res.ok) cache.put(request, res.clone()); return res; })
-        .catch(() => cached);
-      return cached || network;
+        .catch(() => null);
+      // Keep the SW alive until the background refresh + cache write completes.
+      event.waitUntil(network);
+      // Serve the RUNTIME copy first, then the install-time precache (SHELL, found
+      // via the cache-name-less global match), then whatever the network returns.
+      return cached || network.then((res) => res || caches.match(request));
     })
   );
 }
 
 function cachePut(cacheName, key, res) {
-  if (res && res.ok) caches.open(cacheName).then((c) => c.put(key, res));
+  if (res && res.ok) return caches.open(cacheName).then((c) => c.put(key, res));
+  return Promise.resolve();
 }
