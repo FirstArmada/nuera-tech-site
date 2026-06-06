@@ -38,7 +38,7 @@ const STYLE = `
   background:linear-gradient(135deg,#8b5cf6,#22d3ee);color:#0b0b12;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.45)}
 .nt-chat-launch svg{width:26px;height:26px}
 .nt-chat-launch:focus-visible{outline:2px solid #c4b5fd;outline-offset:3px}
-.nt-chat-panel{position:fixed;z-index:60;right:18px;bottom:18px;width:min(380px,calc(100vw - 28px));height:min(560px,calc(100vh - 36px));
+.nt-chat-panel{position:fixed;z-index:80;right:18px;bottom:18px;width:min(380px,calc(100vw - 28px));height:min(560px,calc(100vh - 36px));
   display:flex;flex-direction:column;background:#0f0d18;color:#f4f4f8;border:1px solid rgba(255,255,255,.12);
   border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6)}
 .nt-chat-panel[hidden]{display:none}
@@ -84,6 +84,7 @@ function buildLauncher() {
   launchEl.className = 'nt-chat-launch';
   launchEl.setAttribute('aria-label', 'Ask Nuera — repair pricing assistant');
   launchEl.setAttribute('aria-haspopup', 'dialog');
+  launchEl.setAttribute('aria-expanded', 'false');
   launchEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 0 1-.9-3.8A8.38 8.38 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg>';
   launchEl.addEventListener('click', openPanel);
   const fab = document.querySelector('.fab');
@@ -131,6 +132,9 @@ function openPanel() {
   panel.hidden = false;
   state.open = true;
   launchEl.setAttribute('aria-expanded', 'true');
+  // Hide the FAB stack while open so its buttons (WhatsApp / back-to-top / this
+  // launcher) don't overlap the panel's input. Restored on close.
+  toggleFab(false);
   inputEl.focus();
 }
 
@@ -138,7 +142,15 @@ function closePanel() {
   panel.hidden = true;
   state.open = false;
   launchEl.setAttribute('aria-expanded', 'false');
+  toggleFab(true);
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}
+
+// Show/hide the shared .fab stack the launcher lives in (no-op if the launcher
+// was appended straight to <body> because no .fab existed).
+function toggleFab(show) {
+  const fab = launchEl.closest('.fab');
+  if (fab) fab.style.display = show ? '' : 'none';
 }
 
 function addMsg(role, html) {
