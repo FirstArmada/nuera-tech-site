@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="preload" href="pricing-data.json" as="fetch" crossorigin="anonymous">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📲</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nuera Tech | Guelph Phone Repair — Screen & Battery Replacement</title>
   <meta name="description" content="Guelph's fastest phone repair shop. iPhone, Samsung & Pixel screen and battery replacements up to $110 cheaper than Mobile Klinik. Same-day service, 90-day warranty." />
@@ -109,9 +110,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("repair-modal").addEventListener("click", e => {
       if (e.target === e.currentTarget) e.currentTarget.close();
     });
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('repair-modal');if(m&&m.open)m.close();}});
 
     document.querySelector(".modal-close").addEventListener("click", () => {
       document.getElementById("repair-modal").close();
+const opener=document.querySelector('.open-modal[data-model="'+document.getElementById('modal-title').textContent+'"]');if(opener)opener.focus();
     });
 
     document.getElementById('cards').innerHTML = htmlStr;
