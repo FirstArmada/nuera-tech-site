@@ -1,0 +1,7 @@
+# This is a build-less static site — nothing here should be committed.
+node_modules/
+package.json
+package-lock.json
+.vercel/
+.DS_Store
+*.log
