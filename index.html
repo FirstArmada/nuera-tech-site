@@ -123,7 +123,8 @@
     @media (max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
 
     /* Savings spotlight */
-    .spotlight{margin:46px 0 8px}
+    /* margin-inline must stay auto so this .wrap container centres like the other sections (was `0`, which left-pinned it) */
+    .spotlight{margin:46px auto 8px}
     .spot-card{background:linear-gradient(160deg,rgba(139,92,246,.14),rgba(34,211,238,.08) 60%,var(--panel));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:clamp(20px,3vw,34px);box-shadow:var(--shadow);position:relative;overflow:hidden}
     .spot-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
     .spot-device{font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:800;letter-spacing:-.02em}
