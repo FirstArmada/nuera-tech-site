@@ -134,6 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#year').textContent = new Date().getFullYear();
   initReveal();
   initScrollTop();
+  initHeader();
+  initFaq();
   initWhatsAppDefaults();
   initDialog();
   loadData();
@@ -544,6 +546,74 @@ function initScrollTop() {
   const update = () => { btn.classList.toggle('show', window.scrollY > 600); ticking = false; };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   btn.addEventListener('click', () => scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
+}
+
+// ===========================================================================
+// Header: scroll-aware sticky state + mobile menu
+// ===========================================================================
+function initHeader() {
+  const header = $('.header');
+  if (!header) return;
+  let ticking = false;
+  const update = () => { header.classList.toggle('scrolled', window.scrollY > 8); ticking = false; };
+  update();
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+
+  // Mobile menu (no-ops gracefully if the toggle/panel aren't present)
+  const toggle = $('#nav-toggle');
+  const panel = $('#mobile-nav');
+  if (!toggle || !panel) return;
+  const setOpen = (open) => {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    panel.hidden = !open;
+  };
+  toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  panel.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') { setOpen(false); toggle.focus(); }
+  });
+  addEventListener('click', (e) => {
+    if (toggle.getAttribute('aria-expanded') === 'true' && !e.target.closest('#mobile-nav') && !e.target.closest('#nav-toggle')) setOpen(false);
+  });
+}
+
+// ===========================================================================
+// FAQ: accessible, animated accordion (enhances native <details>)
+// ===========================================================================
+function initFaq() {
+  const items = $$('.faq .qa');
+  if (!items.length) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const closeItem = (d) => {
+    $('summary', d).setAttribute('aria-expanded', 'false');
+    const wrap = $('.qa-wrap', d);
+    if (reduce || !wrap) { d.open = false; return; }
+    // Let the 0fr collapse animation play, then drop the [open] attribute.
+    const done = () => { d.open = false; wrap.removeEventListener('transitionend', done); };
+    wrap.addEventListener('transitionend', done);
+    setTimeout(() => { if (d.open) { d.open = false; wrap.removeEventListener('transitionend', done); } }, 350);
+  };
+
+  items.forEach((d) => {
+    const summary = $('summary', d);
+    const wrap = $('.qa-wrap', d);
+    if (wrap && !wrap.id) wrap.id = 'qa-body-' + Math.random().toString(36).slice(2, 8);
+    summary.setAttribute('aria-expanded', d.open ? 'true' : 'false');
+    if (wrap) summary.setAttribute('aria-controls', wrap.id);
+
+    summary.addEventListener('click', (e) => {
+      e.preventDefault(); // we drive open/close so the close can animate
+      if (!d.open) {
+        items.forEach((o) => { if (o !== d && o.open) closeItem(o); });
+        d.open = true;
+        summary.setAttribute('aria-expanded', 'true');
+      } else {
+        closeItem(d);
+      }
+    });
+  });
 }
 
 let revealIO;
