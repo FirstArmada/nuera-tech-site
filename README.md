@@ -20,7 +20,10 @@ pricing-data.json          # 435 repair lines — FETCHED AT RUNTIME, never inli
 manifest.webmanifest       # PWA manifest (installable)
 sw.js                      # Service worker — offline shell + stale-while-revalidate pricing
 robots.txt / sitemap.xml   # SEO
-vercel.json                # Static config: cache + security headers (CSP), cleanUrls
+vercel.json                # Vercel: cache + security headers (CSP), cleanUrls
+wrangler.jsonc             # Cloudflare Workers: assets-only Worker config (build-less)
+_headers                   # Cloudflare: per-path cache + security headers (mirrors vercel.json)
+.assetsignore              # Cloudflare: repo files to exclude from the deployed site
 assets/
   js/app.js                # ES module: fetch → group → render → filter/search → modal → WA
   fonts/inter-var-latin.woff2   # Self-hosted Inter (variable, latin subset, 48 KB)
@@ -67,6 +70,15 @@ npx serve .            # or: python3 -m http.server 8000
 
 ## Deploy
 
-Push to `main` → Vercel builds (static, no build command) and deploys to
-`nuera.talha-k.com`. `vercel.json` sets caching + a strict Content-Security-Policy.
-The `.github/workflows/deploy.yml` mirror copies the full site to the OpenResty box.
+The same static files fan out to several targets — all build-less, no build step:
+
+- **Vercel** (primary) — push to `main` → deploys to `nuera.talha-k.com`.
+  `vercel.json` sets caching + a strict Content-Security-Policy.
+- **Cloudflare Workers** — an assets-only Worker (`wrangler.jsonc`) serves the
+  repo root from Cloudflare's edge. Deploy with `npx wrangler deploy` (leave the
+  build command empty). `_headers` mirrors the cache + security headers from
+  `vercel.json`; `.assetsignore` keeps non-site files (docs, CI config) out of
+  the upload.
+- **OpenResty mirror** — `.github/workflows/deploy.yml` copies the full site to
+  the self-hosted box on every push to `main`.
+- **GitHub Pages** — `.github/workflows/static.yml` publishes the repo to Pages.

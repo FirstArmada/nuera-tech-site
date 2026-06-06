@@ -3,5 +3,6 @@ node_modules/
 package.json
 package-lock.json
 .vercel/
+.wrangler/
 .DS_Store
 *.log

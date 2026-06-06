@@ -20,3 +20,6 @@
 - Hardened delivery via `vercel.json`: per-path caching + strict Content-Security-Policy and security headers.
 - Made all prices and savings stats runtime-derived (Rule 1); structured data is static + a runtime AggregateOffer.
 - Verified: headless render/interaction tests + 0 axe-core WCAG 2.1 A/AA violations.
+
+## Cycle 5
+- Added Cloudflare Workers as a build-less deploy target: an assets-only Worker (`wrangler.jsonc`) serves the repo root from Cloudflare's edge, with `_headers` mirroring the `vercel.json` cache + CSP/security headers and `.assetsignore` keeping non-site files out of the deploy. Deploys via `npx wrangler deploy`.
