@@ -41,7 +41,7 @@ self.addEventListener('fetch', (e) => {
   const { request } = e;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return; // let cross-origin (logo, analytics) pass through
+  if (url.origin !== self.location.origin) return; // let cross-origin (analytics, etc.) pass through
 
   // Live pricing: stale-while-revalidate
   if (url.pathname === '/pricing-data.json') {
