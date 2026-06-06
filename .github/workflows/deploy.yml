@@ -12,7 +12,11 @@ jobs:
 
       - name: Deploy to OpenResty
         run: |
-          cp index.html /opt/1panel/www/sites/nuera/index/index.html
-          cp pricing-data.json /opt/1panel/www/sites/nuera/index/pricing-data.json
+          DEST=/opt/1panel/www/sites/nuera/index
+          mkdir -p "$DEST/assets"
+          # Root files
+          cp index.html pricing-data.json manifest.webmanifest robots.txt sitemap.xml sw.js "$DEST/"
+          # Hashed/static assets (fonts, js, icons)
+          cp -r assets/. "$DEST/assets/"
           docker exec 1Panel-openresty-IATx nginx -s reload
           echo "Deployed at $(date)"
