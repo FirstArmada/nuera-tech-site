@@ -1,0 +1,45 @@
+# Cloudflare static-asset headers for the Nuera Tech site.
+#
+# Mirrors the per-path caching + security headers from vercel.json so the
+# Cloudflare deploy behaves like the Vercel one. Cloudflare consumes this file
+# at deploy time; it is not served as an asset.
+
+# Security headers on every response (mirrors vercel.json "/(.*)").
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' https://talha-k.com data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://vitals.vercel-insights.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests
+
+# Long-cache, immutable static assets.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# App JS revalidates so deploys take effect immediately.
+/assets/js/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Runtime-fetched pricing: short browser cache, longer edge cache, stale-while-revalidate.
+/pricing-data.json
+  Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=86400
+
+# Service worker must always revalidate and is allowed to control the whole origin.
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+  Service-Worker-Allowed: /
+
+# PWA manifest.
+/manifest.webmanifest
+  Cache-Control: public, max-age=3600
+  Content-Type: application/manifest+json; charset=utf-8
+
+# HTML shell always revalidates (mirrors vercel.json "/(index.html)?").
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

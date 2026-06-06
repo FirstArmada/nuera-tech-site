@@ -1,0 +1,28 @@
+# Files that live in the repo root but are NOT part of the deployed site.
+# `wrangler.jsonc` serves the whole repo root ("." ) as static assets, so
+# anything here that isn't the site itself must be excluded from the upload.
+# Patterns use .gitignore syntax (matched anywhere in the tree).
+# Note: `_headers` is consumed by Cloudflare (not served) and must NOT be listed.
+
+# Version control, tooling & dependencies
+.git
+.github
+.wrangler
+node_modules
+
+# Agent / editor / CI config
+.claude
+.jules
+
+# Wrangler + ignore config (consumed at deploy time, never served)
+wrangler.jsonc
+.assetsignore
+.gitignore
+
+# Repo docs & other-platform config
+README.md
+changelog-agent.md
+vercel.json
+
+# Logs
+*.log

@@ -1,0 +1,21 @@
+{
+  // Cloudflare Workers config for the Nuera Tech static site.
+  //
+  // This is an *assets-only* Worker: there is no Worker script (`main`), so
+  // Cloudflare serves the files in `assets.directory` straight from its edge.
+  // That keeps the site build-less — the exact same files that ship to Vercel,
+  // the OpenResty mirror and GitHub Pages are uploaded as-is, no bundler.
+  //
+  // Deploy: `npx wrangler deploy`  (no build command — nothing to build).
+  "name": "nuera-tech-site",
+  "compatibility_date": "2025-06-06",
+  "assets": {
+    // Serve straight from the repo root. `.assetsignore` excludes the repo
+    // files that aren't part of the site (docs, CI config, this file, etc.).
+    "directory": "./",
+    // Clean URLs: serve `index.html` at `/` and `/foo.html` at `/foo`.
+    "html_handling": "auto-trailing-slash",
+    // No SPA fallback — unknown paths return a real 404 (correct for SEO).
+    "not_found_handling": "none"
+  }
+}
