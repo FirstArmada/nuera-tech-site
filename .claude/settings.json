@@ -4,6 +4,17 @@
       "mcp__github__pull_request_read"
     ]
   },
+  "extraKnownMarketplaces": {
+    "interface-design": {
+      "source": {
+        "source": "github",
+        "repo": "Dammyjay93/interface-design"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "interface-design@interface-design": true
+  },
   "hooks": {
     "SessionStart": [
       {
