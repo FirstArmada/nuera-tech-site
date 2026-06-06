@@ -160,16 +160,37 @@
     @media (prefers-reduced-motion:reduce){.btn:hover{transform:none}}
 
     /* Header */
-    .header{position:sticky;top:0;z-index:60;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(7,7,12,.62);border-bottom:1px solid var(--border)}
+    .header{position:sticky;top:0;z-index:60;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(7,7,12,.62);border-bottom:1px solid var(--border);transition:background .25s ease,box-shadow .25s ease,border-color .25s ease}
+    .header.scrolled{background:rgba(7,7,12,.86);border-bottom-color:var(--border-2);box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
     .header-in{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:var(--header-h)}
-    .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1}
+    .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1;flex:none}
     .brand-sprite{position:absolute;width:0;height:0;overflow:hidden}
     .brand-mark{height:1.6em;width:1.6em;flex:none;display:block}
     .brand-name{font-weight:800;letter-spacing:-.02em;white-space:nowrap}
     .brand-name .t{color:var(--cyan)}
-    .brand-meta{color:var(--muted);font-size:.82rem;display:none}
-    @media (min-width:760px){.brand-meta{display:block}}
     .header .btn{padding:10px 16px;min-height:40px;font-size:.92rem}
+    @media (max-width:999.98px){.header .btn{margin-left:auto}}
+    @media (max-width:599.98px){.header .btn-wa .cta-label{display:none}.header .btn-wa{padding:10px 13px}}
+    /* location/warranty pill */
+    .hpill{display:none;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:#dbe3f4;font-size:.8rem;font-weight:600;white-space:nowrap}
+    .hpill svg{width:14px;height:14px;color:var(--cyan);flex:none}
+    .hpill-dot{width:3px;height:3px;border-radius:50%;background:var(--faint);flex:none}
+    @media (min-width:760px){.hpill{display:inline-flex}}
+    @media (max-width:860px) and (min-width:760px){.hpill .hpill-seg-opt{display:none}}
+    /* desktop nav */
+    .hnav{display:none;gap:6px;margin-left:auto}
+    .hnav a{color:#cdd6e8;text-decoration:none;font-weight:600;font-size:.92rem;padding:8px 12px;border-radius:999px;transition:background .15s,color .15s}
+    .hnav a:hover{background:var(--panel-2);color:#fff}
+    @media (min-width:1000px){.hnav{display:flex}.hpill{margin-left:6px}}
+    /* hamburger + mobile panel */
+    .hburger{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-2);color:var(--text);cursor:pointer}
+    .hburger svg{width:22px;height:22px}
+    .hburger:focus-visible{outline:none;box-shadow:var(--ring)}
+    @media (min-width:1000px){.hburger{display:none}}
+    .mobile-nav{position:absolute;top:var(--header-h);left:0;right:0;display:flex;flex-direction:column;gap:4px;padding:8px clamp(16px,4vw,28px) 14px;border-top:1px solid var(--border);background:rgba(7,7,12,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+    .mobile-nav[hidden]{display:none}
+    .mobile-nav a{color:#e7ecf7;text-decoration:none;font-weight:700;padding:12px 10px;border-radius:12px;min-height:46px;display:flex;align-items:center}
+    .mobile-nav a:hover{background:var(--panel-2)}
 
     /* Hero */
     .hero{padding:clamp(40px,7vw,78px) 0 12px}
@@ -262,50 +283,83 @@
     .errorbox{color:var(--red)}
 
     /* Feature + steps */
-    .features,.steps{display:grid;gap:16px;margin-top:18px}
+    .features,.steps{display:grid;gap:18px;margin-top:22px}
     .features{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
     .steps{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-    .feature,.step{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);border-radius:var(--radius);padding:24px}
-    .feature .ic{display:inline-flex;width:46px;height:46px;align-items:center;justify-content:center;border-radius:14px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.25);margin-bottom:14px}
-    .feature .ic svg{width:24px;height:24px;color:var(--cyan)}
-    .feature h3,.step h3{margin:0 0 8px;font-size:1.12rem}
+    .feature,.step{position:relative;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+    .feature:hover,.step:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.5);box-shadow:0 24px 56px -26px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.22)}
+    @media (prefers-reduced-motion:reduce){.feature:hover,.step:hover{transform:none}}
+    .feature .ic,.step .ic{display:inline-flex;width:46px;height:46px;align-items:center;justify-content:center;border-radius:14px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.25);margin-bottom:14px}
+    .feature .ic svg,.step .ic svg{width:24px;height:24px;color:var(--cyan)}
+    .feature h3,.step h3{margin:0 0 8px;font-size:1.12rem;letter-spacing:-.01em}
     .feature p,.step p{margin:0;color:var(--muted);line-height:1.55}
-    .step .step-n{font-size:.78rem;font-weight:800;letter-spacing:.1em;color:var(--purple-lt);text-transform:uppercase}
+    .step .ic{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.28)}
+    .step .ic svg{color:var(--purple-lt)}
+    .step .step-n{position:absolute;top:16px;right:18px;display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:999px;font-size:.78rem;font-weight:800;color:var(--purple-lt);background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.32)}
+    .features .reveal:nth-child(1),.steps .reveal:nth-child(1){transition-delay:0s}
+    .features .reveal:nth-child(2),.steps .reveal:nth-child(2){transition-delay:.08s}
+    .features .reveal:nth-child(3),.steps .reveal:nth-child(3){transition-delay:.16s}
+    .features .reveal:nth-child(4),.steps .reveal:nth-child(4){transition-delay:.24s}
 
     /* CTA banner */
     .cta{margin:54px 0;background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(34,211,238,.14) 70%,var(--panel));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:clamp(28px,4vw,48px);box-shadow:var(--shadow);text-align:center}
-    .cta h2{margin:0 auto .6em;max-width:22ch}
-    .cta p{color:#d7deee;max-width:54ch;margin:0 auto 24px;font-size:1.05rem}
+    .cta .eyebrow{justify-content:center}
+    .cta h2{margin:.4em auto .5em;max-width:22ch}
+    .cta p{color:#d7deee;max-width:54ch;margin:0 auto;font-size:1.05rem}
+    .cta-trust{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px auto 24px}
+    .cta-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border-2);color:#dbe3f4;font-size:.84rem;font-weight:700}
+    .cta-chip svg{width:15px;height:15px;color:var(--green-lt);flex:none}
+    .btn-cta{margin-inline:auto;font-size:1.02rem;padding:15px 28px;min-height:52px}
+    .cta .cta-fine{color:var(--muted);font-size:.84rem;margin:14px auto 0;opacity:.9}
 
     /* FAQ */
-    .faq{display:grid;gap:10px;margin-top:18px;max-width:840px}
-    details{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
-    details[open]{border-color:var(--border-2)}
-    summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    summary::-webkit-details-marker{display:none}
-    summary::after{content:"+";font-size:1.4rem;font-weight:400;color:var(--muted);transition:transform .2s}
-    details[open] summary::after{transform:rotate(45deg)}
-    details .body{padding:0 20px 18px;color:var(--muted);line-height:1.6}
+    .faq{display:grid;gap:10px;margin-top:22px;max-width:840px}
+    .qa{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:border-color .2s ease,background .2s ease}
+    .qa[open]{border-color:var(--border-2);background:var(--panel-2)}
+    .qa summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px}
+    .qa summary::-webkit-details-marker{display:none}
+    .qa summary:focus-visible{outline:none;box-shadow:var(--ring)}
+    .qa-ic{position:relative;flex:none;width:18px;height:18px}
+    .qa-ic::before,.qa-ic::after{content:"";position:absolute;left:50%;top:50%;background:var(--muted);border-radius:2px;transition:transform .25s ease,opacity .25s ease}
+    .qa-ic::before{width:14px;height:2px;transform:translate(-50%,-50%)}
+    .qa-ic::after{width:2px;height:14px;transform:translate(-50%,-50%)}
+    .qa[open] .qa-ic::after{transform:translate(-50%,-50%) rotate(90deg);opacity:0}
+    .qa-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
+    .qa[open] .qa-wrap{grid-template-rows:1fr}
+    .qa-wrap>.body{overflow:hidden;min-height:0}
+    .qa .body{padding:0 20px 18px;color:var(--muted);line-height:1.6}
+    @media (prefers-reduced-motion:reduce){.qa-wrap,.qa-ic::before,.qa-ic::after{transition:none}}
 
     /* Footer */
-    footer{border-top:1px solid var(--border);margin-top:40px;padding:40px 0 120px;color:var(--muted)}
-    .foot-grid{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-start}
+    footer{border-top:1px solid var(--border);margin-top:40px;padding:48px 0 120px;color:var(--muted)}
+    .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1.3fr;gap:32px;align-items:start}
+    .foot-col{min-width:0}
     .foot-brand .brand{font-size:1.08rem;margin-bottom:10px}
+    .foot-h{margin:0 0 12px;font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
     footer a{color:#cdd6e8;text-decoration:none}
     footer a:hover{color:#fff;text-decoration:underline}
-    .foot-links{display:flex;flex-direction:column;gap:8px;font-size:.92rem}
-    .foot-bottom{margin-top:28px;font-size:.84rem;opacity:.75}
+    .foot-links{display:flex;flex-direction:column;gap:9px;font-size:.92rem}
+    .foot-loc{display:inline-flex;align-items:center;gap:7px}
+    .foot-loc svg{width:15px;height:15px;color:var(--cyan);flex:none}
+    .foot-bottom{margin-top:32px;font-size:.84rem;opacity:.75}
+    @media (max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:520px){.foot-grid{grid-template-columns:1fr}}
 
     /* Floating actions */
-    .fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:linear-gradient(100deg,#25d366,#1fb358);color:#04130c;font-weight:800;text-decoration:none;box-shadow:0 14px 34px -8px rgba(37,211,102,.6)}
+    .fab{position:fixed;right:clamp(14px,3vw,22px);bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:linear-gradient(100deg,#25d366,#1fb358);color:#04130c;font-weight:800;text-decoration:none;box-shadow:0 14px 34px -8px rgba(37,211,102,.6);transition:transform .18s ease,box-shadow .18s ease}
     .fab-wa svg{width:22px;height:22px}
     .fab-wa .fab-txt{display:none}
     @media (min-width:560px){.fab-wa .fab-txt{display:inline}}
-    .fab-top{width:44px;height:44px;align-self:flex-end;border:0;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .25s,transform .25s;backdrop-filter:blur(10px)}
+    .fab-wa:hover{transform:translateY(-2px);box-shadow:0 18px 42px -8px rgba(37,211,102,.7)}
+    .fab-wa:active{transform:translateY(0) scale(.97);box-shadow:0 8px 20px -8px rgba(37,211,102,.6)}
+    .fab-wa:focus-visible{outline:none;box-shadow:var(--ring),0 14px 34px -8px rgba(37,211,102,.6)}
+    .fab-top{width:44px;height:44px;align-self:flex-end;border:0;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .25s,transform .25s,background .18s;backdrop-filter:blur(10px)}
     .fab-top.show{opacity:1;transform:none;pointer-events:auto}
-    .fab-wa:hover{transform:translateY(-2px)}
-    @media (prefers-reduced-motion:reduce){.fab-wa:hover{transform:none}}
+    .fab-top:hover{background:rgba(255,255,255,.16)}
+    .fab-top:active{transform:scale(.94)}
+    .fab-top:focus-visible{outline:none;box-shadow:var(--ring)}
+    @media (prefers-reduced-motion:reduce){.fab-wa:hover,.fab-wa:active,.fab-top:active{transform:none}}
 
     /* Dialog (device detail) */
     dialog{padding:0;border:0;background:transparent;max-width:none;max-height:none;color:var(--text)}
@@ -458,12 +512,34 @@
         <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
         <span class="brand-name">Nuera <span class="t">Tech</span></span>
       </a>
-      <span class="brand-meta">Guelph, ON · Same-day repairs · 90-day warranty</span>
-      <a class="btn btn-wa" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener">
+      <span class="hpill" aria-label="Guelph, Ontario. Same-day repairs. 90-day warranty.">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Guelph, ON</span>
+        <span class="hpill-dot" aria-hidden="true"></span>
+        <span class="hpill-seg-opt">Same-day</span>
+        <span class="hpill-dot hpill-seg-opt" aria-hidden="true"></span>
+        <span>90-day warranty</span>
+      </span>
+      <nav class="hnav" aria-label="Primary">
+        <a href="#finder">Pricing</a>
+        <a href="#why">Why Nuera</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn-wa" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener" aria-label="Book on WhatsApp">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
-        <span>Book on WhatsApp</span>
+        <span class="cta-label">Book on WhatsApp</span>
       </a>
+      <button class="hburger" id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
     </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile" hidden>
+      <a href="#finder">Pricing</a>
+      <a href="#why">Why Nuera</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
   </header>
 
   <main id="main">
@@ -539,22 +615,22 @@
       <span class="eyebrow">Why Nuera</span>
       <h2 id="why-h">Built for speed, trust &amp; honest pricing</h2>
       <div class="features">
-        <div class="feature">
+        <div class="feature reveal">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></span>
           <h3>Same-day repairs</h3>
           <p>Most screen and battery jobs are done in under two hours, so you're back to your day fast.</p>
         </div>
-        <div class="feature">
+        <div class="feature reveal">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
           <h3>90-day warranty</h3>
           <p>Parts and labour covered for 90 days. No fine print, no mall-chain runaround.</p>
         </div>
-        <div class="feature">
+        <div class="feature reveal">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
           <h3>Transparent pricing</h3>
           <p>Every price is published — with the Mobile Klinik comparison where we have it. What you see is what you pay.</p>
         </div>
-        <div class="feature">
+        <div class="feature reveal">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></span>
           <h3>Quality parts</h3>
           <p>Premium aftermarket and OEM-grade parts matched to your device — clearly labelled per repair.</p>
@@ -567,21 +643,43 @@
       <span class="eyebrow">How it works</span>
       <h2 id="how-h">Three steps to a fixed phone</h2>
       <div class="steps">
-        <div class="step"><div class="step-n">Step 1</div><h3>Find your price</h3><p>Search your device and see the exact repair price — plus how much you save vs Mobile Klinik.</p></div>
-        <div class="step"><div class="step-n">Step 2</div><h3>Book on WhatsApp</h3><p>Tap Book and send the pre-filled message. We confirm price and timing in minutes.</p></div>
-        <div class="step"><div class="step-n">Step 3</div><h3>Same-day fix</h3><p>Drop by our Guelph shop. Most repairs are ready the same day, backed by a 90-day warranty.</p></div>
+        <div class="step reveal">
+          <span class="step-n">1</span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <h3>Find your price</h3>
+          <p>Search your device and see the exact repair price — plus how much you save vs Mobile Klinik.</p>
+        </div>
+        <div class="step reveal">
+          <span class="step-n">2</span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg></span>
+          <h3>Book on WhatsApp</h3>
+          <p>Tap Book and send the pre-filled message. We confirm price and timing in minutes.</p>
+        </div>
+        <div class="step reveal">
+          <span class="step-n">3</span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
+          <h3>Same-day fix</h3>
+          <p>Drop by our Guelph shop. Most repairs are ready the same day, backed by a 90-day warranty.</p>
+        </div>
       </div>
     </section>
 
     <!-- CTA BANNER -->
     <section class="wrap reveal">
       <div class="cta">
+        <span class="eyebrow">Save today</span>
         <h2 id="cta-headline">Why pay Mobile Klinik more?</h2>
         <p id="cta-sub">Same quality parts. Honest pricing. You just don't pay for their mall rent. Find your device and book in under a minute.</p>
-        <a class="btn btn-wa" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener" style="margin-inline:auto">
+        <div class="cta-trust" aria-label="Why choose Nuera">
+          <span class="cta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg> 90-day warranty</span>
+          <span class="cta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Same-day, under 2 hrs</span>
+          <span class="cta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Transparent pricing</span>
+        </div>
+        <a class="btn btn-wa btn-cta" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
           Book your repair now
         </a>
+        <p class="cta-fine">Free quote on WhatsApp · No appointment needed</p>
       </div>
     </section>
 
@@ -590,35 +688,55 @@
       <span class="eyebrow">Good to know</span>
       <h2 id="faq-h">Frequently asked questions</h2>
       <div class="faq">
-        <details><summary>How long does a repair take?</summary><div class="body">Most common repairs — iPhone and Samsung screens or batteries — are done the same day, usually within about two hours. We'll give you an exact turnaround when you book.</div></details>
-        <details><summary>Are you really cheaper than Mobile Klinik?</summary><div class="body">Yes. On comparable repairs we show both prices side by side, and we're consistently cheaper — up to $115 less on popular iPhone screen replacements. No mall-rent overhead means a lower price for you.</div></details>
-        <details><summary>What's covered by the warranty?</summary><div class="body">Every repair includes a 90-day warranty on parts and labour. If something related to the repair fails in that window, we make it right.</div></details>
-        <details><summary>Which devices do you repair?</summary><div class="body">iPhone, Samsung Galaxy phones and tablets, Google Pixel, and iPad — screens, batteries, back glass and charge ports. Search your exact model above for live pricing.</div></details>
-        <details><summary>How do I book?</summary><div class="body">Find your device, open it, and tap <em>Book on WhatsApp</em>. Your message is pre-filled with the device and repair so we can confirm in seconds.</div></details>
-        <details><summary>Will my data be safe?</summary><div class="body">Screen, battery, back glass and charge-port repairs don't require wiping your device. We recommend a backup before any repair as good practice, and we never access personal data.</div></details>
+        <details class="qa">
+          <summary><span>How long does a repair take?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <div class="qa-wrap"><div class="body">Most common repairs — iPhone and Samsung screens or batteries — are done the same day, usually within about two hours. We'll give you an exact turnaround when you book.</div></div>
+        </details>
+        <details class="qa">
+          <summary><span>Are you really cheaper than Mobile Klinik?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <div class="qa-wrap"><div class="body">Yes. On comparable repairs we show both prices side by side, and we're consistently cheaper — up to $115 less on popular iPhone screen replacements. No mall-rent overhead means a lower price for you.</div></div>
+        </details>
+        <details class="qa">
+          <summary><span>What's covered by the warranty?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <div class="qa-wrap"><div class="body">Every repair includes a 90-day warranty on parts and labour. If something related to the repair fails in that window, we make it right.</div></div>
+        </details>
+        <details class="qa">
+          <summary><span>Which devices do you repair?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <div class="qa-wrap"><div class="body">iPhone, Samsung Galaxy phones and tablets, Google Pixel, and iPad — screens, batteries, back glass and charge ports. Search your exact model above for live pricing.</div></div>
+        </details>
+        <details class="qa">
+          <summary><span>How do I book?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <div class="qa-wrap"><div class="body">Find your device, open it, and tap <em>Book on WhatsApp</em>. Your message is pre-filled with the device and repair so we can confirm in seconds.</div></div>
+        </details>
+        <details class="qa">
+          <summary><span>Will my data be safe?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <div class="qa-wrap"><div class="body">Screen, battery, back glass and charge-port repairs don't require wiping your device. We recommend a backup before any repair as good practice, and we never access personal data.</div></div>
+        </details>
       </div>
     </section>
   </main>
 
   <footer>
     <div class="wrap foot-grid">
-      <div class="foot-brand">
+      <div class="foot-col foot-brand">
         <span class="brand">
           <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
           <span class="brand-name">Nuera <span class="t">Tech</span></span>
         </span>
         <p class="lead-muted">Honest, same-day phone &amp; tablet repair in Guelph, Ontario.</p>
       </div>
-      <nav class="foot-links" aria-label="Footer">
+      <nav class="foot-col foot-links" aria-label="Footer">
+        <h4 class="foot-h">Explore</h4>
         <a href="#finder">Pricing</a>
         <a href="#why">Why Nuera</a>
         <a href="#how">How it works</a>
         <a href="#faq">FAQ</a>
       </nav>
-      <div class="foot-links">
+      <div class="foot-col foot-links">
+        <h4 class="foot-h">Contact</h4>
         <a data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener">WhatsApp: +1 226 978 4666</a>
         <a href="https://www.instagram.com/nueratech" target="_blank" rel="noopener">Instagram: @nueratech</a>
-        <span>Guelph, Ontario, Canada</span>
+        <span class="foot-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Guelph, Ontario, Canada</span>
       </div>
     </div>
     <div class="wrap foot-bottom">© <span id="year">2026</span> Nuera Tech · Guelph, ON · Prices in CAD, updated live.</div>
