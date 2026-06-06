@@ -263,8 +263,8 @@ function buildFilters() {
   });
 
   // Keyboard: arrow keys move focus + select within each radiogroup (roving tabindex).
-  wireRoving(brandWrap, (btn) => { state.brand = btn.dataset.brand; setPressed(brandWrap, btn); renderGrid(); });
-  wireRoving(typeWrap, (btn) => { state.type = btn.dataset.type; setPressed(typeWrap, btn); renderGrid(); });
+  wireRoving(brandWrap, (btn) => { state.brand = btn.dataset.brand; setPressed(brandWrap, btn); renderGrid(); resetFinderScroll(); });
+  wireRoving(typeWrap, (btn) => { state.type = btn.dataset.type; setPressed(typeWrap, btn); renderGrid(); resetFinderScroll(); });
 
   // search
   const input = $('#search');
@@ -318,7 +318,12 @@ function resetFinderScroll() {
   const finder = $('#finder');
   if (!finder) return;
   const margin = parseFloat(getComputedStyle(finder).scrollMarginTop) || 0; // clears the sticky header
-  const target = Math.max(0, finder.getBoundingClientRect().top + window.scrollY - margin);
+  // Use the layout offset (offsetTop chain), not getBoundingClientRect: the latter includes the
+  // .reveal translateY(22px) transform, which skews the target until the section's reveal
+  // animation has settled. offsetTop is transform-independent, so we always land on the heading.
+  let target = 0;
+  for (let n = finder; n; n = n.offsetParent) target += n.offsetTop;
+  target = Math.max(0, target - margin);
   if (window.scrollY <= target) return;
   window.scrollTo({ top: target, behavior: reduceMotion() ? 'auto' : 'smooth' });
 }
