@@ -1,0 +1,40 @@
+name: Verify
+
+# Quality gate for the build-less static site: validates the runtime artifacts,
+# drives the real user flows in headless Chromium, and runs an axe-core WCAG 2.1
+# A/AA audit. Mirrors the local verification documented in the run-* skill and
+# STYLEGUIDE.md so regressions are caught on every PR.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate artifacts (JSON + JS syntax)
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('pricing-data.json','utf8')); JSON.parse(require('fs').readFileSync('manifest.webmanifest','utf8')); console.log('JSON OK')"
+          node --check sw.js
+          tmp=$(mktemp --suffix=.mjs); cp assets/js/app.js "$tmp"; node --check "$tmp"; rm -f "$tmp"
+          tmp=$(mktemp --suffix=.mjs); cp assets/js/chat.js "$tmp"; node --check "$tmp"; rm -f "$tmp"
+          echo "JS OK"
+
+      - name: Install Playwright (+ Chromium) and axe-core
+        run: |
+          npm install -g playwright axe-core
+          playwright install --with-deps chromium
+
+      - name: User-flow checks (Playwright driver)
+        run: NODE_PATH="$(npm root -g)" node .claude/skills/run-nuera-tech-site/driver.cjs
+
+      - name: Accessibility audit (axe-core WCAG 2.1 A/AA)
+        run: NODE_PATH="$(npm root -g)" node tests/a11y.cjs

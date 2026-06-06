@@ -19,6 +19,24 @@ const COLUMN_MAP = {
 export const BRANDS = ['iphone', 'samsung', 'pixel', 'ipad', 'samsung-tab'];
 export const CHIPS = ['screen', 'battery', 'backglass', 'chargeport'];
 export const round2 = (n) => Math.round(n * 100) / 100;
+export const pctLess = (saved, base) => Math.round((saved / base) * 100);
+
+// Precompute the savings view-model the site renders (hero stats, CTA copy, the
+// spotlight's top comparisons) so the browser doesn't re-derive it on every load.
+// Mirrors app.js computeSavingsStats exactly; app.js falls back to deriving when absent.
+export function computeStats(repairs) {
+  const withMk = repairs.filter((r) => r.mk_price != null && r.mk_price > 0 && r.savings != null);
+  const maxSaving = withMk.length ? Math.max(...withMk.map((r) => r.savings)) : 0;
+  const avgPct = withMk.length
+    ? Math.round(withMk.reduce((a, r) => a + pctLess(r.savings, r.mk_price), 0) / withMk.length)
+    : 0;
+  const top = [...withMk]
+    .sort((a, b) => b.savings - a.savings)
+    .slice(0, 6)
+    .map(({ model, repair_type, chip, price, mk_price, savings }) =>
+      ({ model, repair_type, chip, price, mk_price, savings }));
+  return { maxSaving, avgPct, top };
+}
 
 function num(v) {
   if (v === '' || v == null) return null;
@@ -69,5 +87,5 @@ export function transform(rows, { date = new Date().toISOString().slice(0, 10) }
       sku: String(row[COLUMN_MAP.sku] || '').trim(),
     });
   }
-  return { generated: date, source: 'Google Sheets — Master Price List', repairs };
+  return { generated: date, source: 'Google Sheets — Master Price List', repairs, stats: computeStats(repairs) };
 }
