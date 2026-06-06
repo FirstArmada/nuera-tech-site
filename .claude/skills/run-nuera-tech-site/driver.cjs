@@ -136,11 +136,14 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     }
 
     console.log('\n[3] Brand filter (iPhone)');
+    // The grid renders all cards once and filters by toggling [hidden], so the
+    // assertions below count VISIBLE cards (:visible); a raw '.card' count would
+    // always return the full catalogue regardless of the active filter.
     const iphonePillCnt = (await page.locator('[data-brand="iphone"] .cnt').textContent() || '').trim();
     await page.locator('[data-brand="iphone"]').click();
     await page.waitForTimeout(150);
-    const afterBrand = await page.locator('#grid .card').count();
-    const allIphone = await page.locator('#grid .card .brand-tag').evaluateAll((els) => els.every((e) => e.textContent.trim() === 'iPhone'));
+    const afterBrand = await page.locator('#grid .card:visible').count();
+    const allIphone = await page.locator('#grid .card:visible .brand-tag').evaluateAll((els) => els.every((e) => e.textContent.trim() === 'iPhone'));
     check('iPhone filter count matches pill', String(afterBrand) === iphonePillCnt, `${afterBrand} cards, pill says ${iphonePillCnt}`);
     check('all filtered cards are iPhone', allIphone && afterBrand > 0);
     await page.locator('[data-brand="all"]').click();
@@ -149,7 +152,7 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     console.log('\n[4] Type filter (Back Glass)');
     await page.locator('[data-type="backglass"]').click();
     await page.waitForTimeout(150);
-    const afterType = await page.locator('#grid .card').count();
+    const afterType = await page.locator('#grid .card:visible').count();
     check('back-glass filter narrows grid', afterType > 0 && afterType < cardCount, `${afterType} of ${cardCount}`);
     await page.locator('[data-type="all"]').click();
     await page.waitForTimeout(100);
@@ -157,8 +160,8 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     console.log('\n[5] Search (debounced) -> iPhone 12 Mini');
     await page.locator('#search').fill('iPhone 12 Mini');
     await page.waitForTimeout(300);
-    const searchCards = await page.locator('#grid .card').count();
-    const firstModel = (await page.locator('#grid .card .card-model').first().textContent() || '').trim();
+    const searchCards = await page.locator('#grid .card:visible').count();
+    const firstModel = (await page.locator('#grid .card:visible .card-model').first().textContent() || '').trim();
     check('search narrows to the model', searchCards >= 1 && firstModel === 'iPhone 12 Mini', `${searchCards} card(s), first="${firstModel}"`);
 
     console.log('\n[6] Open device modal + switch screen tier');
