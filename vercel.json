@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "pricing-data.json", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/pricing-data.json", "dest": "/pricing-data.json" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
