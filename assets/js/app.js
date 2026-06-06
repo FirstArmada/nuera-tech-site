@@ -165,9 +165,10 @@ async function loadData() {
     console.error('[nuera] failed to load pricing:', err);
     grid.setAttribute('aria-busy', 'false');
     grid.innerHTML = `<div class="errorbox">
-      <p style="font-weight:700;font-size:1.05rem">We couldn't load live pricing right now.</p>
+      <span class="empty-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
+      <p class="empty-title">We couldn't load live pricing.</p>
       <p style="color:var(--muted)">Please refresh, or message us and we'll quote you directly.</p>
-      <a class="btn btn-wa" style="margin-top:14px" href="${waLink("Hi Nuera Tech! I'd like a repair quote.")}" target="_blank" rel="noopener">Message us on WhatsApp</a>
+      <a class="btn btn-wa" href="${waLink("Hi Nuera Tech! I'd like a repair quote.")}" target="_blank" rel="noopener">Message us on WhatsApp</a>
     </div>`;
     $('#result-count').textContent = 'Pricing unavailable';
   }
@@ -237,13 +238,13 @@ function buildFilters() {
   const brandWrap = $('#brand-filters');
   brandWrap.innerHTML = BRANDS
     .filter((b) => b.id === 'all' || state.devices.some((d) => d.brand === b.id))
-    .map((b) => `<button class="pill" type="button" role="button" data-brand="${b.id}" aria-pressed="${b.id === 'all'}">${b.label}<span class="cnt">${counts('brand', b.id)}</span></button>`)
+    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-pressed="${b.id === 'all'}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${counts('brand', b.id)}</span></button>`)
     .join('');
 
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
     .filter((t) => t.id === 'all' || state.devices.some((d) => d.types.has(t.id)))
-    .map((t) => `<button class="pill rt" type="button" role="button" data-type="${t.id}" aria-pressed="${t.id === 'all'}">${t.label}</button>`)
+    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-pressed="${t.id === 'all'}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
     .join('');
 
   brandWrap.addEventListener('click', (e) => {
@@ -260,6 +261,10 @@ function buildFilters() {
     renderGrid();
     resetFinderScroll();
   });
+
+  // Keyboard: arrow keys move focus + select within each radiogroup (roving tabindex).
+  wireRoving(brandWrap, (btn) => { state.brand = btn.dataset.brand; setPressed(brandWrap, btn); renderGrid(); });
+  wireRoving(typeWrap, (btn) => { state.type = btn.dataset.type; setPressed(typeWrap, btn); renderGrid(); });
 
   // search
   const input = $('#search');
@@ -278,7 +283,31 @@ function buildFilters() {
 }
 
 function setPressed(wrap, active) {
-  $$('.pill', wrap).forEach((p) => p.setAttribute('aria-pressed', String(p === active)));
+  $$('.pill', wrap).forEach((p) => {
+    const on = p === active;
+    p.setAttribute('aria-pressed', String(on)); // visual hook (CSS) — kept
+    p.setAttribute('aria-checked', String(on)); // radio semantics
+    p.tabIndex = on ? 0 : -1;                    // roving tabindex
+  });
+}
+
+// Roving-tabindex keyboard nav for a single-select pill radiogroup. Selection
+// follows focus (WAI-ARIA radio pattern); mouse + Enter/Space keep the click path.
+function wireRoving(wrap, onSelect) {
+  wrap.addEventListener('keydown', (e) => {
+    const pills = $$('.pill', wrap);
+    const i = pills.indexOf(document.activeElement);
+    if (i < 0) return;
+    let j = i;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') j = (i + 1) % pills.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') j = (i - 1 + pills.length) % pills.length;
+    else if (e.key === 'Home') j = 0;
+    else if (e.key === 'End') j = pills.length - 1;
+    else return;
+    e.preventDefault();
+    pills[j].focus();
+    onSelect(pills[j]);
+  });
 }
 
 // Changing a filter re-renders the grid in place, but the window keeps its scroll
@@ -295,41 +324,57 @@ function resetFinderScroll() {
 }
 
 // ===========================================================================
-// Grid
+// Grid — build all cards once, then filter by toggling [hidden] (instant, no re-parse)
 // ===========================================================================
+let cardEls = null; // Map<model, HTMLElement>, built once
+let emptyEl = null; // reused empty-state node
+
 function renderGrid() {
   const grid = $('#grid');
   const { brand, type, q } = state;
-  const list = state.devices.filter((d) =>
-    (brand === 'all' || d.brand === brand) &&
-    (type === 'all' || d.types.has(type)) &&
-    (!q || d.search.includes(q)));
 
-  grid.setAttribute('aria-busy', 'false');
-  if (!list.length) {
-    grid.innerHTML = `<div class="empty">
-      <p style="font-weight:700;font-size:1.1rem;color:var(--text)">No devices match.</p>
-      <p>Try a different model, or message us — we repair more than we can list.</p>
-      <a class="btn btn-wa" style="margin-top:14px" href="${waLink('Hi Nuera Tech! Do you repair: ' + (q || 'my device') + '?')}" target="_blank" rel="noopener">Ask on WhatsApp</a>
-    </div>`;
-  } else {
-    grid.innerHTML = list.map(cardHTML).join('');
+  if (!cardEls) {
+    grid.innerHTML = state.devices.map(cardHTML).join('');
+    cardEls = new Map();
+    $$('.card', grid).forEach((el) => cardEls.set(el.dataset.model, el));
+    grid.setAttribute('aria-busy', 'false');
+    observeReveal(grid); // observe once; the observation persists across hide/show
   }
-  observeReveal(grid);
+
+  let shown = 0;
+  for (const d of state.devices) {
+    const match = (brand === 'all' || d.brand === brand)
+      && (type === 'all' || d.types.has(type))
+      && (!q || d.search.includes(q));
+    const el = cardEls.get(d.model);
+    if (el) { el.hidden = !match; if (match) shown++; }
+  }
+
+  if (!shown) {
+    if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
+    emptyEl.innerHTML = `
+      <span class="empty-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+      <p class="empty-title">No devices match.</p>
+      <p>Try a different model, or message us — we repair more than we can list.</p>
+      <a class="btn btn-wa" href="${waLink('Hi Nuera Tech! Do you repair: ' + (state.q || 'my device') + '?')}" target="_blank" rel="noopener">Ask on WhatsApp</a>`;
+    if (!emptyEl.isConnected) grid.appendChild(emptyEl);
+  } else if (emptyEl && emptyEl.isConnected) {
+    emptyEl.remove();
+  }
 
   const count = $('#result-count');
-  count.textContent = list.length
-    ? `${list.length} device${list.length === 1 ? '' : 's'}`
+  count.textContent = shown
+    ? `${shown} device${shown === 1 ? '' : 's'}`
       + (brand !== 'all' ? ` · ${BRANDS.find((b) => b.id === brand)?.label}` : '')
       + (q ? ` · “${state.q}”` : '')
     : 'No matches';
-  $('#result-hint').textContent = list.length ? 'Tap a device for full pricing' : '';
+  $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
 }
 
 function cardHTML(d) {
   const chips = [...d.types].map((t) => `<span class="rt-chip ${t}">${CHIP_LABEL[t] || t}</span>`).join('');
   const save = d.maxSaving > 0
-    ? `<div class="save-tag">save up to ${money(Math.round(d.maxSaving))}<span>vs Mobile Klinik</span></div>`
+    ? `<div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs Mobile Klinik</span></div>`
     : '';
   return `<button class="card reveal" type="button" data-model="${esc(d.model)}" aria-label="View pricing for ${esc(d.model)}">
     <div class="card-top">
@@ -496,7 +541,7 @@ function buildSpotlight(stats) {
     const r = picks[i];
     $('#spot-device').textContent = `${r.model} — ${r.repair_type}`;
     $('#spot-sub').textContent = 'Same quality parts. Same repair. One honest price.';
-    $('#spot-save').innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> You save ${money(Math.round(r.savings))} · ${pctLess(r.savings, r.mk_price)}% less`;
+    $('#spot-save').innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span class="save-amt">You save ${money(Math.round(r.savings))}</span><span class="save-pct">${pctLess(r.savings, r.mk_price)}% less</span>`;
     const max = r.mk_price;
     $('#spot-bars').innerHTML = `
       <div class="bar-row"><span class="bar-name">Mobile Klinik</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100">${moneyExact(r.mk_price)}</div></div></div>
