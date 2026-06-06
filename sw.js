@@ -10,6 +10,7 @@ const PRECACHE = [
   '/',
   '/index.html',
   '/assets/js/app.js',
+  '/assets/js/chat.js',
   '/assets/fonts/inter-var-latin.woff2',
   '/assets/icons/favicon.svg',
   '/assets/icons/favicon-32.png',
