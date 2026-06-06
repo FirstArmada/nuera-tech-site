@@ -59,6 +59,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&
 const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') ? '' : v.trim();
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
 const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Pull a paint colour out of a back-glass variant string, e.g.
 // "Back Glass (No Logo) — Titanium Natural" → { name:"Titanium Natural", hex:"#b9a894" }.
@@ -248,12 +249,14 @@ function buildFilters() {
     state.brand = btn.dataset.brand;
     setPressed(brandWrap, btn);
     renderGrid();
+    resetFinderScroll();
   });
   typeWrap.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-type]'); if (!btn) return;
     state.type = btn.dataset.type;
     setPressed(typeWrap, btn);
     renderGrid();
+    resetFinderScroll();
   });
 
   // search
@@ -265,7 +268,7 @@ function buildFilters() {
     renderGrid();
   }, 110);
   input.addEventListener('input', onSearch);
-  clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); input.focus(); });
+  clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); resetFinderScroll(); input.focus(); });
 
   // Deep link ?q= (WebSite SearchAction)
   const urlQ = new URLSearchParams(location.search).get('q');
@@ -274,6 +277,19 @@ function buildFilters() {
 
 function setPressed(wrap, active) {
   $$('.pill', wrap).forEach((p) => p.setAttribute('aria-pressed', String(p === active)));
+}
+
+// Changing a filter re-renders the grid in place, but the window keeps its scroll
+// position — so narrowing a long list can leave you stranded past the end of the new,
+// shorter one. Snap back to the top of the finder so results start from the top. We only
+// ever scroll up: a filter tapped while already at/above the finder is left untouched.
+function resetFinderScroll() {
+  const finder = $('#finder');
+  if (!finder) return;
+  const margin = parseFloat(getComputedStyle(finder).scrollMarginTop) || 0; // clears the sticky header
+  const target = Math.max(0, finder.getBoundingClientRect().top + window.scrollY - margin);
+  if (window.scrollY <= target) return;
+  window.scrollTo({ top: target, behavior: reduceMotion() ? 'auto' : 'smooth' });
 }
 
 // ===========================================================================
@@ -543,7 +559,7 @@ function initScrollTop() {
   let ticking = false;
   const update = () => { btn.classList.toggle('show', window.scrollY > 600); ticking = false; };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  btn.addEventListener('click', () => scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
+  btn.addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion() ? 'auto' : 'smooth' }));
 }
 
 let revealIO;
