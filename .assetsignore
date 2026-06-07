@@ -13,6 +13,7 @@ node_modules
 # Agent / editor / CI config
 .claude
 .jules
+tests
 
 # Google Cloud server code (Cloud Run chat proxy + scheduled sync job).
 # Deployed to Cloud Run via its own workflow — never part of the static site.

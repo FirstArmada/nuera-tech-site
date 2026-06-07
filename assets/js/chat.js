@@ -52,7 +52,7 @@ const STYLE = `
 .nt-chat-msg{max-width:85%;padding:9px 12px;border-radius:14px;font-size:.9rem;line-height:1.45;white-space:normal;word-wrap:break-word}
 .nt-chat-msg.user{align-self:flex-end;background:#2a2440;border:1px solid rgba(196,181,253,.3)}
 .nt-chat-msg.bot{align-self:flex-start;background:#16151f;border:1px solid rgba(255,255,255,.08)}
-.nt-chat-wa{display:inline-block;margin-top:8px;padding:7px 12px;border-radius:10px;background:#25d366;color:#06210f;
+.nt-chat-wa{display:inline-block;margin-top:8px;padding:7px 12px;border-radius:10px;background:#34d399;color:#000;
   font-weight:700;text-decoration:none;font-size:.82rem}
 .nt-chat-form{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.1)}
 .nt-chat-form input{flex:1;min-width:0;padding:10px 12px;border-radius:11px;border:1px solid rgba(255,255,255,.14);
