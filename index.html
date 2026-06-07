@@ -50,11 +50,28 @@
        (--color-*, --fs-*, --space-*, --radius-*); legacy names are kept as aliases so existing
        rules + runtime markup keep working. See STYLEGUIDE.md. */
     :root{
+      /* -- HSL foundation: rotate a whole colour family from one --hue knob; --sat-brand is the
+         master vividness dial. The brand --c-* primitives below derive from these (original hex
+         kept as the canonical comment, Δ≤2/255 — visually identical). Saturation stays neon-high
+         on purpose: vibrancy IS the brand. The "premium, not gaming" feel comes from the trust
+         neutral + tighter rhythm + clearer hierarchy + smoother easing, not from desaturation. */
+      --hue-purple:258;--hue-cyan:188;--hue-green:158;--hue-danger:0;
+      --sat-brand:90%;   /* vivid purple/cyan accents */
+      --sat-success:64%; /* greens read calmer by design */
+      --sat-danger:84%;
+      /* trustworthy neutral — a desaturated slate for structural / credibility surfaces */
+      --c-trust-500:hsl(220 16% 46%);--c-trust-400:hsl(220 14% 60%);
+
       /* -- Primitives: raw palette -- */
       --c-ink-900:#07070c;--c-ink-800:#0c0d16;
       --c-slate-50:#f4f6ff;--c-slate-400:#9fa9bd;--c-slate-500:#8794ab; /* tertiary: WCAG AA on ink */
-      --c-purple-500:#8b5cf6;--c-purple-300:#c4b5fd;--c-cyan-400:#22d3ee;
-      --c-green-400:#34d399;--c-green-300:#6ee7b7;--c-rose-400:#ef4444;--c-amber-400:#fbbf24; /* danger sharpened #fb7185→#ef4444 */
+      /* brand primitives now derive from the HSL foundation above (hex = canonical reference) */
+      --c-purple-500:hsl(var(--hue-purple) var(--sat-brand) 66%); /* #8b5cf6 */
+      --c-purple-300:hsl(252 var(--sat-brand) 85%);               /* #c4b5fd · lighter tint */
+      --c-cyan-400:hsl(var(--hue-cyan) 86% 53%);                  /* #22d3ee */
+      --c-green-400:hsl(var(--hue-green) var(--sat-success) 52%); /* #34d399 */
+      --c-green-300:hsl(156 72% 67%);                             /* #6ee7b7 · lighter tint */
+      --c-rose-400:hsl(var(--hue-danger) var(--sat-danger) 60%);--c-amber-400:#fbbf24; /* #ef4444 · danger sharpened from #fb7185 */
       /* Glass fills — kept low so frosted surfaces refract the aurora (paired with backdrop blur) */
       --alpha-1:rgba(255,255,255,.03);--alpha-2:rgba(255,255,255,.05);--alpha-3:rgba(255,255,255,.10);--alpha-4:rgba(255,255,255,.16);
 
@@ -72,7 +89,7 @@
       --repair-screen:var(--c-purple-300);--repair-battery:var(--c-green-300);--repair-backglass:var(--c-amber-400);--repair-chargeport:var(--c-cyan-400);
 
       /* -- Gradients -- */
-      --grad-accent:linear-gradient(100deg,#c4b5fd 0%,#8b5cf6 42%,#22d3ee 100%);
+      --grad-accent:linear-gradient(100deg,var(--c-purple-300) 0%,var(--c-purple-500) 42%,var(--c-cyan-400) 100%);
       --grad-wa:#34d399; /* unified: one solid action green, no cyan bleed */
 
       /* -- Spacing scale (Allium 4px) -- */
@@ -113,6 +130,11 @@
       /* legacy motion aliases */
       --dur-fast:var(--dur-250);--dur-base:var(--dur-250);--dur-slow:var(--dur-300);
       --ease-out:var(--ease-default);--ease-standard:var(--ease-default);
+      /* custom curves — shared by CSS transitions AND the JS WAAPI (see app.js EASE_ENTRANCE mirror) */
+      --ease-emphasized:cubic-bezier(.2,0,0,1);   /* decisive, app-like settle */
+      --ease-entrance:cubic-bezier(.22,1,.36,1);  /* = the curve already used by .bar-fill + the filter fade */
+      --ease-exit:cubic-bezier(.4,0,1,1);          /* quick accelerate-out */
+      --ease-spring:cubic-bezier(.34,1.56,.64,1);  /* optional overshoot (opt-in) */
 
       /* -- Focus ring -- */
       --focus-ring-color:var(--c-purple-300);--focus-ring-width:2px;--focus-ring-offset:2px;
@@ -199,7 +221,9 @@
     @media (max-width:599.98px){.header .btn-wa .cta-label{display:none}.header .btn-wa{padding:10px 13px}}
     /* location/warranty pill */
     .hpill{display:none;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:#dbe3f4;font-size:.8rem;font-weight:600;white-space:nowrap}
-    .hpill svg{width:14px;height:14px;color:var(--cyan);flex:none}
+    /* trust cue: the location/warranty pill is credibility info, so its icon reads in the calm
+       trust-neutral slate rather than a neon accent — "established", next to the vibrant brand. */
+    .hpill svg{width:14px;height:14px;color:var(--c-trust-400);flex:none}
     .hpill-dot{width:3px;height:3px;border-radius:50%;background:var(--faint);flex:none}
     @media (min-width:760px){.hpill{display:inline-flex}}
     @media (max-width:860px) and (min-width:760px){.hpill .hpill-seg-opt{display:none}}
@@ -230,21 +254,26 @@
     /* hero-scoped headline polish — bare h1 / .grad-text left untouched */
     .hero h1{font-weight:var(--fw-display);letter-spacing:-.05em;text-wrap:balance}
     .hero h1 .grad-text{display:inline-block;padding-bottom:.06em;filter:drop-shadow(0 3px 26px rgba(139,92,246,.32))}
-    .hero .lead{font-size:var(--fs-lead);color:#d7deee;max-width:60ch;margin:0 0 28px}
+    .hero .lead{font-size:var(--fs-lead);color:#d7deee;max-width:60ch;margin:0 0 var(--space-5)}
     .hero .lead strong{color:#fff}
-    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center}
+    /* Hierarchy: the gradient "Find your repair" is the primary; lighten the secondary "Message us"
+       (weight + contrast + fill) so the eye lands on the primary first. Scoped to the hero so ghost
+       buttons elsewhere are untouched; min-height:48px is inherited so the touch target is unchanged. */
+    .hero-actions .btn-ghost{font-weight:var(--fw-medium);color:var(--color-text-secondary);background:var(--color-surface-1)}
+    .hero-actions .btn-ghost:hover{color:var(--color-text-primary)}
 
     /* Stat strip */
-    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:28px}
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);margin-top:var(--space-5)}
     @media (min-width:720px){.stats{grid-template-columns:repeat(4,1fr)}}
-    .stat{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-12);padding:16px;backdrop-filter:blur(10px)}
+    .stat{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-12);padding:var(--space-4);backdrop-filter:blur(10px)}
     .stat::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(155deg,rgba(139,92,246,.13),transparent 60%);pointer-events:none}
     .stat .num{position:relative;font-size:clamp(1.3rem,2.6vw,1.8rem);font-weight:700;letter-spacing:-.02em;line-height:1.05}
     .stat .num .grad-text{display:inline}
-    .stat .lbl{position:relative;color:var(--muted);font-size:.82rem;margin-top:8px;line-height:1.35}
+    .stat .lbl{position:relative;color:var(--muted);font-size:.82rem;margin-top:var(--space-2);line-height:1.35}
     /* staggered scroll-in, driven by the hero's existing reveal observer */
     .hero.reveal .stat{opacity:0;transform:translateY(14px)}
-    .hero.reveal.in .stat{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease;transition-delay:calc(var(--i,0)*80ms)}
+    .hero.reveal.in .stat{opacity:1;transform:none;transition:opacity .5s var(--ease-entrance),transform .5s var(--ease-entrance);transition-delay:calc(var(--i,0)*80ms)}
     @media (prefers-reduced-motion:reduce){.hero.reveal .stat,.hero.reveal.in .stat{opacity:1;transform:none;transition:none}}
 
     /* Savings spotlight */
@@ -263,10 +292,12 @@
     .bar-row{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:14px}
     .bar-name{font-size:.82rem;font-weight:700;color:var(--muted);text-align:right}
     .bar-track{position:relative;height:46px;border-radius:12px;background:rgba(255,255,255,.04)}
-    .bar-fill{position:relative;height:100%;border-radius:12px;display:flex;align-items:center;padding:0 14px;font-weight:700;color:#fff;width:0;min-width:fit-content;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);transition:width .9s cubic-bezier(.22,1,.36,1)}
+    .bar-fill{position:relative;height:100%;border-radius:12px;display:flex;align-items:center;padding:0 14px;font-weight:700;color:#fff;width:0;min-width:fit-content;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);transition:width .9s var(--ease-entrance)}
     @media (prefers-reduced-motion:reduce){.bar-fill{transition:none}}
     .bar-mk{background:linear-gradient(90deg,rgba(239,68,68,.5),rgba(239,68,68,.28));border:1px solid rgba(239,68,68,.4)}
-    .bar-nuera{background:var(--grad);color:#0a0a12;box-shadow:0 8px 24px -10px rgba(139,92,246,.6),inset 0 1px 0 rgba(255,255,255,.25)}
+    /* Nuera's "cheaper" bar glows in the savings palette (cyan→green) — inviting + distinct from the red competitor.
+       Dark near-black text on cyan/green (L52-53%) clears WCAG AA comfortably. */
+    .bar-nuera{background:linear-gradient(100deg,var(--c-cyan-400),var(--c-green-400));color:#06120c;box-shadow:0 8px 24px -10px rgba(52,211,153,.55),inset 0 1px 0 rgba(255,255,255,.3)}
     /* Savings is the visual anchor: drops to its own line as a large count-up figure + % badge. */
     .spot-save{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-top:14px;padding:0;background:none;border:0;box-shadow:none;color:var(--green-lt)}
     .spot-save .spot-save-eyebrow{flex-basis:100%;display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green-lt)}
@@ -344,13 +375,13 @@
     .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
     .card-model{font-size:1.06rem;font-weight:700;letter-spacing:-.02em;line-height:1.2}
     .brand-tag{flex:none;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:var(--muted)}
-    .rt-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .rt-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--space-3)}
     .rt-chip{font-size:.72rem;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid transparent}
     .rt-chip.screen{background:rgba(139,92,246,.16);color:#d6c6ff;border-color:rgba(139,92,246,.3)}
     .rt-chip.battery{background:rgba(34,211,238,.14);color:#aef0ff;border-color:rgba(34,211,238,.28)}
     .rt-chip.backglass{background:rgba(251,191,36,.14);color:#ffe2a3;border-color:rgba(251,191,36,.28)}
     .rt-chip.chargeport{background:rgba(52,211,153,.14);color:#a9f3d4;border-color:rgba(52,211,153,.28)}
-    .card-foot{margin-top:auto;padding-top:16px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+    .card-foot{margin-top:auto;padding-top:var(--space-3);display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
     .from{font-size:.78rem;color:var(--muted)}
     .from b{display:block;font-size:1.5rem;color:var(--text);font-weight:700;letter-spacing:-.02em;margin-top:2px}
     .save-tag{font-size:.74rem;font-weight:700;color:var(--green-lt);text-align:right;line-height:1.3;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);border-radius:12px;padding:6px 10px;box-shadow:0 0 22px -12px rgba(52,211,153,.7)}
@@ -439,7 +470,12 @@
 
     /* Floating actions */
     .fab{position:fixed;right:calc(clamp(14px,3vw,22px) + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:var(--color-success);color:var(--color-on-success);font-weight:700;text-decoration:none;box-shadow:var(--glow-success);transition:transform var(--dur-base) ease,box-shadow var(--dur-base) ease}
+    /* one-time entrance, then a low-frequency glow swell so the primary conversion action stays
+       "alive". box-shadow only — no layout/scale change — so it can never intrude on the chat
+       launcher stacked beside it in the .fab column. Gated for reduced motion just below. */
+    @keyframes fab-in{from{opacity:0;transform:translateY(14px) scale(.92)}to{opacity:1;transform:none}}
+    @keyframes fab-pulse{0%,72%,100%{box-shadow:var(--glow-success)}82%{box-shadow:0 16px 40px -10px hsl(var(--hue-green) var(--sat-success) 52% / .9)}}
+    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:var(--color-success);color:var(--color-on-success);font-weight:700;text-decoration:none;box-shadow:var(--glow-success);transition:transform var(--dur-base) ease,box-shadow var(--dur-base) ease;animation:fab-in var(--dur-300) var(--ease-entrance) both,fab-pulse 6.5s var(--ease-default) 2.5s infinite}
     .fab-wa svg{width:22px;height:22px}
     .fab-wa .fab-txt{display:none}
     @media (min-width:560px){.fab-wa .fab-txt{display:inline}}
@@ -451,7 +487,7 @@
     .fab-top:hover{background:rgba(255,255,255,.16)}
     .fab-top:active{transform:scale(.94)}
     .fab-top:focus-visible{outline:none;box-shadow:var(--ring)}
-    @media (prefers-reduced-motion:reduce){.fab-wa:hover,.fab-wa:active,.fab-top:active{transform:none}}
+    @media (prefers-reduced-motion:reduce){.fab-wa{animation:none}.fab-wa:hover,.fab-wa:active,.fab-top:active{transform:none}}
 
     /* Dialog (device detail) */
     dialog{padding:0;border:0;background:transparent;max-width:none;max-height:none;color:var(--text)}
@@ -527,7 +563,7 @@
     }
 
     /* Reveal on scroll */
-    .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+    .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease-entrance),transform .6s var(--ease-entrance)}
     .reveal.in{opacity:1;transform:none}
     @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
     /* Global reduced-motion safety net — covers any motion not handled by the targeted rules above.
