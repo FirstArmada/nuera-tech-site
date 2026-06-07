@@ -23,9 +23,12 @@ strict CSP (`style-src 'self' 'unsafe-inline'`). Add new global styles/tokens to
 that block; do not introduce an external stylesheet without revisiting the
 performance/CSP trade-off.
 
-All JS is self-hosted under `/assets/js`; there are **no third-party scripts** and the CSP stays
-`script-src 'self'` (mirrored in `vercel.json` + `_headers`). Motion is hand-rolled in vanilla
-(see *Motion & animation layer*). Don't add external script origins without revisiting the CSP.
+All JS is self-hosted under `/assets/js`; there are **no third-party application scripts** and
+the production site loads only `'self'` JS (mirrored in `vercel.json` + `_headers`). The CSP
+additionally allow-lists `https://vercel.live` (plus companion
+`connect-`/`frame-`/`img-`/`style-`/`font-src` entries) **solely for the Vercel preview
+Toolbar — it is not injected in production**. Motion is hand-rolled in vanilla (see *Motion &
+animation layer*). Don't add external script origins without revisiting the CSP.
 
 The token system is **layered** so it can evolve without breaking anything:
 
@@ -190,7 +193,7 @@ content owned by the section layer.)*
 ### Motion & animation layer (vanilla — no third-party JS)
 
 Premium motion is **hand-rolled in vanilla JS** — no animation library, no third-party script.
-All JS is self-hosted and the CSP stays `script-src 'self'`. Everything is gated on
+All JS is self-hosted and the motion layer adds no script origin to the CSP. Everything is gated on
 `reduceMotion()` (reduced-motion users get instant, layout-correct updates):
 
 - **Grid filtering** (`applyFilter()` in `app.js`): visibility is toggled **synchronously**
