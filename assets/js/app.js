@@ -60,6 +60,34 @@ const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') 
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
 const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canHover = () => matchMedia('(hover: hover)').matches;
+
+// ---- GSAP (animation layer) — progressive enhancement, never a hard dependency ----
+// GSAP + the Flip plugin are loaded from a CDN in index.html as classic `defer` scripts,
+// so window.gsap / window.Flip are present before this module runs. EVERYTHING below is
+// feature-guarded behind GSAP_OK: if the CDN is blocked (offline, CSP, ad-blocker) the UI
+// degrades to instant, layout-correct updates and never throws — keeping the a11y + driver
+// gates green. Motion is also always gated on reduceMotion() (the CSS reduced-motion net
+// can't stop GSAP's JS-driven inline-style animation, so the JS guard is mandatory).
+const GSAP_OK = typeof window.gsap !== 'undefined' && typeof window.Flip !== 'undefined';
+const gsap = GSAP_OK ? window.gsap : null;
+const Flip = GSAP_OK ? window.Flip : null;
+if (GSAP_OK) { try { gsap.registerPlugin(Flip); } catch (_) { /* noop */ } }
+
+// Animate a money figure from 0 → `to`. Falls back to the final value instantly when GSAP
+// is absent or motion is reduced. The element must NOT live in an aria-live region (it would
+// flood screen readers); it always commits the true final value on complete.
+function countUp(el, to) {
+  if (!el) return;
+  const final = '$' + Math.round(to);
+  if (!GSAP_OK || reduceMotion()) { el.textContent = final; return; }
+  const o = { v: 0 };
+  gsap.to(o, {
+    v: to, duration: 0.9, ease: 'power2.out',
+    onUpdate: () => { el.textContent = '$' + Math.round(o.v); },
+    onComplete: () => { el.textContent = final; },
+  });
+}
 
 // Pull a paint colour out of a back-glass variant string, e.g.
 // "Back Glass (No Logo) — Titanium Natural" → { name:"Titanium Natural", hex:"#b9a894" }.
@@ -345,22 +373,31 @@ function renderGrid() {
   const grid = $('#grid');
   const { brand, type, q } = state;
 
+  let firstBuild = false;
   if (!cardEls) {
     grid.innerHTML = state.devices.map(cardHTML).join('');
     cardEls = new Map();
     $$('.card', grid).forEach((el) => cardEls.set(el.dataset.model, el));
     grid.setAttribute('aria-busy', 'false');
-    observeReveal(grid); // observe once; the observation persists across hide/show
+    observeReveal(grid);      // observe once; the observation persists across hide/show
+    initCardSpotlight(grid);  // pointer-tracked glow (desktop + motion-on only)
+    firstBuild = true;
   }
 
-  let shown = 0;
+  const matching = [];
+  const nonMatching = [];
   for (const d of state.devices) {
     const match = (brand === 'all' || d.brand === brand)
       && (type === 'all' || d.types.has(type))
       && (!q || d.search.includes(q));
     const el = cardEls.get(d.model);
-    if (el) { el.hidden = !match; if (match) shown++; }
+    if (!el) continue;
+    (match ? matching : nonMatching).push(el);
   }
+  // FLIP-animate the transition between filter states — but never on the first build (cards
+  // have only just appeared), and the helper itself no-ops the motion in the fallback path.
+  applyFilter(matching, nonMatching, !firstBuild);
+  const shown = matching.length;
 
   if (!shown) {
     if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
@@ -381,6 +418,52 @@ function renderGrid() {
       + (q ? ` · “${state.q}”` : '')
     : 'No matches';
   $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
+}
+
+// FLIP-animate the grid between filter states. The fallback / reduced-motion / no-GSAP path is
+// the original instant toggle. CRITICAL: non-matching cards are set display:none SYNCHRONOUSLY
+// (so a [hidden] read / Playwright :visible is correct on the very next tick); only matching,
+// entering and moving cards animate. We deliberately do NOT animate "leaving" cards (no onLeave) —
+// that would keep them visible mid-tween and corrupt the visible-count assertions.
+function applyFilter(matching, nonMatching, animate) {
+  if (!animate || !GSAP_OK || reduceMotion()) {
+    nonMatching.forEach((el) => { el.hidden = true; });
+    matching.forEach((el) => { el.hidden = false; });
+    return;
+  }
+  const flipState = Flip.getState(matching);   // capture positions BEFORE mutating the DOM
+  nonMatching.forEach((el) => { el.hidden = true; });
+  matching.forEach((el) => { el.hidden = false; });
+  Flip.from(flipState, {
+    duration: 0.45,
+    ease: 'power2.out',
+    stagger: 0.012,
+    absolute: true,            // movers reposition over the grid without disturbing siblings
+    onEnter: (els) => gsap.fromTo(els,
+      { opacity: 0, scale: 0.92 },
+      { opacity: 1, scale: 1, duration: 0.3, stagger: 0.012 }),
+  });
+}
+
+// Pointer-tracked spotlight glow on cards: sets --mx/--my (consumed by .card::before). Desktop +
+// motion-on only; throttled to a single rect read per animation frame so it stays cheap.
+function initCardSpotlight(grid) {
+  if (reduceMotion() || !canHover()) return;
+  let raf = 0;
+  let pending = null;
+  grid.addEventListener('pointermove', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    pending = { card, x: e.clientX, y: e.clientY };
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      const { card, x, y } = pending;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${((x - r.left) / r.width) * 100}%`);
+      card.style.setProperty('--my', `${((y - r.top) / r.height) * 100}%`);
+    });
+  }, { passive: true });
 }
 
 function cardHTML(d) {
@@ -551,12 +634,20 @@ function buildSpotlight(stats) {
 
   const show = (i) => {
     const r = picks[i];
+    const saving = Math.round(r.savings);
+    const pct = pctLess(r.savings, r.mk_price);
     $('#spot-device').textContent = `${r.model} — ${r.repair_type}`;
     $('#spot-sub').textContent = 'Same quality parts. Same repair. One honest price.';
-    $('#spot-save').innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span class="save-amt">You save ${money(Math.round(r.savings))}</span><span class="save-pct">${pctLess(r.savings, r.mk_price)}% less</span>`;
+    // Savings is the visual anchor: a large count-up dollar figure + a "% less" badge.
+    const save = $('#spot-save');
+    save.innerHTML =
+      `<span class="spot-save-eyebrow"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>You save</span>`
+      + `<span class="save-amt">$${saving}</span>`
+      + `<span class="save-pct">${pct}% less than Mobile Klinik</span>`;
+    countUp($('.save-amt', save), saving);
     const max = r.mk_price;
     $('#spot-bars').innerHTML = `
-      <div class="bar-row"><span class="bar-name">Mobile Klinik</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100">${moneyExact(r.mk_price)}</div></div></div>
+      <div class="bar-row"><span class="bar-name">Mobile Klinik</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100"><span class="bar-was">${moneyExact(r.mk_price)}</span></div></div></div>
       <div class="bar-row"><span class="bar-name">Nuera</span><div class="bar-track"><div class="bar-fill bar-nuera" data-w="${(r.price / max) * 100}">${moneyExact(r.price)}</div></div></div>`;
     requestAnimationFrame(() => requestAnimationFrame(() => {
       $$('#spot-bars .bar-fill').forEach((el) => { el.style.width = el.dataset.w + '%'; });
