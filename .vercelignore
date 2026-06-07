@@ -2,3 +2,4 @@
 # The Google Cloud server code under cloud/ is deployed to Cloud Run by its own
 # workflow (.github/workflows/deploy-cloud.yml) and must not ship to Vercel.
 cloud
+tests

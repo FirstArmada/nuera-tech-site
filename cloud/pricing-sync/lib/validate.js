@@ -24,6 +24,14 @@ export function validate(data, prev) {
     if (r.savings !== null && typeof r.savings !== 'number') throw new Error(`${at}.savings must be number|null`);
   });
 
+  if (data.stats !== undefined) {
+    const s = data.stats;
+    if (!s || typeof s !== 'object') throw new Error('stats must be an object');
+    if (typeof s.maxSaving !== 'number') throw new Error('stats.maxSaving must be a number');
+    if (typeof s.avgPct !== 'number') throw new Error('stats.avgPct must be a number');
+    if (!Array.isArray(s.top)) throw new Error('stats.top must be an array');
+  }
+
   if (prev && Array.isArray(prev.repairs) && prev.repairs.length) {
     const ratio = data.repairs.length / prev.repairs.length;
     if (ratio < 0.8 || ratio > 1.2) {

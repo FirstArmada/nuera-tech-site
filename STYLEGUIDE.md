@@ -5,6 +5,14 @@ UI primitives (Button, Badge/Pill, Card, Section). This document is the contract
 for everyone working on the front end — reference these tokens and classes in new
 code instead of hard-coding values.
 
+> **Foundation (2026 refresh).** The OG Nuera dark-neon palette is preserved, but the
+> *bones* now follow the **TELUS/UDS (Allium)** system: Inter on the four-weight scale
+> (300/400/500/700), the 4px spacing + Allium radius scale, TELUS 250/300ms motion, the
+> semantic-token architecture, and Allium iconography. The display weight is **300** with
+> the brand gradient; there is **one unified action green** (`#34d399`, solid — savings +
+> WhatsApp) and a **sharper danger red** (`#ef4444`). **Dark-only — there is no light
+> theme.** Source: Claude Design handoff (`nuera-tech-design-system`).
+
 ## Scope & architecture
 
 The site is intentionally **build-less**: no framework, bundler, or `node_modules`.
@@ -50,27 +58,30 @@ simply point at the semantic tokens.
 | `--color-accent-2` | `#22d3ee` | Brand cyan |
 | `--color-on-accent` | `#0a0a12` | Text on accent/gradient fills |
 | `--color-success` | `#34d399` | Success / savings |
-| `--color-success-text` | `#6ee7b7` | Success text on dark |
+| `--color-success-text` | `#34d399` | Success text on dark (unified action green) |
 | `--color-on-success` | `#04130c` | Text on green/WhatsApp fills |
-| `--color-danger` | `#fb7185` | Errors / "before" price |
+| `--color-danger` | `#ef4444` | Errors / struck "before" price (sharpened) |
 | `--color-warning` | `#fbbf24` | Warnings / back-glass accents |
 
-**Gradients:** `--grad-accent` (purple→cyan brand gradient) and `--grad-wa`
-(green→cyan WhatsApp gradient).
+**Gradients:** `--grad-accent` (purple→cyan brand gradient). `--grad-wa` is now a
+**solid** action green (`#34d399`) — one unified conversion colour, no cyan bleed.
+New on-fill tokens (`--color-on-success/-danger/-warning`) are pure black/white per WCAG;
+`--color-save`/`--color-was` carry the transparent-pricing signature.
 
-### Scales
+### Scales — TELUS/UDS (Allium) foundation
 
 | Group | Tokens |
 |---|---|
-| **Spacing** (8px rhythm) | `--space-1` 4px · `-2` 8px · `-3` 12px · `-4` 16px · `-5` 20px · `-6` 24px · `-8` 32px · `-10` 40px · `-12` 48px · `-16` 64px · `--space-section` `clamp(48px,7vw,96px)` |
-| **Radius** | `--radius-xs` 10 · `--radius-sm` 14 · `--radius-md` 22 · `--radius-lg` 30 · `--radius-pill` 999 · `--radius-circle` 50% |
-| **Elevation** | `--shadow-1` (subtle) · `--shadow-2` (cards/CTA) · `--shadow-3` (modal) · glow: `--glow-accent`, `--glow-accent-strong`, `--glow-success` |
-| **Type size** | `--fs-2xs` .72 · `--fs-xs` .8 · `--fs-sm` .86 · `--fs-base` 1 · `--fs-lead` (fluid) · `--fs-h3` 1.12 · `--fs-h2` (fluid) · `--fs-display` (fluid) — all `rem` |
-| **Line-height** | `--lh-display` 1.05 · `--lh-heading` 1.12 · `--lh-snug` 1.2 · `--lh-body` 1.6 |
-| **Tracking** | `--track-display` -.04em · `--track-h2` -.03em · `--track-tight` -.02em · `--track-eyebrow` .14em |
-| **Motion** | `--dur-fast` .15s · `--dur-base` .18s · `--dur-slow` .6s · `--ease-out` `cubic-bezier(.22,1,.36,1)` · `--ease-standard` ease |
+| **Spacing** (Allium 4px) | `--space-1` 4 · `-2` 8 · `-3` 16 · `-4` 24 · `-5` 32 · `-6` 40 · `-7` 48 · `-8` 56 · `-9` 64 · `-10` 72 · `-11` 88 · `-12` 128 · `-13` 160 (px) · `--space-section` `clamp(48px,9vw,128px)` |
+| **Radius** (Allium) | `--radius-4` 4 · `-6` 6 · `-8` 8 · `-12` 12 · `-16` 16 · `-24` 24 · `-32` 32 · `--radius-pill` 99 · `--radius-circle` 50% · `--radius-card` = 24. Legacy `--radius-xs/sm/md/lg` alias to 12/16/24/32. |
+| **Elevation** | `--shadow-1/2/3` (deep, soft, dark) · glow: `--glow-accent`, `--glow-accent-strong`, `--glow-success` — the signature; glow > hard shadow |
+| **Type weight** | four weights only: `--fw-display` 300 · `--fw-regular` 400 · `--fw-medium` 500 · `--fw-bold` 700 (no 800) |
+| **Type size** (Allium px) | `--fs-12`…`--fs-64` (12·14·16·20·24·28·32·36·40·48·56·64) · `--fs-base` 16 · `--fs-h2` 32 · `--fs-h3` 28 · `--fs-lead` `clamp(1.06rem,2.6vw,1.25rem)` · `--fs-display` `clamp(2.5rem,6vw,4rem)` |
+| **Line-height** | `--lh-tight` 1.125 · `--lh-headings` 1.2 · `--lh-snug` 1.33 · `--lh-normal` 1.5 · `--lh-relaxed`/`--lh-body` 1.6 |
+| **Tracking** | `--ls-condensed` -.039em · `--ls-medium` -.035em · `--ls-loose` -.017em · `--track-eyebrow` .08em |
+| **Motion** (TELUS) | `--dur-250` 250ms · `--dur-300` 300ms · `--ease-default` `cubic-bezier(.4,0,.2,1)`; legacy `--dur-fast/base/slow` + `--ease-out` alias these |
 | **Focus** | `--focus-ring-color` `#c4b5fd` · `--focus-ring-width` 2px · `--focus-ring-offset` 2px |
-| **Layout** | `--maxw` 1200px · `--header-h` 62px · `--wrap-pad` `clamp(16px,4vw,28px)` |
+| **Layout** | `--maxw` 1200px · `--header-h` 72px · `--wrap-pad` `clamp(16px,4vw,24px)` |
 
 ### Legacy alias map (don't add new ones — adopt the semantic token instead)
 
@@ -85,8 +96,10 @@ simply point at the semantic tokens.
 
 ## Typography
 
-Variable **Inter** (self-hosted, weights 100–900) via `--font-sans`. Headings use
-`clamp()` for fluid, breakpoint-free scaling.
+Variable **Inter** (self-hosted, SIL OFL) via `--font-sans` — used on the four-weight
+Allium scale (`--fw-display` 300 / `--fw-regular` 400 / `--fw-medium` 500 / `--fw-bold`
+700; no 800). The hero **display is weight 300** with the brand gradient; sizes snap to
+the Allium px scale, with `--fs-display`/`--fs-lead` kept fluid via `clamp()`.
 
 | Element | Token | Notes |
 |---|---|---|

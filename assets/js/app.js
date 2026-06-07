@@ -155,7 +155,7 @@ async function loadData() {
     if (!repairs.length) throw new Error('No repairs in data');
 
     buildModel(repairs);
-    const stats = computeSavingsStats(repairs);
+    const stats = usePrecomputedStats(data) || computeSavingsStats(repairs);
     renderStats(stats);
     buildFilters();
     buildSpotlight(stats);
@@ -199,6 +199,14 @@ function buildModel(repairs) {
 // ===========================================================================
 // Hero stats (runtime) + CTA copy + spotlight source
 // ===========================================================================
+// Use the sync job's precomputed savings stats when present (data.stats); otherwise
+// derive them in-browser. Keeps the runtime fast without weakening the fallback (Rule 1).
+function usePrecomputedStats(data) {
+  const s = data && data.stats;
+  if (s && typeof s.maxSaving === 'number' && typeof s.avgPct === 'number' && Array.isArray(s.top)) return s;
+  return null;
+}
+
 function computeSavingsStats(repairs) {
   const withMk = repairs.filter((r) => r.mk_price != null && r.mk_price > 0 && r.savings != null);
   const maxSaving = withMk.length ? Math.max(...withMk.map((r) => r.savings)) : 0;
