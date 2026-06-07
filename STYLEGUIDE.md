@@ -23,10 +23,9 @@ strict CSP (`style-src 'self' 'unsafe-inline'`). Add new global styles/tokens to
 that block; do not introduce an external stylesheet without revisiting the
 performance/CSP trade-off.
 
-App JS — including the GSAP animation layer — is **self-hosted** under `/assets/js`, so the CSP
-is `script-src 'self'` (mirrored in `vercel.json` + `_headers`) with **no external script
-origins**. GSAP is used only as a progressive enhancement (see *Motion & animation layer*).
-Don't add other origins without revisiting the CSP.
+All JS is self-hosted under `/assets/js`; there are **no third-party scripts** and the CSP stays
+`script-src 'self'` (mirrored in `vercel.json` + `_headers`). Motion is hand-rolled in vanilla
+(see *Motion & animation layer*). Don't add external script origins without revisiting the CSP.
 
 The token system is **layered** so it can evolve without breaking anything:
 
@@ -188,26 +187,27 @@ content owned by the section layer.)*
   on top of the global focus ring. The search field opts out of the default outline and
   uses the gradient ring as its (clearly visible) focus indicator — like `.swatch`.
 
-### Motion & animation layer (GSAP)
+### Motion & animation layer (vanilla — no third-party JS)
 
-Premium motion uses **GSAP 3.15 (core only)**, self-hosted at `/assets/js/vendor/gsap.min.js`
-and loaded as a classic `defer` script **before** the app module (so `window.gsap` is ready when
-the app boots). It is a **progressive enhancement, never a hard dependency**:
+Premium motion is **hand-rolled in vanilla JS** — no animation library, no third-party script.
+All JS is self-hosted and the CSP stays `script-src 'self'`. Everything is gated on
+`reduceMotion()` (reduced-motion users get instant, layout-correct updates):
 
-- All GSAP use is guarded by `GSAP_OK` (`window.gsap` present) **and** `reduceMotion()`. If the
-  CDN is blocked, or motion is reduced, the UI falls back to instant, layout-correct updates and
-  **never throws** — the a11y + driver gates pass either way.
 - **Grid filtering** (`applyFilter()` in `app.js`): visibility is toggled **synchronously**
   (non-matching → `display:none` immediately) so the grid is layout-correct on the next tick —
   the driver counts `.card:visible` 150 ms after a filter change and Playwright ignores opacity.
-  The matching set then fades + subtly scales into its **final** layout (`gsap.fromTo`, staggered
-  via `stagger.amount`, with `clearProps` so `:hover`/`:active` keep working). **Card positions
-  are never animated** — a position FLIP made cards fly across the grid and overlap/ghost on big
-  set changes (the wrong pattern for a catalog filter). Touch this path carefully.
-- **Savings count-up** (`countUp()`) animates a number that must never sit in an `aria-live`
-  region and always commits the true final value.
-- The global reduced-motion CSS net cannot stop GSAP's JS-driven inline animation — the
-  **`reduceMotion()` JS guard is mandatory**, not decorative.
+  The matching set then fades + subtly scales into its **final** layout via the **Web Animations
+  API** (`el.animate(...)`, staggered by per-element `delay`, `fill:'backwards'` so it leaves no
+  inline styles and `:hover`/`:active` keep working). The in-flight Animations are tracked and
+  `.cancel()`-ed on the next filter so they never stack. **Card positions are never animated** —
+  that made cards fly across the grid and overlap/ghost on big set changes. Touch this path carefully.
+- **Savings count-up** (`countUp()`) is a `requestAnimationFrame` easeOutCubic tween; it must never
+  sit in an `aria-live` region and always commits the true final value.
+- **Spotlight CLS**: the `.spotlight` section ships with a `reserving` class (responsive
+  `min-height`) so the runtime-populated card doesn't shove the finder down; `buildSpotlight()`
+  removes the class once populated.
+- The global reduced-motion CSS net can't stop JS-driven animation — the **`reduceMotion()` guard
+  is mandatory**, not decorative.
 
 ### New section components
 

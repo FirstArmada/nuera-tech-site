@@ -36,7 +36,6 @@
   <link rel="preload" href="/assets/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/pricing-data.json" as="fetch" type="application/json" crossorigin="anonymous" />
   <link rel="modulepreload" href="/assets/js/app.js" />
-  <!-- GSAP (animation layer) is self-hosted at /assets/js/vendor/gsap.min.js — same-origin, no CDN warm-up needed. -->
 
   <style>
     /* ===== Fonts ===== */
@@ -251,6 +250,11 @@
     /* Savings spotlight */
     /* margin-inline must stay auto so this .wrap container centres like the other sections (was `0`, which left-pinned it) */
     .spotlight{margin:46px auto 8px}
+    /* Reserve ~the populated height before the runtime fetch resolves, so the spotlight appearing
+       doesn't shove the finder down (CLS). JS removes .reserving once populated. Sized just under the
+       measured card+eyebrow height per breakpoint so releasing it never causes a shrink-shift. */
+    .spotlight.reserving{min-height:600px}
+    @media (min-width:560px){.spotlight.reserving{min-height:470px}}
     .spot-card{background:linear-gradient(160deg,rgba(139,92,246,.14),rgba(34,211,238,.08) 60%,var(--panel));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:clamp(20px,3vw,34px);box-shadow:var(--shadow);position:relative;overflow:hidden}
     .spot-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
     .spot-device{font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:700;letter-spacing:-.02em}
@@ -649,11 +653,6 @@
   <!-- Vercel analytics (first-party, same-origin; no-op off Vercel) -->
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
-  <!-- GSAP (motion layer) — self-hosted under /assets/js/vendor, same-origin and SW-precached.
-       Classic defer script runs in document order BEFORE the app module, so window.gsap is ready
-       when app.js boots. All use in app.js is feature-guarded: if the file fails to load the UI
-       degrades to instant (no motion), never throwing. -->
-  <script defer src="/assets/js/vendor/gsap.min.js"></script>
   <script type="module" src="/assets/js/app.js"></script>
   <script type="module" src="/assets/js/chat.js"></script>
 </head>
@@ -740,7 +739,7 @@
     </section>
 
     <!-- SAVINGS SPOTLIGHT -->
-    <section class="spotlight wrap reveal" aria-labelledby="spot-h">
+    <section class="spotlight wrap reveal reserving" aria-labelledby="spot-h">
       <span class="eyebrow">The savings, side by side</span>
       <h2 id="spot-h" class="sr-only">Price comparison versus Mobile Klinik</h2>
       <div class="spot-card" id="spotlight" hidden>

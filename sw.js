@@ -15,7 +15,6 @@ const PRECACHE = [
   '/index.html',
   '/assets/js/app.js',
   '/assets/js/chat.js',
-  '/assets/js/vendor/gsap.min.js',
   '/assets/fonts/inter-var-latin.woff2',
   '/assets/icons/favicon.svg',
   '/assets/icons/favicon-32.png',
@@ -43,8 +42,7 @@ self.addEventListener('fetch', (e) => {
   const { request } = e;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-
-  if (url.origin !== self.location.origin) return; // let other cross-origin (analytics, etc.) pass through
+  if (url.origin !== self.location.origin) return; // let cross-origin (analytics, etc.) pass through
 
   // Live pricing: stale-while-revalidate
   if (url.pathname === '/pricing-data.json') {

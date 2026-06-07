@@ -65,29 +65,27 @@ const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = () => matchMedia('(hover: hover)').matches;
 
-// ---- GSAP (animation layer) — progressive enhancement, never a hard dependency ----
-// GSAP is loaded from a CDN in index.html as a classic `defer` script, so window.gsap is
-// present before this module runs. EVERYTHING below is feature-guarded behind GSAP_OK: if
-// the CDN is blocked (offline, CSP, ad-blocker) the UI degrades to instant, layout-correct
-// updates and never throws — keeping the a11y + driver gates green. Motion is also always
-// gated on reduceMotion() (the CSS reduced-motion net can't stop GSAP's JS-driven inline-style
-// animation, so the JS guard is mandatory).
-const GSAP_OK = typeof window.gsap !== 'undefined';
-const gsap = GSAP_OK ? window.gsap : null;
+// ---- Motion (vanilla — no third-party JS) ----
+// All motion is gated on reduceMotion(): reduced-motion users get instant, layout-correct
+// updates. Animations use requestAnimationFrame / the Web Animations API (compositor-friendly
+// opacity + transform), so there's no render-blocking library and the a11y + driver gates stay green.
 
-// Animate a money figure from 0 → `to`. Falls back to the final value instantly when GSAP
-// is absent or motion is reduced. The element must NOT live in an aria-live region (it would
-// flood screen readers); it always commits the true final value on complete.
+// Animate a money figure from 0 → `to` with a rAF easeOutCubic tween. Reduced-motion → set the
+// final value immediately. The element must NOT live in an aria-live region (it would flood
+// screen readers); it always commits the true final value on the last frame.
 function countUp(el, to) {
   if (!el) return;
   const final = '$' + Math.round(to);
-  if (!GSAP_OK || reduceMotion()) { el.textContent = final; return; }
-  const o = { v: 0 };
-  gsap.to(o, {
-    v: to, duration: 0.9, ease: 'power2.out',
-    onUpdate: () => { el.textContent = '$' + Math.round(o.v); },
-    onComplete: () => { el.textContent = final; },
-  });
+  if (reduceMotion()) { el.textContent = final; return; }
+  const dur = 900;
+  const start = performance.now();
+  const tick = (now) => {
+    const t = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+    el.textContent = '$' + Math.round(to * eased);
+    if (t < 1) requestAnimationFrame(tick); else el.textContent = final;
+  };
+  requestAnimationFrame(tick);
 }
 
 // Pull a paint colour out of a back-glass variant string, e.g.
@@ -393,8 +391,8 @@ function renderGrid() {
     if (!el) continue;
     (match ? matching : nonMatching).push(el);
   }
-  // FLIP-animate the transition between filter states — but never on the first build (cards
-  // have only just appeared), and the helper itself no-ops the motion in the fallback path.
+  // Animate the transition between filter states — but never on the first build (cards have only
+  // just appeared), and the helper itself no-ops the motion in the fallback / reduced-motion path.
   applyFilter(matching, nonMatching, !firstBuild);
   const shown = matching.length;
 
@@ -419,26 +417,36 @@ function renderGrid() {
   $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
 }
 
-// Animate the grid between filter states with a clean "results refresh" — fade + subtle scale
-// the matching set into its FINAL layout. We do NOT animate card positions: a position FLIP made
-// cards fly across the grid and overlap/ghost on big set changes (All → Pixel/Battery). This is
-// the pattern premium product grids use, and it's layout-stable.
-// CRITICAL: visibility is toggled SYNCHRONOUSLY (non-matching → display:none immediately) so a
-// [hidden] read / Playwright :visible count is correct on the very next tick (driver checks 150ms);
-// the fade is opacity/transform only, which Playwright ignores. Fallback (no GSAP / reduced motion)
-// is the plain instant toggle.
+// Animate the grid between filter states with a clean "results refresh" — fade + subtle scale the
+// matching set into its FINAL layout (Web Animations API; opacity/transform only, compositor-friendly).
+// We do NOT animate card positions — that made cards fly across the grid and overlap/ghost on big set
+// changes (All → Pixel/Battery). CRITICAL: visibility is toggled SYNCHRONOUSLY (non-matching →
+// display:none) so a [hidden] read / Playwright :visible count is correct on the very next tick (driver
+// checks 150ms); the fade is opacity/transform only, which Playwright ignores. Reduced-motion / no
+// WAAPI → the plain instant toggle.
+let filterAnims = []; // our in-flight fade Animations; cancelled on the next filter so they never stack
 function applyFilter(matching, nonMatching, animate) {
   nonMatching.forEach((el) => { el.hidden = true; });
   matching.forEach((el) => { el.hidden = false; });
-  if (!animate || !GSAP_OK || reduceMotion()) return;
-  gsap.fromTo(matching,
-    { opacity: 0.25, scale: 0.985 },
-    {
-      opacity: 1, scale: 1, duration: 0.32, ease: 'power2.out',
-      stagger: { amount: 0.3 },          // spread across the set in 0.3s regardless of count
-      clearProps: 'opacity,transform',   // restore inline styles so :hover/:active CSS keeps working
-      overwrite: 'auto',                 // kill any in-flight tween when filters change rapidly
-    });
+  if (!animate || reduceMotion() || typeof matching[0]?.animate !== 'function') return;
+  filterAnims.forEach((a) => a.cancel());   // cancel only our fades — never the CSS hover animations
+  const n = matching.length;
+  filterAnims = matching.map((el, i) => {
+    // A card shown by a filter is "revealed": mark it .in so its BASE opacity is 1. Otherwise a
+    // not-yet-scroll-revealed card (.reveal ⇒ opacity:0) would fade in then vanish when the WAAPI
+    // animation (fill:'backwards') reverts to base. (Only here, not on first build, so the initial
+    // scroll-reveal stagger is preserved.)
+    el.classList.add('in');
+    return el.animate(
+      [{ opacity: 0.25, transform: 'scale(0.985)' }, { opacity: 1, transform: 'none' }],
+      {
+        duration: 320,
+        delay: n > 1 ? (i / (n - 1)) * 280 : 0, // spread the stagger across ~280ms regardless of count
+        easing: 'cubic-bezier(.22,1,.36,1)',
+        fill: 'backwards',                       // hold the dim start through the delay; no inline styles after
+      },
+    );
+  });
 }
 
 // Pointer-tracked spotlight glow on cards: sets --mx/--my (consumed by .card::before). Desktop +
@@ -658,7 +666,12 @@ function buildSpotlight(stats) {
 
   // animate when scrolled into view the first time
   const io = new IntersectionObserver((ents) => {
-    ents.forEach((en) => { if (en.isIntersecting) { show(0); io.disconnect(); } });
+    ents.forEach((en) => {
+      if (!en.isIntersecting) return;
+      show(0);
+      card.closest('.spotlight')?.classList.remove('reserving'); // release the reserved CLS space once populated
+      io.disconnect();
+    });
   }, { threshold: 0.3 });
   io.observe(card);
 }
