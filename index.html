@@ -36,9 +36,7 @@
   <link rel="preload" href="/assets/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/pricing-data.json" as="fetch" type="application/json" crossorigin="anonymous" />
   <link rel="modulepreload" href="/assets/js/app.js" />
-  <!-- GSAP CDN (animation layer) — warm the connection early; loaded as a progressive enhancement below. -->
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <!-- GSAP (animation layer) is self-hosted at /assets/js/vendor/gsap.min.js — same-origin, no CDN warm-up needed. -->
 
   <style>
     /* ===== Fonts ===== */
@@ -186,7 +184,10 @@
     @media (prefers-reduced-motion:reduce){.btn:hover{transform:none}}
 
     /* Header */
-    .header{position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(7,7,12,.62);border-bottom:1px solid var(--border);transition:background .25s ease,box-shadow .25s ease,border-color .25s ease}
+    .header{position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(7,7,12,.72);border-bottom:1px solid var(--border);transition:background .25s ease,box-shadow .25s ease,border-color .25s ease}
+    /* perf: the sticky header re-samples its blurred backdrop every scroll frame — the heaviest paint on the page.
+       Smaller radius on mobile (blur cost ~scales with radius²), with higher opacity carrying legibility. */
+    @media (max-width:600px){.header{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(7,7,12,.82)}}
     .header.scrolled{background:rgba(7,7,12,.86);border-bottom-color:var(--border-2);box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
     .header-in{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:var(--header-h)}
     .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1;flex:none}
@@ -278,7 +279,9 @@
     /* Finder controls */
     .finder{padding-top:46px}
     .controls{position:sticky;top:calc(var(--header-h) + env(safe-area-inset-top));z-index:40;padding:14px 0;margin-bottom:6px}
-    .controls-inner{display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:var(--radius);background:rgba(10,11,20,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border)}
+    .controls-inner{display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:var(--radius);background:rgba(10,11,20,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border)}
+    /* perf: the sticky filter bar sits directly under the header on mobile (stacked blurs) — shrink it hardest there. */
+    @media (max-width:600px){.controls-inner{backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);background:rgba(10,11,20,.88)}}
     .search{position:relative}
     /* premium focus: an animated gradient ring (matches the cards) is the focus indicator + a soft aura glow */
     .search::before{content:"";position:absolute;inset:0;border-radius:999px;padding:1.5px;z-index:1;opacity:0;pointer-events:none;background:conic-gradient(from var(--angle,120deg),var(--c-purple-300),var(--c-cyan-400),var(--c-purple-500),var(--c-purple-300));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;transition:opacity var(--dur-base) var(--ease-out)}
@@ -312,7 +315,7 @@
     @media (max-width:720px){.grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}}
     @media (max-width:520px){.grid{grid-template-columns:1fr}}
     /* perf: Add content-visibility to defer rendering of offscreen cards and below-the-fold sections, improving initial load and TTI */
-    .card{content-visibility:auto;contain-intrinsic-size:auto 190px;position:relative;isolation:isolate;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--color-surface-2),var(--color-surface-1));border:1px solid var(--color-border);border-radius:var(--radius-md);padding:18px;text-align:left;cursor:pointer;color:inherit;font:inherit;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
+    .card{content-visibility:auto;contain-intrinsic-size:auto 242px;position:relative;isolation:isolate;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--color-surface-2),var(--color-surface-1));border:1px solid var(--color-border);border-radius:var(--radius-md);padding:18px;text-align:left;cursor:pointer;color:inherit;font:inherit;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
     /* Layered interactive states: content above two glow layers.
        ::before = pointer-tracked spotlight (--mx/--my from app.js); ::after = animated gradient border. */
     .card>*{position:relative;z-index:1}
@@ -355,7 +358,7 @@
     @media (prefers-reduced-motion:reduce){.card:hover .card-view svg,.card:focus-visible .card-view svg{transform:none}}
 
     /* Skeletons */
-    .skel{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);height:190px}
+    .skel{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);height:242px}
     .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transform:translateX(-100%);animation:shimmer 1.3s infinite}
     @keyframes shimmer{100%{transform:translateX(100%)}}
     @media (prefers-reduced-motion:reduce){.skel::after{animation:none}}
@@ -564,6 +567,15 @@
       footer{padding-bottom:56px}
     }
 
+    /* perf: low-end / battery-saver proxy — drop the backdrop blur entirely and lean on opaque surfaces,
+       removing the per-frame backdrop re-sample on the sticky header + filter bar (+ mobile action bar). */
+    @media (prefers-reduced-motion:reduce){
+      .header,.controls-inner,.actionbar{backdrop-filter:none;-webkit-backdrop-filter:none}
+      .header{background:rgba(7,7,12,.92)}
+      .controls-inner{background:rgba(10,11,20,.94)}
+      .actionbar{background:rgba(7,7,12,.96)}
+    }
+
     /* High-contrast strategy (automatic, OS-driven). A subtle dark halo sharpens light text on glass;
        prefers-contrast opaques surfaces + strengthens borders; forced-colors keeps gradient text visible. */
     .from b,.rgroup-price .p,.spot-save .save-amt{text-shadow:0 1px 12px rgba(0,0,0,.55)}
@@ -637,11 +649,11 @@
   <!-- Vercel analytics (first-party, same-origin; no-op off Vercel) -->
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
-  <!-- GSAP (motion layer). Pinned + SRI-locked + crossorigin (CORS → SW-cacheable, non-opaque).
+  <!-- GSAP (motion layer) — self-hosted under /assets/js/vendor, same-origin and SW-precached.
        Classic defer script runs in document order BEFORE the app module, so window.gsap is ready
-       when app.js boots. All use in app.js is feature-guarded: if the CDN is blocked the UI
+       when app.js boots. All use in app.js is feature-guarded: if the file fails to load the UI
        degrades to instant (no motion), never throwing. -->
-  <script defer crossorigin="anonymous" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+  <script defer src="/assets/js/vendor/gsap.min.js"></script>
   <script type="module" src="/assets/js/app.js"></script>
   <script type="module" src="/assets/js/chat.js"></script>
 </head>

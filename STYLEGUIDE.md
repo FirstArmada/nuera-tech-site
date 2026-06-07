@@ -23,10 +23,10 @@ strict CSP (`style-src 'self' 'unsafe-inline'`). Add new global styles/tokens to
 that block; do not introduce an external stylesheet without revisiting the
 performance/CSP trade-off.
 
-App JS is self-hosted under `/assets/js`. The **one** allow-listed external script is the
-GSAP animation CDN (`script-src 'self' https://cdn.jsdelivr.net`, mirrored in `vercel.json`
-+ `_headers`) — pinned + SRI-locked and used only as a progressive enhancement (see
-*Motion & animation layer*). Don't add other origins without revisiting the CSP.
+App JS — including the GSAP animation layer — is **self-hosted** under `/assets/js`, so the CSP
+is `script-src 'self'` (mirrored in `vercel.json` + `_headers`) with **no external script
+origins**. GSAP is used only as a progressive enhancement (see *Motion & animation layer*).
+Don't add other origins without revisiting the CSP.
 
 The token system is **layered** so it can evolve without breaking anything:
 
@@ -190,10 +190,9 @@ content owned by the section layer.)*
 
 ### Motion & animation layer (GSAP)
 
-Premium motion uses **GSAP 3.15 (core only)**, loaded from a CDN (`cdn.jsdelivr.net`,
-pinned + SRI + `crossorigin`) as a classic `defer` script **before** the app module, and
-allow-listed in `script-src` (both `vercel.json` and `_headers`). It is a **progressive
-enhancement, never a hard dependency**:
+Premium motion uses **GSAP 3.15 (core only)**, self-hosted at `/assets/js/vendor/gsap.min.js`
+and loaded as a classic `defer` script **before** the app module (so `window.gsap` is ready when
+the app boots). It is a **progressive enhancement, never a hard dependency**:
 
 - All GSAP use is guarded by `GSAP_OK` (`window.gsap` present) **and** `reduceMotion()`. If the
   CDN is blocked, or motion is reduced, the UI falls back to instant, layout-correct updates and
