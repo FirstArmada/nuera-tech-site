@@ -39,6 +39,7 @@ JS + a headless puppeteer run (render 153 cards, filters/search, modal, WhatsApp
 links, runtime schema) + an axe-core WCAG 2.1 A/AA audit (must be 0 violations).
 Only ~76 of 435 lines have a Mobile Klinik comparison (all iPhone screens);
 the savings UI must degrade gracefully where `mk_price`/`savings` are null.
+## 2026-06-06 - [CSS Performance] Learning: [Adding content-visibility: auto with a contain-intrinsic-size effectively defers rendering of off-screen elements without layout shifts, making it perfect for long lists or below-the-fold content in single-page vanilla apps.] Action: [Look for opportunities to apply content-visibility to long lists or heavy components that aren't visible on initial load.]
 
 ## Foundation refresh (TELUS/UDS "Allium" bones, Nuera palette)
 - The inline token block in `index.html` now follows the TELUS/UDS (Allium) system in its
