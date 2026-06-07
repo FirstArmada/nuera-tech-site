@@ -169,7 +169,7 @@ function groupRepairs(repairs) {
 }
 
 // ---- state ----
-const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null, limit: 12 };
+const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null };
 
 // ===========================================================================
 // Boot
@@ -314,8 +314,8 @@ function buildFilters() {
   });
 
   // Keyboard: arrow keys move focus + select within each radiogroup (roving tabindex).
-  wireRoving(brandWrap, (btn) => { state.brand = btn.dataset.brand; setPressed(brandWrap, btn); state.limit = 12; renderGrid(); resetFinderScroll(); });
-  wireRoving(typeWrap, (btn) => { state.type = btn.dataset.type; setPressed(typeWrap, btn); state.limit = 12; renderGrid(); resetFinderScroll(); });
+  wireRoving(brandWrap, (btn) => { state.brand = btn.dataset.brand; setPressed(brandWrap, btn); renderGrid(); resetFinderScroll(); });
+  wireRoving(typeWrap, (btn) => { state.type = btn.dataset.type; setPressed(typeWrap, btn); renderGrid(); resetFinderScroll(); });
 
   // search
   const input = $('#search');
@@ -323,19 +323,10 @@ function buildFilters() {
   const onSearch = debounce(() => {
     state.q = input.value.trim().toLowerCase();
     clear.classList.toggle('show', input.value.length > 0);
-    state.limit = 12;
     renderGrid();
   }, 110);
   input.addEventListener('input', onSearch);
-
-  const loadMoreBtn = $('#load-more');
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
-      state.limit += 12;
-      renderGrid();
-    });
-  }
-  clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); state.limit = 12; renderGrid(); resetFinderScroll(); input.focus(); });
+  clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); resetFinderScroll(); input.focus(); });
 
   // Deep link ?q= (WebSite SearchAction)
   const urlQ = new URLSearchParams(location.search).get('q');
@@ -416,30 +407,11 @@ function renderGrid() {
       && (!q || d.search.includes(q));
     const el = cardEls.get(d.model);
     if (!el) continue;
-
-    if (match) {
-        matching.push(el);
-    } else {
-        nonMatching.push(el);
-    }
+    (match ? matching : nonMatching).push(el);
   }
-
-  const visibleMatching = matching.slice(0, state.limit);
-  const hiddenMatching = matching.slice(state.limit);
-
-  for (const el of hiddenMatching) {
-      nonMatching.push(el);
-  }
-
-  // Handle Load More button
-  const loadMoreBtn = $('#load-more');
-  if (loadMoreBtn) {
-      loadMoreBtn.style.display = matching.length > state.limit ? 'inline-flex' : 'none';
-  }
-
   // Animate the transition between filter states — but never on the first build (cards have only
   // just appeared), and the helper itself no-ops the motion in the fallback / reduced-motion path.
-  applyFilter(visibleMatching, nonMatching, !firstBuild);
+  applyFilter(matching, nonMatching, !firstBuild);
   const shown = matching.length;
 
   if (!shown) {

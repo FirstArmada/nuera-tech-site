@@ -140,7 +140,7 @@
       --focus-ring-color:var(--c-purple-300);--focus-ring-width:2px;--focus-ring-offset:2px;
 
       /* -- Layout -- */
-      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(1.25rem,4vw,24px);--actionbar-h:72px;
+      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(16px,4vw,24px);--actionbar-h:72px;
       --touch-min:48px; /* minimum interactive touch target ("broken-screen" a11y) */
 
       /* -- Legacy aliases (existing rules + runtime markup depend on these) -- */
@@ -262,12 +262,6 @@
        buttons elsewhere are untouched; min-height:48px is inherited so the touch target is unchanged. */
     .hero-actions .btn-ghost{font-weight:var(--fw-medium);color:var(--color-text-secondary);background:var(--color-surface-1)}
     .hero-actions .btn-ghost:hover{color:var(--color-text-primary)}
-
-    @media (max-width: 600px) {
-      .hero { text-align: center; }
-      .hero h1, .hero .lead { margin-inline: auto; }
-      .hero-actions { justify-content: center; }
-    }
 
     /* Stat strip */
     .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);margin-top:var(--space-5)}
@@ -825,9 +819,6 @@
       <div class="grid" id="grid" aria-busy="true">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
-      </div>
-      <div style="text-align: center; margin-top: 24px;">
-        <button id="load-more" class="btn btn-ghost" style="display: none; width: 100%; max-width: 300px; color: var(--color-text-primary); background: var(--color-surface-2);">Load More Devices</button>
       </div>
     </section>
 

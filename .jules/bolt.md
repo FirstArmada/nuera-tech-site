@@ -57,8 +57,3 @@ the savings UI must degrade gracefully where `mk_price`/`savings` are null.
   The sync job (`cloud/pricing-sync/lib/transform.js` → `computeStats`) emits it.
 - Verify with the run-* driver (24/24) AND `tests/a11y.cjs` (axe 0 violations); CI runs both
   on every PR via `.github/workflows/verify.yml`. SW cache is `nuera-v3`.
-
-## 2026-06-07 - Pagination Logic in Vanilla App Learning:
-We added a 'load more' pagination by storing a limit in state and slicing the visible cards to pass to the applyFilter WAAPI animation. This allowed us to keep the logic for showing/hiding consistent without re-rendering the DOM on every load-more event.
-
-Action: When implementing "Load More" pagination in a vanilla JS app that builds a list of elements once and toggles them using display properties, rely on maintaining a max visibility limit in a central state object and slicing the final DOM array before applying the transitions.
