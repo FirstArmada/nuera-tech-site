@@ -301,6 +301,7 @@
     .search input:focus-visible{outline:none} /* the animated gradient ring is the focus indicator */
     .search:focus-within input{border-color:transparent;background:rgba(255,255,255,.09);box-shadow:0 0 32px -8px rgba(139,92,246,.55)}
     .search .clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);z-index:2;background:var(--panel-2);border:0;border-radius:var(--radius-circle);width:36px;height:36px;color:var(--muted);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:1.1rem;transition:background var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard)}
+    .search .clear::after{content:"";position:absolute;inset:-4px;border-radius:50%} /* extend hit area to >=44px (visual stays 36px), mirrors .swatch::after */
     .search .clear.show{display:flex}
     .search .clear:hover{background:rgba(255,255,255,.16);color:#fff}
     .filter-row{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px;scroll-snap-type:x proximity;scroll-padding-left:2px}
