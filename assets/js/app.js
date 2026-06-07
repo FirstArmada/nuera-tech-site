@@ -65,6 +65,13 @@ const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = () => matchMedia('(hover: hover)').matches;
 
+// Shared easing: mirror the CSS --ease-entrance token so WAAPI animations ride the exact same
+// curve as the CSS transitions (one source of truth, no build step). Falls back to the literal
+// curve if the var is absent (older engines).
+const EASE_ENTRANCE =
+  getComputedStyle(document.documentElement).getPropertyValue('--ease-entrance').trim()
+  || 'cubic-bezier(.22,1,.36,1)';
+
 // ---- Motion (vanilla — no third-party JS) ----
 // All motion is gated on reduceMotion(): reduced-motion users get instant, layout-correct
 // updates. Animations use requestAnimationFrame / the Web Animations API (compositor-friendly
@@ -86,6 +93,17 @@ function countUp(el, to) {
     if (t < 1) requestAnimationFrame(tick); else el.textContent = final;
   };
   requestAnimationFrame(tick);
+}
+
+// Brief, non-jarring confirmation that the result set refreshed: an opacity + lift flash on the
+// (already aria-live) count. Compositor-only (opacity/transform), skipped under reduced motion,
+// and only fired on filter/search changes — never the first build (see renderGrid).
+function pulseResultCount(el) {
+  if (!el || reduceMotion() || typeof el.animate !== 'function') return;
+  el.animate(
+    [{ opacity: 0.45, transform: 'translateY(2px)' }, { opacity: 1, transform: 'none' }],
+    { duration: 260, easing: EASE_ENTRANCE, fill: 'backwards' },
+  );
 }
 
 // Pull a paint colour out of a back-glass variant string, e.g.
@@ -415,6 +433,7 @@ function renderGrid() {
       + (q ? ` · “${state.q}”` : '')
     : 'No matches';
   $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
+  if (!firstBuild) pulseResultCount(count); // visual "results refreshed" cue; never on first paint
 }
 
 // Animate the grid between filter states with a clean "results refresh" — fade + subtle scale the
@@ -442,7 +461,7 @@ function applyFilter(matching, nonMatching, animate) {
       {
         duration: 320,
         delay: n > 1 ? (i / (n - 1)) * 280 : 0, // spread the stagger across ~280ms regardless of count
-        easing: 'cubic-bezier(.22,1,.36,1)',
+        easing: EASE_ENTRANCE,
         fill: 'backwards',                       // hold the dim start through the delay; no inline styles after
       },
     );

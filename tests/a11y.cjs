@@ -49,9 +49,22 @@ function startServer() {
   const server = await startServer();
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   try {
-    const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
+    // reducedMotion so the site's CSS snaps .reveal sections to their settled opacity:1 state —
+    // the audit must judge the resting page, never a transient reveal-fade frame.
+    const page = await browser.newPage({ viewport: { width: 1366, height: 900 }, reducedMotion: 'reduce' });
     await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#grid .card', { timeout: 15000 }); // wait for the runtime render
+    // Force every deferred/animated region into its fully-rendered, settled state before auditing.
+    // Without this the audit is BOTH non-deterministic AND incomplete: content-visibility:auto skips
+    // off-screen sections (#why/#how/.cta/#faq/footer) so axe never evaluates them, and the .reveal
+    // opacity fade can be sampled mid-transition (a bright accent flattens toward the dark bg → a
+    // false "color-contrast" failure). Rendering everything settled scans the whole page reliably —
+    // this is the accessible end-state every user reaches, and it leaves the colours under test
+    // unchanged (content-visibility/opacity affect rendering + timing, not contrast).
+    await page.addStyleTag({ content:
+      '*,*::before,*::after{content-visibility:visible !important}'
+      + '.reveal{opacity:1 !important;transform:none !important}' });
+    await page.waitForTimeout(120); // let layout settle after un-deferring content-visibility
     await page.addScriptTag({ content: axe.source });
     const results = await page.evaluate(async () =>
       await window.axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] }));
