@@ -29,5 +29,9 @@ README.md
 changelog-agent.md
 vercel.json
 
+# Unreferenced root social-card assets (the live OG image is assets/icons/og-image.png).
+social-card.png
+social-card.svg
+
 # Logs
 *.log

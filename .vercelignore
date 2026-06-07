@@ -3,3 +3,7 @@
 # workflow (.github/workflows/deploy-cloud.yml) and must not ship to Vercel.
 cloud
 tests
+
+# Unreferenced root social-card assets (the live OG image is assets/icons/og-image.png).
+social-card.png
+social-card.svg

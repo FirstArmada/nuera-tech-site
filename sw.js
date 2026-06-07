@@ -6,6 +6,10 @@ const VERSION = 'nuera-v5';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
+// Install-time shell = only what the first render / offline reload actually needs.
+// The PWA-install icons (192 / 512 / maskable / apple-touch, ~154KB) are deliberately
+// NOT precached: they're fetched on demand by the /assets/ stale-while-revalidate handler
+// the first time the OS requests one, so a first visit no longer pays for them up front.
 const PRECACHE = [
   '/',
   '/index.html',
@@ -14,10 +18,6 @@ const PRECACHE = [
   '/assets/fonts/inter-var-latin.woff2',
   '/assets/icons/favicon.svg',
   '/assets/icons/favicon-32.png',
-  '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png',
-  '/assets/icons/maskable-512.png',
-  '/assets/icons/apple-touch-icon.png',
   '/manifest.webmanifest',
   '/pricing-data.json',
 ];
