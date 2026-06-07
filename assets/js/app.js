@@ -32,13 +32,20 @@ const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') 
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
 
 // ---- state ----
-const state = { devices: [], filtered: [], byModel: new Map(), brand: 'all', type: 'all', q: '' };
+const state = { devices: [], filtered: [], byModel: new Map(), brand: 'all', type: 'all', q: '', limit: 12 };
 
 // ===========================================================================
 // Boot
 // ===========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   $('#year').textContent = new Date().getFullYear();
+  const loadMoreBtn = $('#load-more');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      state.limit += 12;
+      renderGrid();
+    });
+  }
   initReveal();
   initScrollTop();
   initWhatsAppDefaults();
@@ -151,12 +158,14 @@ function buildFilters() {
   brandWrap.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-brand]'); if (!btn) return;
     state.brand = btn.dataset.brand;
+    state.limit = 12; // Reset limit on filter
     setPressed(brandWrap, btn);
     renderGrid();
   });
   typeWrap.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-type]'); if (!btn) return;
     state.type = btn.dataset.type;
+    state.limit = 12; // Reset limit on filter
     setPressed(typeWrap, btn);
     renderGrid();
   });
@@ -166,11 +175,12 @@ function buildFilters() {
   const clear = $('#search-clear');
   const onSearch = debounce(() => {
     state.q = input.value.trim().toLowerCase();
+    state.limit = 12; // Reset limit on search
     clear.classList.toggle('show', input.value.length > 0);
     renderGrid();
   }, 110);
   input.addEventListener('input', onSearch);
-  clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); input.focus(); });
+  clear.addEventListener('click', () => { input.value = ''; state.q = ''; state.limit = 12; clear.classList.remove('show'); renderGrid(); input.focus(); });
 
   // Deep link ?q= (WebSite SearchAction)
   const urlQ = new URLSearchParams(location.search).get('q');
@@ -186,7 +196,9 @@ function setPressed(wrap, active) {
 // ===========================================================================
 function renderGrid() {
   const grid = $('#grid');
-  const { brand, type, q } = state;
+  const loadMoreBtn = $('#load-more');
+  const { brand, type, q, limit } = state;
+
   const list = state.devices.filter((d) =>
     (brand === 'all' || d.brand === brand) &&
     (type === 'all' || d.types.has(type)) &&
@@ -201,7 +213,13 @@ function renderGrid() {
       <a class="btn btn-wa" style="margin-top:14px" href="${waLink('Hi Nuera Tech! Do you repair: ' + (q || 'my device') + '?')}" target="_blank" rel="noopener">Ask on WhatsApp</a>
     </div>`;
   } else {
-    grid.innerHTML = list.map(cardHTML).join('');
+    const visibleList = list.slice(0, limit);
+    grid.innerHTML = visibleList.map(cardHTML).join('');
+    if (list.length > limit) {
+      loadMoreBtn.style.display = 'inline-flex';
+    } else {
+      loadMoreBtn.style.display = 'none';
+    }
   }
   observeReveal(grid);
 

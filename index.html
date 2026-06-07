@@ -72,7 +72,7 @@
     @media (prefers-reduced-motion:reduce){.aurora::after{animation:none}}
 
     /* Layout */
-    .wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(16px,4vw,28px)}
+    .wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(1.25rem,4vw,28px)}
     section{scroll-margin-top:calc(var(--header-h) + 12px)}
     .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
     h2{font-size:clamp(1.6rem,3.4vw,2.5rem);letter-spacing:-.03em;line-height:1.08;margin:.4em 0 .25em}
@@ -105,10 +105,13 @@
     .header .btn{padding:10px 16px;min-height:40px;font-size:.92rem}
 
     /* Hero */
-    .hero{padding:clamp(40px,7vw,78px) 0 12px}
+    .hero{padding:clamp(40px,7vw,78px) 0 12px;text-align:center;display:flex;flex-direction:column;align-items:center}
+    .hero .badge{margin-inline:auto}
+    .hero .lead{margin-inline:auto}
+    .hero-actions{justify-content:center}
     .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:#dbe3f4;font-size:.85rem;font-weight:600;margin-bottom:22px}
     .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(52,211,153,.18)}
-    h1{font-size:clamp(2.6rem,7.5vw,5.4rem);line-height:.96;letter-spacing:-.045em;font-weight:800;margin:0 0 18px}
+    h1{font-size:clamp(2.6rem,7.5vw,5.4rem);line-height:.96;letter-spacing:-.045em;font-weight:800;margin:0 auto 18px}
     .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
     .hero .lead{font-size:clamp(1.05rem,1.9vw,1.3rem);color:#d7deee;max-width:62ch;margin:0 0 26px}
     .hero .lead strong{color:#fff}
@@ -412,6 +415,9 @@
       <div class="grid" id="grid" aria-busy="true">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+      </div>
+      <div style="text-align:center;margin-top:24px">
+        <button id="load-more" class="btn btn-ghost" style="display:none;margin:0 auto">Load More Devices</button>
       </div>
     </section>
 
