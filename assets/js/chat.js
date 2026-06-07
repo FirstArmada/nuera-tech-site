@@ -38,7 +38,7 @@ const STYLE = `
   background:linear-gradient(135deg,#8b5cf6,#22d3ee);color:#0b0b12;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.45)}
 .nt-chat-launch svg{width:26px;height:26px}
 .nt-chat-launch:focus-visible{outline:2px solid #c4b5fd;outline-offset:3px}
-.nt-chat-panel{position:fixed;z-index:80;right:18px;bottom:18px;width:min(380px,calc(100vw - 28px));height:min(560px,calc(100vh - 36px));
+.nt-chat-panel{position:fixed;z-index:80;right:18px;bottom:18px;width:min(380px,calc(100dvw - 28px));height:min(560px,calc(100dvh - 36px));
   display:flex;flex-direction:column;background:#0f0d18;color:#f4f4f8;border:1px solid rgba(255,255,255,.12);
   border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6)}
 .nt-chat-panel[hidden]{display:none}

@@ -63,16 +63,14 @@ const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matche
 const canHover = () => matchMedia('(hover: hover)').matches;
 
 // ---- GSAP (animation layer) — progressive enhancement, never a hard dependency ----
-// GSAP + the Flip plugin are loaded from a CDN in index.html as classic `defer` scripts,
-// so window.gsap / window.Flip are present before this module runs. EVERYTHING below is
-// feature-guarded behind GSAP_OK: if the CDN is blocked (offline, CSP, ad-blocker) the UI
-// degrades to instant, layout-correct updates and never throws — keeping the a11y + driver
-// gates green. Motion is also always gated on reduceMotion() (the CSS reduced-motion net
-// can't stop GSAP's JS-driven inline-style animation, so the JS guard is mandatory).
-const GSAP_OK = typeof window.gsap !== 'undefined' && typeof window.Flip !== 'undefined';
+// GSAP is loaded from a CDN in index.html as a classic `defer` script, so window.gsap is
+// present before this module runs. EVERYTHING below is feature-guarded behind GSAP_OK: if
+// the CDN is blocked (offline, CSP, ad-blocker) the UI degrades to instant, layout-correct
+// updates and never throws — keeping the a11y + driver gates green. Motion is also always
+// gated on reduceMotion() (the CSS reduced-motion net can't stop GSAP's JS-driven inline-style
+// animation, so the JS guard is mandatory).
+const GSAP_OK = typeof window.gsap !== 'undefined';
 const gsap = GSAP_OK ? window.gsap : null;
-const Flip = GSAP_OK ? window.Flip : null;
-if (GSAP_OK) { try { gsap.registerPlugin(Flip); } catch (_) { /* noop */ } }
 
 // Animate a money figure from 0 → `to`. Falls back to the final value instantly when GSAP
 // is absent or motion is reduced. The element must NOT live in an aria-live region (it would
@@ -420,29 +418,26 @@ function renderGrid() {
   $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
 }
 
-// FLIP-animate the grid between filter states. The fallback / reduced-motion / no-GSAP path is
-// the original instant toggle. CRITICAL: non-matching cards are set display:none SYNCHRONOUSLY
-// (so a [hidden] read / Playwright :visible is correct on the very next tick); only matching,
-// entering and moving cards animate. We deliberately do NOT animate "leaving" cards (no onLeave) —
-// that would keep them visible mid-tween and corrupt the visible-count assertions.
+// Animate the grid between filter states with a clean "results refresh" — fade + subtle scale
+// the matching set into its FINAL layout. We do NOT animate card positions: a position FLIP made
+// cards fly across the grid and overlap/ghost on big set changes (All → Pixel/Battery). This is
+// the pattern premium product grids use, and it's layout-stable.
+// CRITICAL: visibility is toggled SYNCHRONOUSLY (non-matching → display:none immediately) so a
+// [hidden] read / Playwright :visible count is correct on the very next tick (driver checks 150ms);
+// the fade is opacity/transform only, which Playwright ignores. Fallback (no GSAP / reduced motion)
+// is the plain instant toggle.
 function applyFilter(matching, nonMatching, animate) {
-  if (!animate || !GSAP_OK || reduceMotion()) {
-    nonMatching.forEach((el) => { el.hidden = true; });
-    matching.forEach((el) => { el.hidden = false; });
-    return;
-  }
-  const flipState = Flip.getState(matching);   // capture positions BEFORE mutating the DOM
   nonMatching.forEach((el) => { el.hidden = true; });
   matching.forEach((el) => { el.hidden = false; });
-  Flip.from(flipState, {
-    duration: 0.45,
-    ease: 'power2.out',
-    stagger: 0.012,
-    absolute: true,            // movers reposition over the grid without disturbing siblings
-    onEnter: (els) => gsap.fromTo(els,
-      { opacity: 0, scale: 0.92 },
-      { opacity: 1, scale: 1, duration: 0.3, stagger: 0.012 }),
-  });
+  if (!animate || !GSAP_OK || reduceMotion()) return;
+  gsap.fromTo(matching,
+    { opacity: 0.25, scale: 0.985 },
+    {
+      opacity: 1, scale: 1, duration: 0.32, ease: 'power2.out',
+      stagger: { amount: 0.3 },          // spread across the set in 0.3s regardless of count
+      clearProps: 'opacity,transform',   // restore inline styles so :hover/:active CSS keeps working
+      overwrite: 'auto',                 // kill any in-flight tween when filters change rapidly
+    });
 }
 
 // Pointer-tracked spotlight glow on cards: sets --mx/--my (consumed by .card::before). Desktop +

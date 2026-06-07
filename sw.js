@@ -11,7 +11,6 @@ const RUNTIME = `${VERSION}-runtime`;
 // keep their motion. The site degrades gracefully (instant, no motion) if they're absent.
 const CDN_SCRIPTS = [
   'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js',
-  'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/Flip.min.js',
 ];
 
 const PRECACHE = [

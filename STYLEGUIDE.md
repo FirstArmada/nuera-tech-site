@@ -190,21 +190,23 @@ content owned by the section layer.)*
 
 ### Motion & animation layer (GSAP)
 
-Premium motion uses **GSAP 3.15 + the Flip plugin**, loaded from a CDN (`cdn.jsdelivr.net`,
-pinned + SRI + `crossorigin`) as classic `defer` scripts **before** the app module, and
+Premium motion uses **GSAP 3.15 (core only)**, loaded from a CDN (`cdn.jsdelivr.net`,
+pinned + SRI + `crossorigin`) as a classic `defer` script **before** the app module, and
 allow-listed in `script-src` (both `vercel.json` and `_headers`). It is a **progressive
 enhancement, never a hard dependency**:
 
-- All GSAP use is guarded by `GSAP_OK` (`window.gsap` + `window.Flip` present) **and**
-  `reduceMotion()`. If the CDN is blocked, or motion is reduced, the UI falls back to
-  instant, layout-correct updates and **never throws** — the a11y + driver gates pass either way.
-- **Grid filtering** uses `Flip` (`applyFilter()` in `app.js`): capture `Flip.getState()`
-  of the cards that will be visible, then set `hidden` synchronously, then `Flip.from(…)`.
-  **Non-matching cards go `display:none` synchronously and are never animated** (no
-  `onLeave`) — the driver counts `.card:visible` 150 ms after a filter change, so leaving
-  cards must not linger. Touch this path carefully.
-- **Savings count-up** (`countUp()`) animates a number that must never sit in an
-  `aria-live` region and always commits the true final value.
+- All GSAP use is guarded by `GSAP_OK` (`window.gsap` present) **and** `reduceMotion()`. If the
+  CDN is blocked, or motion is reduced, the UI falls back to instant, layout-correct updates and
+  **never throws** — the a11y + driver gates pass either way.
+- **Grid filtering** (`applyFilter()` in `app.js`): visibility is toggled **synchronously**
+  (non-matching → `display:none` immediately) so the grid is layout-correct on the next tick —
+  the driver counts `.card:visible` 150 ms after a filter change and Playwright ignores opacity.
+  The matching set then fades + subtly scales into its **final** layout (`gsap.fromTo`, staggered
+  via `stagger.amount`, with `clearProps` so `:hover`/`:active` keep working). **Card positions
+  are never animated** — a position FLIP made cards fly across the grid and overlap/ghost on big
+  set changes (the wrong pattern for a catalog filter). Touch this path carefully.
+- **Savings count-up** (`countUp()`) animates a number that must never sit in an `aria-live`
+  region and always commits the true final value.
 - The global reduced-motion CSS net cannot stop GSAP's JS-driven inline animation — the
   **`reduceMotion()` JS guard is mandatory**, not decorative.
 
