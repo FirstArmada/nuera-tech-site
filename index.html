@@ -140,7 +140,7 @@
       --focus-ring-color:var(--c-purple-300);--focus-ring-width:2px;--focus-ring-offset:2px;
 
       /* -- Layout -- */
-      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(16px,4vw,24px);--actionbar-h:72px;
+      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(20px,4vw,24px);--actionbar-h:72px;
       --touch-min:48px; /* minimum interactive touch target ("broken-screen" a11y) */
 
       /* -- Legacy aliases (existing rules + runtime markup depend on these) -- */
@@ -279,11 +279,12 @@
     /* Savings spotlight */
     /* margin-inline must stay auto so this .wrap container centres like the other sections (was `0`, which left-pinned it) */
     .spotlight{margin:46px auto 8px}
-    /* Reserve ~the populated height before the runtime fetch resolves, so the spotlight appearing
-       doesn't shove the finder down (CLS). JS removes .reserving once populated. Sized just under the
-       measured card+eyebrow height per breakpoint so releasing it never causes a shrink-shift. */
-    .spotlight.reserving{min-height:600px}
-    @media (min-width:560px){.spotlight.reserving{min-height:470px}}
+    /* Reserve a slice of the populated height before the runtime fetch resolves, so the spotlight
+       appearing doesn't shove the finder far down (CLS). Trimmed from a near-full reserve so a
+       no-data / failed-fetch state never leaves a full-screen empty gap before the device list;
+       JS removes .reserving once the spotlight is populated AND whenever there's no spotlight data. */
+    .spotlight.reserving{min-height:420px}
+    @media (min-width:560px){.spotlight.reserving{min-height:360px}}
     .spot-card{background:linear-gradient(160deg,rgba(139,92,246,.14),rgba(34,211,238,.08) 60%,var(--panel));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:clamp(20px,3vw,34px);box-shadow:var(--shadow);position:relative;overflow:hidden}
     .spot-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
     .spot-device{font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:700;letter-spacing:-.02em}
@@ -372,6 +373,13 @@
     .card:active{transform:scale(.985)} /* immediate press feedback on touch */
     @media (prefers-reduced-motion:reduce){.card:focus-visible,.card:hover,.card:active{transform:none}.card:focus-visible::after,.card:hover::after{animation:none}}
     .card[hidden]{display:none}
+    /* "Load More" pagination control — reuses the primary button (var(--grad-accent) / --color-accent
+       via .btn-primary), centred below the grid. The [hidden] rule is explicit because .btn sets
+       display:inline-flex, which would otherwise beat the UA [hidden]{display:none} (mirrors .card[hidden]). */
+    .load-more-row{display:flex;justify-content:center}
+    .load-more{margin-top:var(--space-5)}
+    .load-more[hidden]{display:none}
+    .load-more .lm-cnt{font-weight:600;margin-left:6px}
     .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
     .card-model{font-size:1.06rem;font-weight:700;letter-spacing:-.02em;line-height:1.2}
     .brand-tag{flex:none;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:var(--muted)}
@@ -560,6 +568,12 @@
       dialog[open]{place-items:end center}
       .sheet{width:100vw;max-height:90dvh;border-radius:24px 24px 0 0;border-bottom:0}
       .hero-actions .btn{flex:1 1 auto}
+      /* Centre the hero copy on phones — badge · headline · lead · actions · WhatsApp cue · stats.
+         text-align cascades to the inline badge/cue + stat cards; the lead needs margin auto to
+         centre its 60ch block, and the flex action row gets justify-content. */
+      .hero{text-align:center}
+      .hero .lead{margin-inline:auto}
+      .hero-actions{justify-content:center}
     }
 
     /* Reveal on scroll */
@@ -819,6 +833,10 @@
       <div class="grid" id="grid" aria-busy="true">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+      </div>
+
+      <div class="load-more-row">
+        <button class="btn btn-primary load-more" id="load-more" type="button" hidden>Load More Devices</button>
       </div>
     </section>
 

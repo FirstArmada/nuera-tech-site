@@ -206,6 +206,7 @@ async function loadData() {
     injectPriceSchema(repairs);
   } catch (err) {
     console.error('[nuera] failed to load pricing:', err);
+    $('.spotlight')?.classList.remove('reserving'); // release the reserve so a failed fetch leaves no empty gap
     grid.setAttribute('aria-busy', 'false');
     grid.innerHTML = `<div class="errorbox">
       <span class="empty-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
@@ -384,7 +385,12 @@ function resetFinderScroll() {
 let cardEls = null; // Map<model, HTMLElement>, built once
 let emptyEl = null; // reused empty-state node
 
-function renderGrid() {
+// "Load More" pagination: cap the rendered grid to one page, growing by PAGE_SIZE per click.
+const PAGE_SIZE = 12;
+let visibleLimit = PAGE_SIZE; // reset to PAGE_SIZE on any new search/filter; grown by "Load More"
+let pagedShown = 0;           // matching cards currently shown — lets us animate only the new slice
+
+function renderGrid(resetPage = true) {
   const grid = $('#grid');
   const { brand, type, q } = state;
 
@@ -396,8 +402,12 @@ function renderGrid() {
     grid.setAttribute('aria-busy', 'false');
     observeReveal(grid);      // observe once; the observation persists across hide/show
     initCardSpotlight(grid);  // pointer-tracked glow (desktop + motion-on only)
+    initLoadMore();           // wire the "Load More" control once (static markup)
     firstBuild = true;
   }
+
+  // A new search/filter starts back at page one; only "Load More" (renderGrid(false)) keeps the page.
+  if (resetPage) visibleLimit = PAGE_SIZE;
 
   const matching = [];
   const nonMatching = [];
@@ -409,10 +419,19 @@ function renderGrid() {
     if (!el) continue;
     (match ? matching : nonMatching).push(el);
   }
-  // Animate the transition between filter states — but never on the first build (cards have only
-  // just appeared), and the helper itself no-ops the motion in the fallback / reduced-motion path.
-  applyFilter(matching, nonMatching, !firstBuild);
-  const shown = matching.length;
+
+  // Pagination caps the DOM to `visibleLimit` matches; the overflow stays [hidden] via the SAME
+  // mechanism as filtering, so .card content-visibility is untouched. On "Load More" we animate only
+  // the freshly revealed slice (visible.slice(animateFrom)) so already-settled cards never re-flash.
+  // Never animate the first build (cards just appeared); the helper no-ops motion in reduced-motion.
+  const visible = matching.slice(0, visibleLimit);
+  const pagedOut = matching.slice(visibleLimit);
+  const animateFrom = resetPage ? 0 : Math.min(pagedShown, visible.length);
+  applyFilter(visible, nonMatching.concat(pagedOut), !firstBuild, visible.slice(animateFrom));
+  pagedShown = visible.length;
+  updateLoadMore(matching.length);
+
+  const shown = matching.length; // result meta + empty state reflect TOTAL matches, not the page
 
   if (!shown) {
     if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
@@ -436,21 +455,23 @@ function renderGrid() {
   if (!firstBuild) pulseResultCount(count); // visual "results refreshed" cue; never on first paint
 }
 
-// Animate the grid between filter states with a clean "results refresh" — fade + subtle scale the
-// matching set into its FINAL layout (Web Animations API; opacity/transform only, compositor-friendly).
-// We do NOT animate card positions — that made cards fly across the grid and overlap/ghost on big set
-// changes (All → Pixel/Battery). CRITICAL: visibility is toggled SYNCHRONOUSLY (non-matching →
-// display:none) so a [hidden] read / Playwright :visible count is correct on the very next tick (driver
-// checks 150ms); the fade is opacity/transform only, which Playwright ignores. Reduced-motion / no
-// WAAPI → the plain instant toggle.
+// Animate the grid between filter/pagination states with a clean "results refresh" — fade + subtle
+// scale the visible set (or just `animateEls`, the freshly revealed page) into its FINAL layout (Web
+// Animations API; opacity/transform only, compositor-friendly). We do NOT animate card positions —
+// that made cards fly across the grid and overlap/ghost on big set changes (All → Pixel/Battery).
+// CRITICAL: visibility is toggled SYNCHRONOUSLY (non-matching + paged-out → display:none) so a
+// [hidden] read / Playwright :visible count is correct on the very next tick (driver checks 150ms);
+// the fade is opacity/transform only, which Playwright ignores. Reduced-motion / no WAAPI → the plain
+// instant toggle.
 let filterAnims = []; // our in-flight fade Animations; cancelled on the next filter so they never stack
-function applyFilter(matching, nonMatching, animate) {
-  nonMatching.forEach((el) => { el.hidden = true; });
-  matching.forEach((el) => { el.hidden = false; });
-  if (!animate || reduceMotion() || typeof matching[0]?.animate !== 'function') return;
+function applyFilter(visible, hidden, animate, animateEls) {
+  hidden.forEach((el) => { el.hidden = true; });
+  visible.forEach((el) => { el.hidden = false; });
+  if (!animate || reduceMotion() || typeof visible[0]?.animate !== 'function') return;
   filterAnims.forEach((a) => a.cancel());   // cancel only our fades — never the CSS hover animations
-  const n = matching.length;
-  filterAnims = matching.map((el, i) => {
+  const list = (animateEls && animateEls.length) ? animateEls : visible; // animate just the new slice when given
+  const n = list.length;
+  filterAnims = list.map((el, i) => {
     // A card shown by a filter is "revealed": mark it .in so its BASE opacity is 1. Otherwise a
     // not-yet-scroll-revealed card (.reveal ⇒ opacity:0) would fade in then vanish when the WAAPI
     // animation (fill:'backwards') reverts to base. (Only here, not on first build, so the initial
@@ -466,6 +487,34 @@ function applyFilter(matching, nonMatching, animate) {
       },
     );
   });
+}
+
+// "Load More" pagination — the grid renders one page (PAGE_SIZE) at a time; each click reveals the
+// next page via renderGrid(false), which keeps the page and animates only the new slice. Wired once;
+// the button is static markup driven entirely by renderGrid → updateLoadMore.
+function initLoadMore() {
+  const btn = $('#load-more');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const prev = pagedShown;
+    visibleLimit += PAGE_SIZE;
+    renderGrid(false);
+    // a11y: only if the button just disappeared (last page reached) do we move focus, so keyboard
+    // users aren't stranded on a removed control; otherwise focus stays on the button to keep paging.
+    if (btn.hidden) {
+      const cards = $$('.card', $('#grid')).filter((el) => !el.hidden);
+      (cards[prev] || cards[cards.length - 1])?.focus();
+    }
+  });
+}
+
+// Show the button only while matches exceed the current page; label it with the remaining count.
+function updateLoadMore(total) {
+  const btn = $('#load-more');
+  if (!btn) return;
+  const remaining = total - visibleLimit;
+  btn.hidden = remaining <= 0;
+  if (!btn.hidden) btn.innerHTML = `Load More Devices <span class="lm-cnt">${remaining} more</span>`;
 }
 
 // Pointer-tracked spotlight glow on cards: sets --mx/--my (consumed by .card::before). Desktop +
@@ -646,7 +695,12 @@ function selectOption(gi, oi) {
 // ===========================================================================
 function buildSpotlight(stats) {
   const { top } = stats;
-  if (!top.length) return;
+  if (!top.length) {
+    // No comparison data → the spotlight stays hidden; release its reserved space so it never
+    // leaves a permanent empty gap before the device list.
+    $('.spotlight')?.classList.remove('reserving');
+    return;
+  }
 
   const picks = top.slice(0, 6);
   const card = $('#spotlight');

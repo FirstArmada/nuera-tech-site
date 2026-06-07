@@ -135,17 +135,27 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
       check('spotlight pill switches device', spotDevice2 !== spotDevice, `"${spotDevice}" -> "${spotDevice2}"`);
     }
 
-    console.log('\n[3] Brand filter (iPhone)');
-    // The grid renders all cards once and filters by toggling [hidden], so the
-    // assertions below count VISIBLE cards (:visible); a raw '.card' count would
-    // always return the full catalogue regardless of the active filter.
+    console.log('\n[3] Brand filter (iPhone) + Load More pagination');
+    // The grid renders all cards once and filters by toggling [hidden]; on top of that the grid is
+    // PAGINATED to PAGE cards, so the visible (:visible) count caps at min(total, PAGE). The pill shows
+    // the FULL brand total and #result-count reports it; "Load More" reveals the next page.
+    const PAGE = 12;
     const iphonePillCnt = (await page.locator('[data-brand="iphone"] .cnt').textContent() || '').trim();
     await page.locator('[data-brand="iphone"]').click();
     await page.waitForTimeout(150);
     const afterBrand = await page.locator('#grid .card:visible').count();
     const allIphone = await page.locator('#grid .card:visible .brand-tag').evaluateAll((els) => els.every((e) => e.textContent.trim() === 'iPhone'));
-    check('iPhone filter count matches pill', String(afterBrand) === iphonePillCnt, `${afterBrand} cards, pill says ${iphonePillCnt}`);
+    check('iPhone filter caps at one page', afterBrand === Math.min(Number(iphonePillCnt), PAGE), `${afterBrand} visible, pill says ${iphonePillCnt} (page ${PAGE})`);
     check('all filtered cards are iPhone', allIphone && afterBrand > 0);
+    const iphoneResult = (await page.locator('#result-count').textContent() || '').trim();
+    check('result count shows full iPhone total', iphoneResult.startsWith(iphonePillCnt), `"${iphoneResult}", pill ${iphonePillCnt}`);
+    const loadMore = page.locator('#load-more');
+    if (await loadMore.isVisible()) {
+      await loadMore.click();
+      await page.waitForTimeout(150);
+      const afterLoadMore = await page.locator('#grid .card:visible').count();
+      check('Load More reveals the next page', afterLoadMore > afterBrand, `${afterBrand} -> ${afterLoadMore}`);
+    }
     await page.locator('[data-brand="all"]').click();
     await page.waitForTimeout(100);
 
