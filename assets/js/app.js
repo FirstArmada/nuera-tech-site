@@ -705,5 +705,15 @@ function debounce(fn, wait) { let t; return (...a) => { clearTimeout(t); t = set
 // PWA service worker
 // ===========================================================================
 if ('serviceWorker' in navigator) {
+  // When an updated service worker takes control, reload once so a fresh deploy's code
+  // applies without a manual refresh. Guarded so it only fires on an UPDATE (a worker was
+  // already controlling the page), never on first registration — so there's no reload loop.
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloading) return;
+    reloading = true;
+    location.reload();
+  });
   addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }

@@ -2,7 +2,7 @@
  * pricing-data.json uses stale-while-revalidate: still fetched at runtime,
  * just served fast from cache then refreshed in the background (Rule 1 intact).
  */
-const VERSION = 'nuera-v3';
+const VERSION = 'nuera-v4';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
@@ -60,12 +60,35 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Static assets: cache-first with background refresh
+  // App code (app.js, chat.js): NETWORK-FIRST so a new deploy applies on the FIRST
+  // load when online; the cached copy is only the offline fallback. Mutable JS must
+  // not be served cache-first — that caused "the new build doesn't show until I refresh".
+  if (url.pathname.startsWith('/assets/js/')) {
+    e.respondWith(networkFirst(e));
+    return;
+  }
+
+  // Other static assets (fonts, icons — immutable, long-cache): stale-while-revalidate.
   if (url.pathname.startsWith('/assets/')) {
     e.respondWith(staleWhileRevalidate(e));
     return;
   }
 });
+
+// Network-first: fresh from the network when online (and refresh the cache), fall back
+// to the cached copy offline. Used for the app code so deploys take effect immediately.
+function networkFirst(event) {
+  const request = event.request;
+  return fetch(request)
+    .then((res) => {
+      if (res && res.ok) {
+        const copy = res.clone();
+        event.waitUntil(caches.open(RUNTIME).then((c) => c.put(request, copy)));
+      }
+      return res;
+    })
+    .catch(() => caches.match(request));
+}
 
 function staleWhileRevalidate(event) {
   const request = event.request;
