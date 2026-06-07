@@ -790,13 +790,31 @@ function initFaq() {
 }
 
 let revealIO;
+// Single idempotent reveal path — shared by the scroll observer AND the content-visibility
+// fallback below, so whichever fires first reveals the element and detaches the other.
+function reveal(el) {
+  el.classList.add('in');
+  revealIO.unobserve(el);
+  el.removeEventListener('contentvisibilityautostatechange', onCVStateChange);
+}
+// content-visibility:auto can strand the reveal: on a JUMP scroll (refresh with scroll
+// restoration, scrollbar drag, in-page anchor) a card can land in the viewport without giving
+// IntersectionObserver a recompute, so it stays at opacity:0 forever. When the browser actually
+// renders the element (skipped → false ⇒ it's near the viewport), reveal it. No-op on elements
+// without content-visibility (the event never fires there), so the scroll stagger is preserved.
+function onCVStateChange(e) { if (!e.skipped) reveal(e.currentTarget); }
 function initReveal() {
   revealIO = new IntersectionObserver((ents) => {
-    ents.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); revealIO.unobserve(en.target); } });
+    ents.forEach((en) => { if (en.isIntersecting) reveal(en.target); });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   observeReveal(document);
 }
-function observeReveal(root) { $$('.reveal:not(.in)', root).forEach((el) => revealIO.observe(el)); }
+function observeReveal(root) {
+  $$('.reveal:not(.in)', root).forEach((el) => {
+    revealIO.observe(el);
+    el.addEventListener('contentvisibilityautostatechange', onCVStateChange);
+  });
+}
 
 // ---- utils ----
 function debounce(fn, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); }; }
