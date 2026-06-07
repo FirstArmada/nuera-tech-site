@@ -48,6 +48,9 @@ const SWATCH_COLORS = {
   'gold': '#e8d2a8', 'silver': '#d8dade', 'teal': '#3a8a8a',
 };
 
+// Precompute the sorted keys once (longest key first so "titanium black" wins over "black")
+const SWATCH_KEYS = Object.keys(SWATCH_COLORS).sort((a, b) => b.length - a.length);
+
 // ---- tiny DOM helpers ----
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -71,9 +74,7 @@ function parseColor(variant) {
   const seg = parts[parts.length - 1].replace(/\(.*?\)/g, ' ').replace(/no logo|large camera hole|back glass|service pack/gi, ' ').replace(/\s+/g, ' ').trim();
   if (!seg) return null;
   const low = seg.toLowerCase();
-  // longest key first so "titanium black" wins over "black"
-  const keys = Object.keys(SWATCH_COLORS).sort((a, b) => b.length - a.length);
-  for (const k of keys) if (low.includes(k)) return { name: seg, hex: SWATCH_COLORS[k] };
+  for (const k of SWATCH_KEYS) if (low.includes(k)) return { name: seg, hex: SWATCH_COLORS[k] };
   return null;
 }
 
