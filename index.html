@@ -475,7 +475,7 @@
        launcher stacked beside it in the .fab column. Gated for reduced motion just below. */
     @keyframes fab-in{from{opacity:0;transform:translateY(14px) scale(.92)}to{opacity:1;transform:none}}
     @keyframes fab-pulse{0%,72%,100%{box-shadow:var(--glow-success)}82%{box-shadow:0 16px 40px -10px hsl(var(--hue-green) var(--sat-success) 52% / .9)}}
-    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:var(--color-success);color:var(--color-on-success);font-weight:700;text-decoration:none;box-shadow:var(--glow-success);transition:transform var(--dur-base) ease,box-shadow var(--dur-base) ease;animation:fab-in var(--dur-300) var(--ease-entrance) both,fab-pulse 6.5s var(--ease-default) 2.5s infinite}
+    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:var(--color-success);color:var(--color-on-success);font-weight:700;text-decoration:none;box-shadow:var(--glow-success);transition:transform var(--dur-base) ease,box-shadow var(--dur-base) ease;animation:fab-in var(--dur-300) var(--ease-entrance) backwards,fab-pulse 6.5s var(--ease-default) 2.5s infinite}
     .fab-wa svg{width:22px;height:22px}
     .fab-wa .fab-txt{display:none}
     @media (min-width:560px){.fab-wa .fab-txt{display:inline}}
