@@ -2,16 +2,9 @@
  * pricing-data.json uses stale-while-revalidate: still fetched at runtime,
  * just served fast from cache then refreshed in the background (Rule 1 intact).
  */
-const VERSION = 'nuera-v4';
+const VERSION = 'nuera-v5';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
-
-// GSAP (animation layer) is served from a CDN. Loaded with crossorigin="anonymous",
-// so these requests are CORS (non-opaque) and cache normally — letting offline reloads
-// keep their motion. The site degrades gracefully (instant, no motion) if they're absent.
-const CDN_SCRIPTS = [
-  'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js',
-];
 
 const PRECACHE = [
   '/',
@@ -49,14 +42,7 @@ self.addEventListener('fetch', (e) => {
   const { request } = e;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-
-  // GSAP from the CDN: stale-while-revalidate so a repeat/offline load keeps animations.
-  // (CORS request via crossorigin="anonymous" → non-opaque → res.ok, so it caches.)
-  if (CDN_SCRIPTS.includes(url.href)) {
-    e.respondWith(staleWhileRevalidate(e));
-    return;
-  }
-  if (url.origin !== self.location.origin) return; // let other cross-origin (analytics, etc.) pass through
+  if (url.origin !== self.location.origin) return; // let cross-origin (analytics, etc.) pass through
 
   // Live pricing: stale-while-revalidate
   if (url.pathname === '/pricing-data.json') {
