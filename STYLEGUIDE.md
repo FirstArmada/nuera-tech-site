@@ -23,6 +23,11 @@ strict CSP (`style-src 'self' 'unsafe-inline'`). Add new global styles/tokens to
 that block; do not introduce an external stylesheet without revisiting the
 performance/CSP trade-off.
 
+App JS is self-hosted under `/assets/js`. The **one** allow-listed external script is the
+GSAP animation CDN (`script-src 'self' https://cdn.jsdelivr.net`, mirrored in `vercel.json`
++ `_headers`) — pinned + SRI-locked and used only as a progressive enhancement (see
+*Motion & animation layer*). Don't add other origins without revisiting the CSP.
+
 The token system is **layered** so it can evolve without breaking anything:
 
 ```
@@ -120,7 +125,7 @@ the Allium px scale, with `--fs-display`/`--fs-lead` kept fluid via `clamp()`.
 
 ### Button — `.btn` + variant
 
-`.btn` is the base (inline-flex, pill radius, 700 weight, **min-height 46px** touch
+`.btn` is the base (inline-flex, pill radius, 700 weight, **min-height 48px** touch
 target, hover lift + `:active` press). Pair with exactly one variant:
 
 | Variant | Class | Look | Use for |
@@ -166,6 +171,57 @@ content owned by the section layer.)*
   Defined but **not yet applied** — adopt it on `<section>` elements to replace the
   current ad-hoc `style="padding-top:…"` / per-section margins (section-layer change).
 
+### Interactive states — gradient border + pointer spotlight
+
+`.card` and `.search` share a two-layer hover/focus treatment driven by CSS only:
+
+- **`::after` animated gradient border** — a masked ring (`mask-composite: exclude`)
+  filled with `conic-gradient(from var(--angle) …)`. The `@property --angle` custom
+  property animates via `@keyframes border-spin` so the border *flows*. Where `@property`
+  is unsupported the ring is a static gradient (graceful). Hidden (`opacity:0`) until
+  `:hover`/`:focus-visible`.
+- **`::before` pointer spotlight** — a radial-gradient centred on `--mx`/`--my`, set by
+  `initCardSpotlight()` in `app.js` (rAF-throttled `pointermove`, gated on
+  `(hover:hover)` + motion). Defaults to centre when unset.
+- Card content sits above both layers via `.card{isolation:isolate}` + `.card>*{z-index:1}`.
+- `:focus-visible` gets **full parity** with `:hover` (keyboard users get the same state),
+  on top of the global focus ring. The search field opts out of the default outline and
+  uses the gradient ring as its (clearly visible) focus indicator — like `.swatch`.
+
+### Motion & animation layer (GSAP)
+
+Premium motion uses **GSAP 3.15 (core only)**, loaded from a CDN (`cdn.jsdelivr.net`,
+pinned + SRI + `crossorigin`) as a classic `defer` script **before** the app module, and
+allow-listed in `script-src` (both `vercel.json` and `_headers`). It is a **progressive
+enhancement, never a hard dependency**:
+
+- All GSAP use is guarded by `GSAP_OK` (`window.gsap` present) **and** `reduceMotion()`. If the
+  CDN is blocked, or motion is reduced, the UI falls back to instant, layout-correct updates and
+  **never throws** — the a11y + driver gates pass either way.
+- **Grid filtering** (`applyFilter()` in `app.js`): visibility is toggled **synchronously**
+  (non-matching → `display:none` immediately) so the grid is layout-correct on the next tick —
+  the driver counts `.card:visible` 150 ms after a filter change and Playwright ignores opacity.
+  The matching set then fades + subtly scales into its **final** layout (`gsap.fromTo`, staggered
+  via `stagger.amount`, with `clearProps` so `:hover`/`:active` keep working). **Card positions
+  are never animated** — a position FLIP made cards fly across the grid and overlap/ghost on big
+  set changes (the wrong pattern for a catalog filter). Touch this path carefully.
+- **Savings count-up** (`countUp()`) animates a number that must never sit in an `aria-live`
+  region and always commits the true final value.
+- The global reduced-motion CSS net cannot stop GSAP's JS-driven inline animation — the
+  **`reduceMotion()` JS guard is mandatory**, not decorative.
+
+### New section components
+
+- **`.actionbar`** — mobile-only (`≤559px`) sticky bottom bar holding the primary
+  *Book on WhatsApp* CTA (a `data-wa="general"` link, so `initWhatsAppDefaults()` fills it)
+  + a *Find* shortcut to `#finder`. `z-index:75` (above `.fab` 70, below the chat panel 80).
+  On mobile it hides `.fab-wa`, lifts the `.fab` stack by `var(--actionbar-h)`, and pads
+  `body` so the footer isn't occluded.
+- **`.wa-cue`** — a small "Opens WhatsApp with a pre-filled message" line placed beside
+  WhatsApp CTAs (hero, CTA banner, modal foot) to reduce app-switch drop-off.
+- **`.trust-strip`** — reassurance row (90-day warranty · same-day · OEM-grade parts) in the
+  device-detail `.sheet-foot`, directly above the booking CTA.
+
 ---
 
 ## Accessibility
@@ -179,7 +235,17 @@ content owned by the section layer.)*
   a global catch-all that near-zeroes all animation/transition durations. It uses
   `.001ms` (not `0`) so `transitionend`/`animationend` listeners in `app.js` still
   fire (reveal-on-scroll and the savings bars settle to their final state).
-- **Touch targets** — buttons are `min-height: 46px`.
+- **Touch targets** — interactive controls meet a **48px** minimum (`--touch-min`) for
+  "broken-screen" tapping: buttons, filter `.pill`s, `.spot-pill`, `.opt`, `.book`, the
+  action-bar CTAs (52px), and the search field (52px). Colour swatches keep a 40px visual
+  but extend to ~50px via the `::after` box; smaller secondary controls (close, hamburger,
+  back-to-top) are 44px.
+- **High contrast (automatic, OS-driven)** — conversion-critical text (prices, savings,
+  "Same-day", "90-day warranty") carries a subtle dark halo for legibility on bright/failing
+  displays. `@media (prefers-contrast: more)` opaques glass surfaces, strengthens borders,
+  and brightens secondary text; `@media (forced-colors: active)` forces gradient/clipped text
+  (`.grad-text`, the savings figure) to a solid system colour so it never vanishes, and keeps
+  the comparison bars meaningful (`forced-color-adjust:none`). No in-page toggle.
 
 ### Contrast (WCAG 2.1, computed sRGB; AA normal ≥ 4.5, large ≥ 3.0)
 
