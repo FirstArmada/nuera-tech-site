@@ -12,7 +12,9 @@
  * dialog panel that is `hidden` until opened. It never touches the finder/grid/
  * modal state, so the existing UI and its tests are unaffected.
  */
-const CHAT_ENDPOINT = 'https://chat.nuera.talha-k.com/chat';
+// Cloud Run service URL. Swap for https://chat.nuera.talha-k.com/chat once the
+// custom domain is mapped (both are whitelisted in the site CSP).
+const CHAT_ENDPOINT = 'https://nuera-chat-proxy-360967029120.us-central1.run.app/chat';
 const MAX_TURNS = 12; // trim history to bound proxy cost / prompt size
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
