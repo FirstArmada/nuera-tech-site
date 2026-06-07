@@ -169,7 +169,8 @@ function groupRepairs(repairs) {
 }
 
 // ---- state ----
-const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null };
+const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null, page: 1 };
+const PAGE_SIZE = 12; // device cards revealed per page; "Load More" adds one page at a time
 
 // ===========================================================================
 // Boot
@@ -328,6 +329,17 @@ function buildFilters() {
   input.addEventListener('input', onSearch);
   clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); resetFinderScroll(); input.focus(); });
 
+  // "Load More" pager. Every filter/search above calls renderGrid() (which resets to page 1); this
+  // only grows the page and re-renders, keeping the current scroll position.
+  const loadMore = $('#load-more');
+  if (loadMore) loadMore.addEventListener('click', () => {
+    const shownBefore = state.page * PAGE_SIZE;
+    state.page += 1;
+    renderGrid({ resetPage: false });
+    // keyboard a11y: if that was the final page (button now hidden), focus the first new card
+    if (loadMore.hidden) $$('#grid .card:not([hidden])')[shownBefore]?.focus();
+  });
+
   // Deep link ?q= (WebSite SearchAction)
   const urlQ = new URLSearchParams(location.search).get('q');
   if (urlQ) { input.value = urlQ; state.q = urlQ.trim().toLowerCase(); clear.classList.add('show'); }
@@ -384,9 +396,10 @@ function resetFinderScroll() {
 let cardEls = null; // Map<model, HTMLElement>, built once
 let emptyEl = null; // reused empty-state node
 
-function renderGrid() {
+function renderGrid({ resetPage = true } = {}) {
   const grid = $('#grid');
   const { brand, type, q } = state;
+  if (resetPage) state.page = 1; // a new filter/search always starts from the first page
 
   let firstBuild = false;
   if (!cardEls) {
@@ -409,10 +422,23 @@ function renderGrid() {
     if (!el) continue;
     (match ? matching : nonMatching).push(el);
   }
-  // Animate the transition between filter states — but never on the first build (cards have only
-  // just appeared), and the helper itself no-ops the motion in the fallback / reduced-motion path.
-  applyFilter(matching, nonMatching, !firstBuild);
+  // Pagination: show only the first `visibleCount` matches; the rest stay [hidden] behind "Load
+  // More". Animate the transition — never on first build (scroll-reveal handles those), and on a
+  // Load-More click only the freshly revealed slice (not the cards already on screen).
+  const visibleCount = state.page * PAGE_SIZE;
+  const show = matching.slice(0, visibleCount);
+  const hide = nonMatching.concat(matching.slice(visibleCount));
+  const animateEls = firstBuild ? [] : (resetPage ? show : matching.slice((state.page - 1) * PAGE_SIZE, visibleCount));
+  applyFilter(show, hide, animateEls);
   const shown = matching.length;
+
+  // "Load More" is offered only while unshown matches remain.
+  const loadMore = $('#load-more');
+  if (loadMore) {
+    const remaining = matching.length - visibleCount;
+    loadMore.hidden = remaining <= 0;
+    if (remaining > 0) loadMore.setAttribute('aria-label', `Load ${Math.min(PAGE_SIZE, remaining)} more devices — ${remaining} remaining`);
+  }
 
   if (!shown) {
     if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
@@ -444,16 +470,16 @@ function renderGrid() {
 // checks 150ms); the fade is opacity/transform only, which Playwright ignores. Reduced-motion / no
 // WAAPI → the plain instant toggle.
 let filterAnims = []; // our in-flight fade Animations; cancelled on the next filter so they never stack
-function applyFilter(matching, nonMatching, animate) {
-  nonMatching.forEach((el) => { el.hidden = true; });
-  matching.forEach((el) => { el.hidden = false; });
-  if (!animate || reduceMotion() || typeof matching[0]?.animate !== 'function') return;
+function applyFilter(showEls, hideEls, animateEls) {
+  hideEls.forEach((el) => { el.hidden = true; });
+  showEls.forEach((el) => { el.hidden = false; });
+  if (!animateEls || !animateEls.length || reduceMotion() || typeof animateEls[0]?.animate !== 'function') return;
   filterAnims.forEach((a) => a.cancel());   // cancel only our fades — never the CSS hover animations
-  const n = matching.length;
-  filterAnims = matching.map((el, i) => {
-    // A card shown by a filter is "revealed": mark it .in so its BASE opacity is 1. Otherwise a
+  const n = animateEls.length;
+  filterAnims = animateEls.map((el, i) => {
+    // A card shown by a filter/page is "revealed": mark it .in so its BASE opacity is 1. Otherwise a
     // not-yet-scroll-revealed card (.reveal ⇒ opacity:0) would fade in then vanish when the WAAPI
-    // animation (fill:'backwards') reverts to base. (Only here, not on first build, so the initial
+    // animation (fill:'backwards') reverts to base. (Never on first build, so the initial
     // scroll-reveal stagger is preserved.)
     el.classList.add('in');
     return el.animate(

@@ -117,6 +117,20 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     await page.screenshot({ path: `${SHOTS}/01-hero.png` });
     await page.screenshot({ path: `${SHOTS}/01b-fullpage.png`, fullPage: true });
 
+    console.log('\n[1b] Load More pagination');
+    const PAGE = 12; // mirrors PAGE_SIZE in app.js
+    const visInit = await page.locator('#grid .card:visible').count();
+    check('initial grid capped to one page', visInit === PAGE, `${visInit} visible of ${cardCount}`);
+    check('Load More shown when catalogue exceeds a page', (await page.locator('#load-more').evaluate((el) => el.hidden)) === false);
+    await page.locator('#load-more').click();
+    await page.waitForTimeout(150);
+    check('Load More reveals the next page', (await page.locator('#grid .card:visible').count()) === PAGE * 2);
+    await page.locator('#search').fill('iphone');
+    await page.waitForTimeout(300);
+    check('new search resets pagination to one page', (await page.locator('#grid .card:visible').count()) === PAGE);
+    await page.locator('#search-clear').click();
+    await page.waitForTimeout(200);
+
     console.log('\n[2] Savings spotlight animates into view');
     check('spotlight revealed (not hidden)', (await page.locator('#spotlight').evaluate((el) => el.hidden)) === false);
     await page.locator('#spotlight').scrollIntoViewIfNeeded();
@@ -144,8 +158,10 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     await page.waitForTimeout(150);
     const afterBrand = await page.locator('#grid .card:visible').count();
     const allIphone = await page.locator('#grid .card:visible .brand-tag').evaluateAll((els) => els.every((e) => e.textContent.trim() === 'iPhone'));
-    check('iPhone filter count matches pill', String(afterBrand) === iphonePillCnt, `${afterBrand} cards, pill says ${iphonePillCnt}`);
-    check('all filtered cards are iPhone', allIphone && afterBrand > 0);
+    // Pagination caps the VISIBLE set to one page; the pill + result-count still report the full total.
+    check('iPhone filter visible capped to one page', afterBrand === Math.min(Number(iphonePillCnt), 12), `${afterBrand} visible, pill says ${iphonePillCnt}`);
+    check('all visible filtered cards are iPhone', allIphone && afterBrand > 0);
+    check('result count reflects full iPhone total', (((await page.locator('#result-count').textContent()) || '').trim()).startsWith(iphonePillCnt), iphonePillCnt);
     await page.locator('[data-brand="all"]').click();
     await page.waitForTimeout(100);
 
