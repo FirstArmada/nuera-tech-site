@@ -47,6 +47,14 @@ assets/
   153 devices; accessible card grid; bottom-sheet detail modal on mobile.
 - **WhatsApp booking** — every repair row deep-links to WhatsApp with a pre-filled
   message (device, repair, price, and the dollar saving).
+- **Social proof** — a `#reviews` section (aggregate rating + review cards) and a hero rating
+  chip. *Content is placeholder — swap in real Google reviews before relying on it (see below).*
+- **Visit us** — a `#visit` section with the shop address, a "Get directions" link, and an
+  opening-hours table whose **"Open now / Closed" pill + today-highlight are computed live** from
+  the table itself (`initHours()`). *Address + hours are placeholders — fill in the real ones.*
+- **Share / copy quote** — the device modal can copy (or `navigator.share`) a plain-text summary
+  of the current quote.
+- **Premium polish** — a subtle film-grain depth overlay and a top reading-progress bar.
 - **PWA** — installable, offline-capable app shell.
 - **Accessibility** — 0 axe-core WCAG 2.1 A/AA violations; full keyboard support,
   focus management, reduced-motion support, semantic landmarks.
@@ -54,6 +62,19 @@ assets/
   runtime AggregateOffer; OG/Twitter cards; sitemap/robots.
 - **Performance** — inlined CSS (no render-blocking), self-hosted font, inline SVG
   icons (no icon-library CDN), long-cache immutable assets.
+
+## Placeholder content to replace before launch
+
+Three new sections ship with clearly-marked sample content (each flagged by an HTML comment in
+`index.html`). Replace it with the real thing before merging — nothing is fabricated into SEO/JSON-LD:
+
+- **Reviews** (`#reviews`) — names, devices, quotes, star `--fill` values, and the aggregate score +
+  count. Use your real Google reviews.
+- **Hero rating chip** — the `4.9` score + star `--fill` to match your real rating.
+- **Visit us** (`#visit`) — the street address (in the `<address>` and unaffected by the Maps link,
+  which searches by name + city) and the **opening hours**: edit each `.hours` `<tr>`'s visible text
+  **and** its `data-open`/`data-close` (minutes from midnight; omit both for a closed day) so the live
+  "Open now / Closed" pill stays correct.
 
 ## Local development & verification
 

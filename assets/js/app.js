@@ -179,10 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#year').textContent = new Date().getFullYear();
   initReveal();
   initScrollTop();
+  initScrollProgress();
   initHeader();
   initFaq();
+  initHours();
   initWhatsAppDefaults();
   initDialog();
+  initShareQuote();
   loadData();
 });
 
@@ -667,6 +670,49 @@ function selectOption(gi, oi) {
   set(`[data-book="${gi}"]`, (el) => { el.href = waLink(bookMsg(r, state.openModel)); });
 }
 
+// ---- share / copy the current quote ----
+// Build a plain-text summary of the open device + the currently-selected option per repair type.
+function quoteText() {
+  const model = state.openModel;
+  const groups = state.groups || [];
+  if (!model || !groups.length) return '';
+  const lines = [`My Nuera Tech repair quote — ${model}:`];
+  for (const g of groups) {
+    const r = selOpt(g);
+    const tier = g.swatch ? (g.colors[g.selected]?.name || '') : cleanVariant(r.variant);
+    const hasSave = r.mk_price != null && r.mk_price > 0 && r.savings != null && r.savings > 0;
+    lines.push(`• ${g.rtype}${tier ? ` (${tier})` : ''}: ${moneyExact(r.price)}`
+      + (hasSave ? ` — save ${money(Math.round(r.savings))} vs Mobile Klinik` : ''));
+  }
+  lines.push('', 'Book on WhatsApp: ' + waLink(`Hi Nuera Tech! I'd like to book a repair for my ${model}.`), 'https://nuera.talha-k.com/');
+  return lines.join('\n');
+}
+
+function initShareQuote() {
+  const btn = $('#detail-share');
+  const fb = $('#share-feedback');
+  if (!btn) return;
+  let fbT;
+  const flash = (msg) => {
+    if (!fb) return;
+    fb.textContent = msg;
+    fb.classList.add('show');
+    clearTimeout(fbT);
+    fbT = setTimeout(() => fb.classList.remove('show'), 2400);
+  };
+  btn.addEventListener('click', async () => {
+    const text = quoteText();
+    if (!text) return;
+    // Native share sheet on capable devices; clipboard everywhere else.
+    if (navigator.share) {
+      try { await navigator.share({ title: `Nuera Tech — ${state.openModel} repair quote`, text }); return; }
+      catch (err) { if (err && err.name === 'AbortError') return; } // user dismissed → fall through to copy
+    }
+    try { await navigator.clipboard.writeText(text); flash('Copied to clipboard'); }
+    catch { flash('Press ⌘/Ctrl+C to copy'); }
+  });
+}
+
 // ===========================================================================
 // Savings spotlight (interactive bar comparison)
 // ===========================================================================
@@ -764,6 +810,62 @@ function initScrollTop() {
   const update = () => { btn.classList.toggle('show', window.scrollY > 600); ticking = false; };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   btn.addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion() ? 'auto' : 'smooth' }));
+}
+
+// Reading-progress bar: scale the top gradient line by how far the page is scrolled. rAF-throttled,
+// position-driven (not a decorative animation) so it stays accurate under reduced motion too.
+function initScrollProgress() {
+  const bar = $('#scroll-progress-bar');
+  if (!bar) return;
+  let ticking = false;
+  const update = () => {
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    bar.style.setProperty('--p', (max > 0 ? Math.min(1, window.scrollY / max) : 0).toFixed(4));
+    ticking = false;
+  };
+  update();
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update, { passive: true });
+}
+
+// "Open now / Closed" status + today-highlight for the Visit section. The #visit hours table is the
+// single source of truth: each <tr data-day> (0=Sun…6=Sat) optionally carries data-open/data-close in
+// minutes-from-midnight. No-op (and the static table still shows) if the section/rows aren't present.
+function initHours() {
+  const status = $('#visit-status');
+  const rows = $$('#visit .hours tr[data-day]');
+  if (!status || !rows.length) return;
+
+  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const fmt = (m) => {
+    const h = Math.floor(m / 60), mm = m % 60;
+    return `${((h + 11) % 12) + 1}${mm ? ':' + String(mm).padStart(2, '0') : ''} ${h < 12 ? 'AM' : 'PM'}`;
+  };
+  const num = (v) => (v != null && v !== '' ? +v : null);
+  const byDay = new Map();
+  rows.forEach((tr) => byDay.set(+tr.dataset.day, { open: num(tr.dataset.open), close: num(tr.dataset.close), tr }));
+
+  const now = new Date();
+  const day = now.getDay();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  byDay.get(day)?.tr.classList.add('today');
+
+  const set = (state, text) => { status.dataset.state = state; status.textContent = text; };
+  const today = byDay.get(day);
+  if (today && today.open != null && today.close != null && mins >= today.open && mins < today.close) {
+    set('open', `Open now · closes ${fmt(today.close)}`);
+    return;
+  }
+  // Closed now — surface the next opening within the coming week.
+  for (let i = 0; i < 7; i++) {
+    const d = (day + i) % 7;
+    const slot = byDay.get(d);
+    if (!slot || slot.open == null || slot.close == null) continue;
+    if (i === 0 && mins < slot.open) { set('closed', `Closed · opens ${fmt(slot.open)}`); return; }
+    if (i >= 1) { set('closed', `Closed · opens ${i === 1 ? 'tomorrow' : DAYS[d]} ${fmt(slot.open)}`); return; }
+  }
+  set('closed', 'Closed');
 }
 
 // ===========================================================================
