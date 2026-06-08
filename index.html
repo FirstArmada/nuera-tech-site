@@ -140,7 +140,7 @@
       --focus-ring-color:var(--c-purple-300);--focus-ring-width:2px;--focus-ring-offset:2px;
 
       /* -- Layout -- */
-      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(16px,4vw,24px);--actionbar-h:72px;
+      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(20px,4vw,24px);--actionbar-h:72px;
       --touch-min:48px; /* minimum interactive touch target ("broken-screen" a11y) */
 
       /* -- Legacy aliases (existing rules + runtime markup depend on these) -- */
@@ -243,7 +243,9 @@
     .mobile-nav a:hover{background:var(--panel-2)}
 
     /* Hero */
-    .hero{padding:clamp(40px,7vw,78px) 0 12px}
+    /* padding-block (not the 4-side shorthand) so the .wrap side padding isn't zeroed out —
+       otherwise the hero copy sits flush against the screen edge on mobile. */
+    .hero{padding-block:clamp(40px,7vw,78px) 12px}
     .badge{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border-radius:var(--radius-pill);background:var(--color-surface-2);border:1px solid var(--color-border);color:#dbe3f4;font-size:.85rem;font-weight:600;margin-bottom:18px}
     .badge .dot{position:relative;width:8px;height:8px;border-radius:var(--radius-circle);background:var(--color-success);box-shadow:0 0 0 4px rgba(52,211,153,.18)}
     .badge .dot::after{content:"";position:absolute;inset:0;border-radius:var(--radius-circle);background:var(--color-success);animation:ping 2.6s var(--ease-out) infinite}
@@ -313,6 +315,15 @@
 
     /* Finder controls */
     .finder{padding-top:46px}
+    /* Mobile (≤600px): center the hero copy + tighten the run-up to the device list so the grid
+       isn't pushed far down. The spotlight's CLS reserve (.spotlight.reserving) is left intact. */
+    @media (max-width:600px){
+      .hero{text-align:center}
+      .hero .lead{margin-inline:auto}
+      .hero-actions{justify-content:center}
+      .spotlight{margin-top:var(--space-4)}
+      .finder{padding-top:var(--space-4)}
+    }
     .controls{position:sticky;top:calc(var(--header-h) + env(safe-area-inset-top));z-index:40;padding:14px 0;margin-bottom:6px}
     .controls-inner{display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:var(--radius);background:rgba(10,11,20,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border)}
     /* perf: the sticky filter bar sits directly under the header on mobile (stacked blurs) — shrink it hardest there. */
@@ -350,6 +361,9 @@
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:16px}
     @media (max-width:720px){.grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}}
     @media (max-width:520px){.grid{grid-template-columns:1fr}}
+    /* "Load More" pager — reuses the .btn system; centred below the grid */
+    .load-more{display:flex;justify-content:center;margin-top:var(--space-5)}
+    #load-more[hidden]{display:none} /* .btn sets display:inline-flex, which would override [hidden] */
     /* perf: Add content-visibility to defer rendering of offscreen cards and below-the-fold sections, improving initial load and TTI */
     .card{content-visibility:auto;contain-intrinsic-size:auto 242px;position:relative;isolation:isolate;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--color-surface-2),var(--color-surface-1));border:1px solid var(--color-border);border-radius:var(--radius-md);padding:18px;text-align:left;cursor:pointer;color:inherit;font:inherit;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
     /* Layered interactive states: content above two glow layers.
@@ -819,6 +833,9 @@
       <div class="grid" id="grid" aria-busy="true">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+      </div>
+      <div class="load-more">
+        <button class="btn btn-secondary" id="load-more" type="button" hidden>Load More Devices</button>
       </div>
     </section>
 
