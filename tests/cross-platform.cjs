@@ -19,8 +19,13 @@ function loadPlaywright() {
   }
 }
 
+// Served root is a constant (path.resolve(__dirname, '..')) — never derived from
+// external/env input — so the containment check below is a trusted boundary that
+// static analysis recognizes as a sanitizer (mirrors tests/mobile.cjs).
+const SITE_ROOT = path.resolve(__dirname, '..');
+
 // 2. Local Static Server
-function startServer(dir) {
+function startServer() {
   const mimes = {
     '.html': 'text/html',
     '.js': 'text/javascript',
@@ -31,15 +36,14 @@ function startServer(dir) {
     '.png': 'image/png'
   };
 
-  const root = path.resolve(dir);
   const server = http.createServer((req, res) => {
     try {
       const urlPath = req.url === '/' ? 'index.html' : req.url.split('?')[0];
-      // Resolve request path against `root` and enforce containment to prevent traversal.
-      const decodedPath = decodeURIComponent(urlPath);
-      const relativePath = decodedPath.replace(/^[/\\]+/, '');
-      const safePath = path.resolve(root, relativePath);
-      if (safePath !== root && !safePath.startsWith(root + path.sep)) {
+      // Resolve the request against the constant SITE_ROOT and reject anything
+      // that escapes it (path traversal).
+      const relativePath = decodeURIComponent(urlPath).replace(/^[/\\]+/, '');
+      const safePath = path.resolve(SITE_ROOT, relativePath);
+      if (safePath !== SITE_ROOT && !safePath.startsWith(SITE_ROOT + path.sep)) {
         res.writeHead(403);
         res.end('Forbidden');
         return;
@@ -74,11 +78,10 @@ async function runSuite() {
   const pw = loadPlaywright();
   const { chromium, firefox, webkit, devices } = pw;
 
-  const baseDir = process.env.BASE || path.join(__dirname, '..');
   const shotsDir = process.env.SHOTS || path.join(__dirname, 'shots');
   if (!fs.existsSync(shotsDir)) fs.mkdirSync(shotsDir, { recursive: true });
 
-  const { server, port } = await startServer(baseDir);
+  const { server, port } = await startServer();
   const targetUrl = `http://localhost:${port}/`;
 
   const matrix = [
