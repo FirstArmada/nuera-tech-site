@@ -503,26 +503,15 @@
     @media (max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
     @media (max-width:520px){.foot-grid{grid-template-columns:1fr}}
 
-    /* Floating actions */
+    /* Floating actions — the chat launcher (injected by chat.js) is the primary
+       conversion action here; the stack also carries a back-to-top control. */
     .fab{position:fixed;right:calc(clamp(14px,3vw,22px) + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-    /* one-time entrance, then a low-frequency glow swell so the primary conversion action stays
-       "alive". box-shadow only — no layout/scale change — so it can never intrude on the chat
-       launcher stacked beside it in the .fab column. Gated for reduced motion just below. */
-    @keyframes fab-in{from{opacity:0;transform:translateY(14px) scale(.92)}to{opacity:1;transform:none}}
-    @keyframes fab-pulse{0%,72%,100%{box-shadow:var(--glow-success)}82%{box-shadow:0 16px 40px -10px hsl(var(--hue-green) var(--sat-success) 52% / .9)}}
-    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:var(--color-success);color:var(--color-on-success);font-weight:700;text-decoration:none;box-shadow:var(--glow-success);transition:transform var(--dur-base) ease,box-shadow var(--dur-base) ease;animation:fab-in var(--dur-300) var(--ease-entrance) backwards,fab-pulse 6.5s var(--ease-default) 2.5s infinite}
-    .fab-wa svg{width:22px;height:22px}
-    .fab-wa .fab-txt{display:none}
-    @media (min-width:560px){.fab-wa .fab-txt{display:inline}}
-    .fab-wa:hover{transform:translateY(-2px);box-shadow:0 18px 42px -8px rgba(52,211,153,.7)}
-    .fab-wa:active{transform:translateY(0) scale(.97);box-shadow:0 8px 20px -8px rgba(52,211,153,.6)}
-    .fab-wa:focus-visible{outline:none;box-shadow:var(--ring),0 14px 34px -8px rgba(52,211,153,.6)}
     .fab-top{width:48px;height:48px;align-self:flex-end;border:0;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .25s,transform .25s,background .18s;backdrop-filter:blur(10px)}
     .fab-top.show{opacity:1;transform:none;pointer-events:auto}
     .fab-top:hover{background:rgba(255,255,255,.16)}
     .fab-top:active{transform:scale(.94)}
     .fab-top:focus-visible{outline:none;box-shadow:var(--ring)}
-    @media (prefers-reduced-motion:reduce){.fab-wa{animation:none}.fab-wa:hover,.fab-wa:active,.fab-top:active{transform:none}}
+    @media (prefers-reduced-motion:reduce){.fab-top:active{transform:none}}
 
     /* Dialog (device detail) */
     dialog{padding:0;border:0;background:transparent;max-width:none;max-height:none;color:var(--text)}
@@ -655,8 +644,7 @@
       .actionbar-find{flex:0 0 auto;padding:0 18px;color:var(--text);background:var(--color-surface-3);border:1px solid var(--border-2)}
       .actionbar-book{flex:1 1 auto;padding:0 18px;color:var(--color-on-success);background:var(--grad-wa);box-shadow:var(--glow-success)}
       .actionbar-book:active,.actionbar-find:active{transform:translateY(1px)}
-      /* the bar carries WhatsApp now: hide the floating FAB WA button; lift the FAB stack (back-to-top + chat launcher) above the bar */
-      .fab-wa{display:none}
+      /* the bar carries WhatsApp here; lift the FAB stack (back-to-top + chat launcher) above the bar */
       .fab{bottom:calc(16px + env(safe-area-inset-bottom) + var(--actionbar-h))}
       /* clear the bar so it never occludes the footer */
       body{padding-bottom:calc(var(--actionbar-h) + env(safe-area-inset-bottom))}
@@ -762,19 +750,19 @@
     @media (forced-colors:active){
       /* gradient/clipped text would otherwise vanish (its painted background is dropped) — force a system colour */
       .grad-text,.brand-name .t,.spot-save .save-amt,.rating-summary .rating-score{-webkit-text-fill-color:currentColor;color:CanvasText;background:none}
-      .btn,.pill,.card,.opt,.book,.actionbar a,.fab-wa,.fab-top,.spot-pill{border:1px solid}
+      .btn,.pill,.card,.opt,.book,.actionbar a,.fab-top,.spot-pill{border:1px solid}
       .bar-fill,.spot-save .save-pct,.save-tag{forced-color-adjust:none}
     }
 
     /* Mobile interaction hardening (iOS Safari / Android Chrome / in-app browsers) */
     /* Kill the 300ms tap delay + stray double-tap-zoom on interactive targets. */
     .btn,.pill,.card,.swatch,.book,.opt,.spot-pill,.card-view,.sheet-close,.hburger,
-    .fab-wa,.fab-top,.actionbar a,.qa summary,.hnav a,.mobile-nav a,.search .clear,.share-quote{touch-action:manipulation}
+    .fab-top,.actionbar a,.qa summary,.hnav a,.mobile-nav a,.search .clear,.share-quote{touch-action:manipulation}
     /* Sticky-hover guard: on touch devices (no true hover) neutralize hover-only lifts/glows so a
        tapped control never stays "hovered" until the next tap. :active provides the press feedback. */
     @media (hover:none){
       .btn:hover,.btn-primary:hover,.btn-secondary:hover,.btn-wa:hover,.btn-ghost:hover,
-      .feature:hover,.step:hover,.review:hover,.fab-wa:hover,.fab-top:hover,.swatch:hover{transform:none}
+      .feature:hover,.step:hover,.review:hover,.fab-top:hover,.swatch:hover{transform:none}
       .feature:hover,.step:hover,.review:hover{box-shadow:none;border-color:var(--border)}
       .search input:hover{border-color:var(--border-2)}
     }
@@ -1211,10 +1199,6 @@
     <button class="fab-top" id="fab-top" type="button" aria-label="Back to top">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
     </button>
-    <a class="fab-wa" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener" aria-label="Book a repair on WhatsApp">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
-      <span class="fab-txt">Book on WhatsApp</span>
-    </a>
   </div>
 
   <!-- Mobile-only sticky action bar — keeps the primary WhatsApp CTA in thumb's reach -->

@@ -134,8 +134,8 @@ function openPanel() {
   panel.hidden = false;
   state.open = true;
   launchEl.setAttribute('aria-expanded', 'true');
-  // Hide the FAB stack while open so its buttons (WhatsApp / back-to-top / this
-  // launcher) don't overlap the panel's input. Restored on close.
+  // Hide the FAB stack while open so its buttons (back-to-top / this launcher)
+  // don't overlap the panel's input. Restored on close.
   toggleFab(false);
   inputEl.focus();
 }
