@@ -29,13 +29,13 @@ function bookMsg(r, model) {
   const v = cleanVariant(r.variant);
   const hasSave = r.mk_price != null && r.mk_price > 0 && r.savings != null && r.savings > 0;
   return `Hi Nuera Tech! I'd like to book:\n• ${r.repair_type}${v ? ' (' + v + ')' : ''} for my ${model}\n• Your price: $${Number(r.price).toFixed(2)}`
-    + (hasSave ? `\n• (Mobile Klinik: $${Number(r.mk_price).toFixed(2)} — I save $${Math.round(r.savings)})` : '');
+    + (hasSave ? `\n• (Typical price: $${Number(r.mk_price).toFixed(2)} — I save $${Math.round(r.savings)})` : '');
 }
 
 export const functionDeclarations = [
   {
     name: 'lookup_repair_price',
-    description: "Look up Nuera Tech's repair prices for a specific device model. Returns cheapest-first options per repair type, including the Mobile Klinik comparison where one exists.",
+    description: "Look up Nuera Tech's repair prices for a specific device model. Returns cheapest-first options per repair type, including the typical-price comparison where one exists.",
     parameters: {
       type: 'object',
       properties: {

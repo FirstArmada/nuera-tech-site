@@ -24,7 +24,7 @@ function systemText() {
     '- Use lookup_repair_price for a known model; use find_devices when the model is vague.',
     '- When the customer is ready to book, call get_booking_link and share the WhatsApp link.',
     '- We do same-day repairs with a 90-day parts-and-labour warranty. For anything off-topic or that needs a person, point them to WhatsApp.',
-    '- Keep replies to a few sentences. Lead with the cheapest relevant option; mention the Mobile Klinik saving only when the data includes one.',
+    '- Keep replies to a few sentences. Lead with the cheapest relevant option; mention the saving vs other shops only when the data includes one.',
   ].join('\n');
 }
 
