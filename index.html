@@ -287,11 +287,14 @@
     /* Savings spotlight */
     /* margin-inline must stay auto so this .wrap container centres like the other sections (was `0`, which left-pinned it) */
     .spotlight{margin:46px auto 8px}
+    /* the spotlight's <h2> is sr-only (no layout), so unlike other sections the eyebrow has
+       nothing below it — give it the same eyebrow→content gap the visible-h2 sections get. */
+    .spotlight>.eyebrow{display:flex;margin-bottom:var(--space-3)}
     /* Reserve ~the populated height before the runtime fetch resolves, so the spotlight appearing
        doesn't shove the finder down (CLS). JS removes .reserving once populated. Sized just under the
        measured card+eyebrow height per breakpoint so releasing it never causes a shrink-shift. */
-    .spotlight.reserving{min-height:600px}
-    @media (min-width:560px){.spotlight.reserving{min-height:470px}}
+    .spotlight.reserving{min-height:616px}
+    @media (min-width:560px){.spotlight.reserving{min-height:486px}}
     .spot-card{background:linear-gradient(160deg,rgba(139,92,246,.14),rgba(34,211,238,.08) 60%,var(--panel));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:clamp(20px,3vw,34px);box-shadow:var(--shadow);position:relative;overflow:hidden}
     .spot-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
     .spot-device{font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:700;letter-spacing:-.02em;min-width:0;overflow-wrap:anywhere}
@@ -626,10 +629,10 @@
        ===================================================================== */
 
     /* "Opens WhatsApp…" expectation cue — sets expectations before the app switch (less drop-off) */
-    .wa-cue{display:inline-flex;align-items:center;gap:7px;margin:0;color:var(--muted);font-size:.82rem;line-height:1.45}
-    .wa-cue svg{width:15px;height:15px;color:var(--green-lt);flex:none}
+    .wa-cue{display:inline-flex;align-items:flex-start;gap:var(--space-2);margin:0;color:var(--muted);font-size:.82rem;line-height:1.45}
+    .wa-cue svg{width:15px;height:15px;color:var(--green-lt);flex:none;margin-top:2px}
     .wa-cue b{color:#e7ecf7;font-weight:700}
-    .hero .wa-cue{margin-top:14px}
+    .hero .wa-cue{margin-top:var(--space-3)}
     .cta .wa-cue{justify-content:center;margin:14px auto 0}
 
     /* Device-detail trust strip — reassurance (warranty · same-day · OEM-grade) right above the CTA */
