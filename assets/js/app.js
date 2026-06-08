@@ -13,6 +13,15 @@ const BRANDS = [
   { id: 'ipad', label: 'iPad' },
   { id: 'samsung-tab', label: 'Samsung Tab' },
 ];
+// Manufacturer shown on the card badge — collapses device families (iphone/ipad → Apple, etc.).
+const MANUFACTURER = { iphone: 'Apple', ipad: 'Apple', samsung: 'Samsung', 'samsung-tab': 'Samsung', pixel: 'Google' };
+const manufacturer = (b) => MANUFACTURER[b] || brandLabel(b);
+// Strip a leading manufacturer word so the card title doesn't echo the badge
+// ("Samsung Galaxy S20" → "Galaxy S20", "Google Pixel 10" → "Pixel 10"; Apple names are untouched).
+const stripManufacturer = (model, b) => {
+  const m = MANUFACTURER[b];
+  return m ? model.replace(new RegExp(`^${m}\\s+`, 'i'), '') : model;
+};
 const TYPES = [
   { id: 'all', label: 'All repairs' },
   { id: 'screen', label: 'Screen' },
@@ -175,7 +184,7 @@ function groupRepairs(repairs) {
 }
 
 // ---- state ----
-const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null, page: 1, sort: 'default' };
+const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null, page: 1, sort: 'savings' };
 const PAGE_SIZE = 12; // device cards revealed per page; "Load More" adds one page at a time
 
 // ===========================================================================
@@ -423,7 +432,7 @@ function updateURL() {
   if (state.type !== 'all') p.set('type', state.type);
   const qv = ($('#search')?.value || '').trim();
   if (qv) p.set('q', qv);
-  if (state.sort !== 'default') p.set('sort', state.sort);
+  if (state.sort !== 'savings') p.set('sort', state.sort);
   const qs = p.toString();
   history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
 }
@@ -437,7 +446,7 @@ function syncFromURL() {
   state.brand = BRANDS.some((b) => b.id === brand) ? brand : 'all';
   state.type = TYPES.some((t) => t.id === type) ? type : 'all';
   state.q = q.trim().toLowerCase();
-  state.sort = ['savings', 'price'].includes(sort) ? sort : 'default';
+  state.sort = ['savings', 'price', 'default'].includes(sort) ? sort : 'savings';
   const input = $('#search'); const clear = $('#search-clear');
   if (input) { input.value = q; clear?.classList.toggle('show', q.length > 0); }
   const sortSel = $('#sort'); if (sortSel) sortSel.value = state.sort;
@@ -577,8 +586,8 @@ function cardHTML(d) {
     : '';
   return `<button class="card reveal" type="button" data-model="${esc(d.model)}" aria-label="View pricing for ${esc(d.model)}">
     <div class="card-top">
-      <span class="card-model">${esc(d.model)}</span>
-      <span class="brand-tag">${brandLabel(d.brand)}</span>
+      <span class="card-model">${esc(stripManufacturer(d.model, d.brand))}</span>
+      <span class="brand-tag">${esc(manufacturer(d.brand))}</span>
     </div>
     <div class="rt-chips">${chips}</div>
     <div class="card-foot">

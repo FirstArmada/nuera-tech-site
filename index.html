@@ -184,7 +184,7 @@
     .section{padding-block:var(--space-section)} /* opt-in section vertical rhythm — defined as a hook, not yet applied */
     section{scroll-margin-top:calc(var(--header-h) + 12px + env(safe-area-inset-top))}
     .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:var(--fs-xs);font-weight:700;letter-spacing:var(--track-eyebrow);text-transform:uppercase;color:var(--cyan)}
-    h2{font-size:var(--fs-h2);letter-spacing:var(--track-h2);line-height:1.08;margin:.4em 0 .25em}
+    h2{font-size:var(--fs-h2);letter-spacing:var(--track-h2);line-height:var(--lh-display);margin:var(--space-3) 0 var(--space-2)}
     .lead-muted{color:var(--color-text-secondary);max-width:60ch;margin:0}
 
     /* Accessibility */
@@ -213,17 +213,17 @@
        Smaller radius on mobile (blur cost ~scales with radius²), with higher opacity carrying legibility. */
     @media (max-width:600px){.header{backdrop-filter:blur(8px) saturate(130%);-webkit-backdrop-filter:blur(8px) saturate(130%);background:rgba(7,7,12,.82)}}
     .header.scrolled{background:rgba(7,7,12,.86);border-bottom-color:var(--border-2);box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
-    .header-in{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:var(--header-h)}
+    .header-in{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);min-height:var(--header-h)}
     .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1;flex:none}
     .brand-sprite{position:absolute;width:0;height:0;overflow:hidden}
     .brand-mark{height:1.6em;width:1.6em;flex:none;display:block}
-    .brand-name{font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+    .brand-name{font-weight:700;letter-spacing:var(--track-tight);white-space:nowrap}
     .brand-name .t{color:var(--cyan)}
-    .header .btn{padding:10px 16px;min-height:44px;font-size:.92rem}
+    .header .btn{padding:var(--space-2) var(--space-3);min-height:44px;font-size:.92rem}
     @media (max-width:999.98px){.header .btn{margin-left:auto}}
     @media (max-width:599.98px){.header .btn-wa .cta-label{display:none}.header .btn-wa{padding:10px 13px}}
     /* location/warranty pill */
-    .hpill{display:none;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:#dbe3f4;font-size:.8rem;font-weight:600;white-space:nowrap}
+    .hpill{display:none;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:#dbe3f4;font-size:.8rem;font-weight:600;white-space:nowrap}
     /* trust cue: the location/warranty pill is credibility info, so its icon reads in the calm
        trust-neutral slate rather than a neon accent — "established", next to the vibrant brand. */
     .hpill svg{width:14px;height:14px;color:var(--c-trust-400);flex:none}
@@ -231,18 +231,21 @@
     @media (min-width:760px){.hpill{display:inline-flex}}
     @media (max-width:860px) and (min-width:760px){.hpill .hpill-seg-opt{display:none}}
     /* desktop nav */
-    .hnav{display:none;gap:6px;margin-left:auto}
-    .hnav a{color:#cdd6e8;text-decoration:none;font-weight:600;font-size:.92rem;padding:8px 12px;border-radius:999px;transition:background .15s,color .15s}
+    .hnav{display:none;gap:var(--space-2);margin-left:auto}
+    .hnav a{color:#cdd6e8;text-decoration:none;font-weight:600;font-size:.92rem;padding:var(--space-2) var(--space-2);border-radius:999px;transition:background .15s,color .15s}
     .hnav a:hover{background:var(--panel-2);color:#fff}
-    @media (min-width:1000px){.hnav{display:flex}.hpill{margin-left:6px}}
+    @media (min-width:1000px){.hnav{display:flex}.hpill{margin-left:var(--space-2)}}
+    /* nav + pill + CTA only fit together at ≥1140px; in the 1000–1140 band the nav alone fits,
+       so drop the (supplementary) location pill there to avoid clipping the WhatsApp button. */
+    @media (min-width:1000px) and (max-width:1139.98px){.hpill{display:none}}
     /* hamburger + mobile panel */
     .hburger{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-2);color:var(--text);cursor:pointer}
     .hburger svg{width:22px;height:22px}
     .hburger:focus-visible{outline:none;box-shadow:var(--ring)}
     @media (min-width:1000px){.hburger{display:none}}
-    .mobile-nav{position:absolute;top:calc(var(--header-h) + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;gap:4px;padding:8px clamp(16px,4vw,28px) 14px;border-top:1px solid var(--border);background:rgba(7,7,12,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+    .mobile-nav{position:absolute;top:calc(var(--header-h) + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-2) clamp(16px,4vw,28px) var(--space-3);border-top:1px solid var(--border);background:rgba(7,7,12,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
     .mobile-nav[hidden]{display:none}
-    .mobile-nav a{color:#e7ecf7;text-decoration:none;font-weight:700;padding:12px 10px;border-radius:12px;min-height:46px;display:flex;align-items:center}
+    .mobile-nav a{color:#e7ecf7;text-decoration:none;font-weight:700;padding:var(--space-3) var(--space-2);border-radius:12px;min-height:46px;display:flex;align-items:center}
     .mobile-nav a:hover{background:var(--panel-2)}
 
     /* Hero */
@@ -254,7 +257,7 @@
     .badge .dot::after{content:"";position:absolute;inset:0;border-radius:var(--radius-circle);background:var(--color-success);animation:ping 2.6s var(--ease-out) infinite}
     @keyframes ping{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(2.6);opacity:0}}
     @media (prefers-reduced-motion:reduce){.badge .dot::after{animation:none;display:none}}
-    h1{font-size:var(--fs-display);line-height:var(--lh-display);letter-spacing:var(--track-display);font-weight:700;margin:0 0 18px}
+    h1{font-size:var(--fs-display);line-height:var(--lh-display);letter-spacing:var(--track-display);font-weight:700;margin:0 0 var(--space-3)}
     .grad-text{background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
     /* hero-scoped headline polish — bare h1 / .grad-text left untouched */
     .hero h1{font-weight:var(--fw-display);letter-spacing:-.05em;text-wrap:balance}
@@ -284,14 +287,17 @@
     /* Savings spotlight */
     /* margin-inline must stay auto so this .wrap container centres like the other sections (was `0`, which left-pinned it) */
     .spotlight{margin:46px auto 8px}
+    /* the spotlight's <h2> is sr-only (no layout), so unlike other sections the eyebrow has
+       nothing below it — give it the same eyebrow→content gap the visible-h2 sections get. */
+    .spotlight>.eyebrow{display:flex;margin-bottom:var(--space-3)}
     /* Reserve ~the populated height before the runtime fetch resolves, so the spotlight appearing
        doesn't shove the finder down (CLS). JS removes .reserving once populated. Sized just under the
        measured card+eyebrow height per breakpoint so releasing it never causes a shrink-shift. */
-    .spotlight.reserving{min-height:600px}
-    @media (min-width:560px){.spotlight.reserving{min-height:470px}}
+    .spotlight.reserving{min-height:616px}
+    @media (min-width:560px){.spotlight.reserving{min-height:486px}}
     .spot-card{background:linear-gradient(160deg,rgba(139,92,246,.14),rgba(34,211,238,.08) 60%,var(--panel));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:clamp(20px,3vw,34px);box-shadow:var(--shadow);position:relative;overflow:hidden}
     .spot-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
-    .spot-device{font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:700;letter-spacing:-.02em}
+    .spot-device{font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:700;letter-spacing:-.02em;min-width:0;overflow-wrap:anywhere}
     .spot-sub{color:var(--muted);font-size:.9rem;margin-top:2px}
     .bars{margin:22px 0 6px;display:grid;gap:14px}
     .bar-row{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:14px}
@@ -407,7 +413,7 @@
     @media (prefers-reduced-motion:reduce){.card:focus-visible,.card:hover,.card:active{transform:none}.card:focus-visible::after,.card:hover::after{animation:none}}
     .card[hidden]{display:none}
     .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-    .card-model{font-size:1.06rem;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+    .card-model{font-size:1.06rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;min-width:0;overflow-wrap:anywhere}
     .brand-tag{flex:none;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:var(--muted)}
     .rt-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--space-3)}
     .rt-chip{font-size:.72rem;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid transparent}
@@ -448,7 +454,7 @@
     @media (prefers-reduced-motion:reduce){.feature:hover,.step:hover{transform:none}}
     .feature .ic,.step .ic{display:inline-flex;width:46px;height:46px;align-items:center;justify-content:center;border-radius:14px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.25);margin-bottom:14px}
     .feature .ic svg,.step .ic svg{width:24px;height:24px;color:var(--cyan)}
-    .feature h3,.step h3{margin:0 0 8px;font-size:1.12rem;letter-spacing:-.01em}
+    .feature h3,.step h3{margin:0 0 var(--space-2);font-size:1.12rem;letter-spacing:-.01em}
     .feature p,.step p{margin:0;color:var(--muted);line-height:1.55}
     .step .ic{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.28)}
     .step .ic svg{color:var(--purple-lt)}
@@ -623,10 +629,10 @@
        ===================================================================== */
 
     /* "Opens WhatsApp…" expectation cue — sets expectations before the app switch (less drop-off) */
-    .wa-cue{display:inline-flex;align-items:center;gap:7px;margin:0;color:var(--muted);font-size:.82rem;line-height:1.45}
-    .wa-cue svg{width:15px;height:15px;color:var(--green-lt);flex:none}
+    .wa-cue{display:inline-flex;align-items:flex-start;gap:var(--space-2);margin:0;color:var(--muted);font-size:.82rem;line-height:1.45}
+    .wa-cue svg{width:15px;height:15px;color:var(--green-lt);flex:none;margin-top:2px}
     .wa-cue b{color:#e7ecf7;font-weight:700}
-    .hero .wa-cue{margin-top:14px}
+    .hero .wa-cue{margin-top:var(--space-3)}
     .cta .wa-cue{justify-content:center;margin:14px auto 0}
 
     /* Device-detail trust strip — reassurance (warranty · same-day · OEM-grade) right above the CTA */
@@ -952,7 +958,7 @@
         <label class="sort-field"><span class="sr-only">Sort devices by</span>
           <select id="sort">
             <option value="default">Featured</option>
-            <option value="savings">Biggest savings</option>
+            <option value="savings" selected>Biggest savings</option>
             <option value="price">Price: low to high</option>
           </select>
         </label>
@@ -1025,7 +1031,7 @@
     <!-- PLACEHOLDER CONTENT — swap the names, devices, quotes and star fills below for your real
          Google reviews before merging, and update the aggregate score + count to match. Keep one
          <figure class="review"> per card; keep each star block's aria-label in sync with its rating. -->
-    <section id="reviews" class="wrap reveal" aria-labelledby="reviews-h">
+    <section id="reviews" class="wrap reveal" aria-labelledby="reviews-h" style="padding-top:var(--space-8)">
       <span class="eyebrow">Loved in Guelph</span>
       <h2 id="reviews-h">Rated by the people we've fixed up</h2>
       <div class="rating-summary">
@@ -1135,7 +1141,7 @@
     </section>
 
     <!-- FAQ -->
-    <section id="faq" class="wrap reveal" aria-labelledby="faq-h">
+    <section id="faq" class="wrap reveal" aria-labelledby="faq-h" style="padding-top:var(--space-8)">
       <span class="eyebrow">Good to know</span>
       <h2 id="faq-h">Frequently asked questions</h2>
       <div class="faq">
