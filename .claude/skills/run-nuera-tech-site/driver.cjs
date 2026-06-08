@@ -157,7 +157,8 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     await page.locator('[data-brand="iphone"]').click();
     await page.waitForTimeout(150);
     const afterBrand = await page.locator('#grid .card:visible').count();
-    const allIphone = await page.locator('#grid .card:visible .brand-tag').evaluateAll((els) => els.every((e) => e.textContent.trim() === 'iPhone'));
+    // badge now shows the manufacturer ("Apple"); the iPhone family is read from the (un-stripped) title.
+    const allIphone = await page.locator('#grid .card:visible').evaluateAll((els) => els.length > 0 && els.every((c) => c.querySelector('.card-model').textContent.trim().startsWith('iPhone') && c.querySelector('.brand-tag').textContent.trim() === 'Apple'));
     // Pagination caps the VISIBLE set to one page; the pill + result-count still report the full total.
     check('iPhone filter visible capped to one page', afterBrand === Math.min(Number(iphonePillCnt), 12), `${afterBrand} visible, pill says ${iphonePillCnt}`);
     check('all visible filtered cards are iPhone', allIphone && afterBrand > 0);
@@ -247,7 +248,7 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     await up.waitForTimeout(400);
     check('brand pill restored from URL', (await up.locator('[data-brand="iphone"]').getAttribute('aria-checked')) === 'true');
     check('sort select restored from URL', (await up.locator('#sort').inputValue()) === 'savings');
-    check('visible cards all iPhone after deep link', await up.locator('#grid .card:visible .brand-tag').evaluateAll((els) => els.length > 0 && els.every((e) => e.textContent.trim() === 'iPhone')));
+    check('visible cards all iPhone after deep link', await up.locator('#grid .card:visible').evaluateAll((els) => els.length > 0 && els.every((c) => c.querySelector('.card-model').textContent.trim().startsWith('iPhone') && c.querySelector('.brand-tag').textContent.trim() === 'Apple')));
     await up.locator('[data-type="screen"]').click();
     await up.waitForTimeout(150);
     check('filter change written to URL', new URL(up.url()).searchParams.get('type') === 'screen');
