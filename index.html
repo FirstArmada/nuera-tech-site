@@ -50,6 +50,9 @@
        (--color-*, --fs-*, --space-*, --radius-*); legacy names are kept as aliases so existing
        rules + runtime markup keep working. See STYLEGUIDE.md. */
     :root{
+      /* Dark-only UI: render native form controls, scrollbars and <dialog> dark to match
+         (the <meta name="color-scheme"> only hints UA chrome; this is the canonical declaration). */
+      color-scheme: dark;
       /* -- HSL foundation: rotate a whole colour family from one --hue knob; --sat-brand is the
          master vividness dial. The brand --c-* primitives below derive from these (original hex
          kept as the canonical comment, Δ≤2/255 — visually identical). Saturation stays neon-high
@@ -205,10 +208,10 @@
     @media (prefers-reduced-motion:reduce){.btn:hover{transform:none}}
 
     /* Header */
-    .header{position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(7,7,12,.72);border-bottom:1px solid var(--border);transition:background .25s ease,box-shadow .25s ease,border-color .25s ease}
+    .header{position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);background:rgba(7,7,12,.72);border-bottom:1px solid var(--border);transition:background .25s ease,box-shadow .25s ease,border-color .25s ease}
     /* perf: the sticky header re-samples its blurred backdrop every scroll frame — the heaviest paint on the page.
        Smaller radius on mobile (blur cost ~scales with radius²), with higher opacity carrying legibility. */
-    @media (max-width:600px){.header{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(7,7,12,.82)}}
+    @media (max-width:600px){.header{backdrop-filter:blur(8px) saturate(130%);-webkit-backdrop-filter:blur(8px) saturate(130%);background:rgba(7,7,12,.82)}}
     .header.scrolled{background:rgba(7,7,12,.86);border-bottom-color:var(--border-2);box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
     .header-in{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:var(--header-h)}
     .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1;flex:none}
@@ -296,6 +299,15 @@
     .bar-track{position:relative;height:46px;border-radius:12px;background:rgba(255,255,255,.04)}
     .bar-fill{position:relative;height:100%;border-radius:12px;display:flex;align-items:center;padding:0 14px;font-weight:700;color:#fff;width:0;min-width:fit-content;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);transition:width .9s var(--ease-entrance)}
     @media (prefers-reduced-motion:reduce){.bar-fill{transition:none}}
+    /* Progressive enhancement: where scroll-driven animations are supported, the bars fill as the
+       section scrolls into view (scrubbed against its own view() timeline). Engines without it keep
+       the IntersectionObserver + transition baseline above; reduced-motion users get instant widths. */
+    @supports (animation-timeline:view()){
+      @media (prefers-reduced-motion:no-preference){
+        .bar-fill{width:var(--bar-w,0);transition:none;animation:bar-grow linear both;animation-timeline:view();animation-range:cover 12% cover 56%}
+        @keyframes bar-grow{from{width:0}to{width:var(--bar-w,0)}}
+      }
+    }
     .bar-mk{background:linear-gradient(90deg,rgba(239,68,68,.5),rgba(239,68,68,.28));border:1px solid rgba(239,68,68,.4)}
     /* Nuera's "cheaper" bar glows in the savings palette (cyan→green) — inviting + distinct from the red competitor.
        Dark near-black text on cyan/green (L52-53%) clears WCAG AA comfortably. */
@@ -510,6 +522,14 @@
     @keyframes dlg-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
     @keyframes fade{from{opacity:0}to{opacity:1}}
     @media (prefers-reduced-motion:reduce){dialog[open],dialog::backdrop{animation:none}}
+    /* View Transition: morph just the sheet between page ↔ modal on open/close (only one .sheet exists
+       in the DOM, so the name is unique). Progressive enhancement — gated in JS by feature-detection +
+       reduced-motion; when VT is off, dlg-in above is the fallback. Grid/cards are deliberately unnamed
+       to stay clear of the reverted filter-VT path. */
+    .sheet{view-transition-name:device-sheet}
+    @media (prefers-reduced-motion:reduce){.sheet{view-transition-name:none}}
+    ::view-transition-group(device-sheet){animation-duration:var(--dur-300)}
+    ::view-transition-old(device-sheet),::view-transition-new(device-sheet){animation-timing-function:var(--ease-emphasized)}
     .sheet{position:relative;width:min(620px,100vw);max-height:86dvh;display:flex;flex-direction:column;background:linear-gradient(180deg,#11121d,#0a0b13);border:1px solid var(--border-2);border-radius:var(--radius-lg);box-shadow:0 40px 100px -20px rgba(0,0,0,.7);overflow:hidden}
     .sheet::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--grad)}
     .sheet-head{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 22px 14px;border-bottom:1px solid var(--border);background:linear-gradient(160deg,rgba(139,92,246,.12),transparent 72%)}
@@ -542,6 +562,14 @@
     .opt .opt-price{font-size:.8rem;color:var(--muted);font-weight:700}
     .opt[aria-checked=true] .opt-price{color:#fff}
     .opt .opt-flag{position:absolute;top:-9px;right:9px;font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--grad);color:#0a0a12;padding:2px 8px;border-radius:999px}
+    /* +$X premium over the cheapest tier (real prices, computed per render) */
+    .opt .opt-delta{font-size:.72rem;font-weight:700;color:var(--muted)}
+    .opt[aria-checked=true] .opt-delta{color:#cdfbe6}
+    /* Exactly two tiers render as a segmented toggle (clearest "this vs that"); 3+ stay as chips */
+    .opts-seg{gap:0;padding:3px;border:1px solid var(--border-2);background:var(--panel-2);border-radius:16px;flex-wrap:nowrap}
+    .opts-seg .opt{flex:1 1 0;border:0;background:transparent;border-radius:13px;box-shadow:none;align-items:center;text-align:center}
+    .opts-seg .opt:hover{background:rgba(255,255,255,.06)}
+    .opts-seg .opt[aria-checked=true]{background:rgba(139,92,246,.18);box-shadow:0 0 0 1px rgba(139,92,246,.45)}
     /* colour swatches (back glass) */
     .swatches{display:flex;gap:14px;margin-top:16px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:8px 2px;scroll-snap-type:x proximity}
     .swatches::-webkit-scrollbar{display:none}

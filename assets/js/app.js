@@ -64,6 +64,12 @@ const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
 const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = () => matchMedia('(hover: hover)').matches;
+// Run a DOM mutation inside a View Transition where supported; otherwise (or under reduced motion)
+// apply it directly so the existing CSS animations remain the fallback. Used for the device modal.
+const withViewTransition = (mutate) => {
+  if (typeof document.startViewTransition !== 'function' || reduceMotion()) { mutate(); return; }
+  document.startViewTransition(mutate);
+};
 
 // Shared easing: mirror the CSS --ease-entrance token so WAAPI animations ride the exact same
 // curve as the CSS transitions (one source of truth, no build step). Falls back to the literal
@@ -549,8 +555,10 @@ function initDialog() {
     const card = e.target.closest('.card'); if (!card) return;
     openDevice(card.dataset.model, card);
   });
-  $('#detail-close').addEventListener('click', () => dlg.close());
-  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); }); // backdrop
+  $('#detail-close').addEventListener('click', () => withViewTransition(() => dlg.close()));
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) withViewTransition(() => dlg.close()); }); // backdrop
+  // Esc fires the dialog's native cancel/close (left un-wrapped → instant); the close listener below
+  // still restores focus in every path.
   dlg.addEventListener('close', () => { if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); });
 
   // Option/colour picking is event-delegated so it survives each re-render.
@@ -584,8 +592,8 @@ function openDevice(model, trigger) {
   $('#detail-body').innerHTML = groups.map((g, i) => groupHTML(g, i, d.model)).join('');
 
   $('#detail-book-all').href = waLink(`Hi Nuera Tech! I'd like to book a repair for my ${d.model}.`);
-  $('#detail').showModal();
-  $('#detail-body').scrollTop = 0;
+  // The sheet is already populated above, so the View Transition captures the filled "new" state.
+  withViewTransition(() => { $('#detail').showModal(); $('#detail-body').scrollTop = 0; });
 }
 
 // ---- option-group rendering ----
@@ -623,9 +631,13 @@ function optionsHTML(g, gi) {
   const showFlag = g.options[g.options.length - 1].price > g.options[0].price; // varies by tier
   const chips = g.options.map((r, o) => {
     const flag = (showFlag && o === 0) ? '<span class="opt-flag">Lowest</span>' : '';
-    return `<button class="opt" type="button" role="radio" aria-checked="${o === g.selected}" tabindex="${o === g.selected ? 0 : -1}" data-g="${gi}" data-o="${o}">${flag}<span class="opt-label">${esc(tierLabel(r))}</span><span class="opt-price">${moneyExact(r.price)}</span></button>`;
+    const delta = r.price - g.options[0].price; // real-data premium over the cheapest tier
+    const deltaHTML = delta > 0 ? `<span class="opt-delta">+${moneyExact(delta)}</span>` : '';
+    return `<button class="opt" type="button" role="radio" aria-checked="${o === g.selected}" tabindex="${o === g.selected ? 0 : -1}" data-g="${gi}" data-o="${o}">${flag}<span class="opt-label">${esc(tierLabel(r))}</span><span class="opt-price">${moneyExact(r.price)}</span>${deltaHTML}</button>`;
   }).join('');
-  return `<div class="opts" role="radiogroup" aria-label="${esc(g.rtype)} options">${chips}</div>`;
+  // Two tiers read clearest as a segmented toggle; 3+ keep the wrapping chip grid.
+  const seg = g.options.length === 2 ? ' opts-seg' : '';
+  return `<div class="opts${seg}" role="radiogroup" aria-label="${esc(g.rtype)} options">${chips}</div>`;
 }
 
 function groupHTML(g, gi, model) {
@@ -695,9 +707,13 @@ function buildSpotlight(stats) {
       + `<span class="save-pct">${pct}% less than Mobile Klinik</span>`;
     countUp($('.save-amt', save), saving);
     const max = r.mk_price;
+    const nueraW = (r.price / max) * 100;
+    // --bar-w carries the target width so the CSS scroll-driven fill (where supported) can scrub
+    // 0 → --bar-w. The double-rAF below sets the resting inline width as the universal baseline;
+    // the two agree on the final value, so there's no jump when the scroll animation lands.
     $('#spot-bars').innerHTML = `
-      <div class="bar-row"><span class="bar-name">Mobile Klinik</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100"><span class="bar-was">${moneyExact(r.mk_price)}</span></div></div></div>
-      <div class="bar-row"><span class="bar-name">Nuera</span><div class="bar-track"><div class="bar-fill bar-nuera" data-w="${(r.price / max) * 100}">${moneyExact(r.price)}</div></div></div>`;
+      <div class="bar-row"><span class="bar-name">Mobile Klinik</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100" style="--bar-w:100%"><span class="bar-was">${moneyExact(r.mk_price)}</span></div></div></div>
+      <div class="bar-row"><span class="bar-name">Nuera</span><div class="bar-track"><div class="bar-fill bar-nuera" data-w="${nueraW}" style="--bar-w:${nueraW}%">${moneyExact(r.price)}</div></div></div>`;
     requestAnimationFrame(() => requestAnimationFrame(() => {
       $$('#spot-bars .bar-fill').forEach((el) => { el.style.width = el.dataset.w + '%'; });
     }));
