@@ -239,6 +239,20 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     await mp.screenshot({ path: `${SHOTS}/06-mobile-modal.png` });
     await mctx.close();
 
+    console.log('\n[9] Shareable filters + sort (deep link + URL write)');
+    const uctx = await browser.newContext({ viewport: { width: 1366, height: 900 } });
+    const up = await uctx.newPage();
+    await up.goto(new URL('?brand=iphone&sort=savings', BASE).href, { waitUntil: 'domcontentloaded' });
+    await up.waitForSelector('#grid .card:visible', { timeout: 15000 }); // first DOM card is a hidden non-iPhone under this filter
+    await up.waitForTimeout(400);
+    check('brand pill restored from URL', (await up.locator('[data-brand="iphone"]').getAttribute('aria-checked')) === 'true');
+    check('sort select restored from URL', (await up.locator('#sort').inputValue()) === 'savings');
+    check('visible cards all iPhone after deep link', await up.locator('#grid .card:visible .brand-tag').evaluateAll((els) => els.length > 0 && els.every((e) => e.textContent.trim() === 'iPhone')));
+    await up.locator('[data-type="screen"]').click();
+    await up.waitForTimeout(150);
+    check('filter change written to URL', new URL(up.url()).searchParams.get('type') === 'screen');
+    await uctx.close();
+
     console.log('\n[console/page errors]');
     console.log('  console.error:', consoleErrors.length ? consoleErrors : '(none)');
     console.log('  pageerror   :', pageErrors.length ? pageErrors : '(none)');
