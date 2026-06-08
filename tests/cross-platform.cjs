@@ -31,11 +31,18 @@ function startServer(dir) {
     '.png': 'image/png'
   };
 
+  const root = path.resolve(dir);
   const server = http.createServer((req, res) => {
-    const urlPath = req.url === '/' ? 'index.html' : req.url.split('?')[0];
-    const filePath = path.join(dir, urlPath);
-
     try {
+      const urlPath = req.url === '/' ? 'index.html' : req.url.split('?')[0];
+      // Map the request onto disk, then confirm it stays inside `root` so a
+      // crafted path (e.g. "/../../etc/passwd") can't escape the served dir.
+      const filePath = path.join(root, path.normalize(decodeURIComponent(urlPath)));
+      if (filePath !== root && !filePath.startsWith(root + path.sep)) {
+        res.writeHead(403);
+        res.end('Forbidden');
+        return;
+      }
       const data = fs.readFileSync(filePath);
       const ext = path.extname(filePath);
       res.writeHead(200, { 'Content-Type': mimes[ext] || 'application/octet-stream' });
