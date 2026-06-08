@@ -616,6 +616,10 @@
     /* Reveal on scroll */
     .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease-entrance),transform .6s var(--ease-entrance)}
     .reveal.in{opacity:1;transform:none}
+    /* WebKit rescue: snap an in-view section visible with no transition when the 0→1 opacity
+       transition stalls after a scroll jump (set by settleReveal() in app.js). Same specificity as
+       .reveal.in but later in source, so it wins and cancels a stuck transition. */
+    .reveal.reveal-shown{opacity:1;transform:none;transition:none}
     @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
     /* Global reduced-motion safety net — covers any motion not handled by the targeted rules above.
        Uses .001ms (not 0) so transitionend/animationend listeners in app.js still fire. */
