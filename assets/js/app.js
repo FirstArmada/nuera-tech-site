@@ -835,11 +835,12 @@ function initFaq() {
 }
 
 let revealIO;
-// Single idempotent reveal path — shared by the scroll observer AND the content-visibility
-// fallback below, so whichever fires first reveals the element and detaches the other.
+// Single idempotent reveal path — shared by the scroll observer, the content-visibility fallback,
+// and the WebKit viewport sweep below, so whichever fires first reveals the element and detaches
+// the others.
 function reveal(el) {
   el.classList.add('in');
-  revealIO.unobserve(el);
+  if (revealIO) revealIO.unobserve(el);
   el.removeEventListener('contentvisibilityautostatechange', onCVStateChange);
 }
 // content-visibility:auto can strand the reveal: on a JUMP scroll (refresh with scroll
@@ -847,18 +848,62 @@ function reveal(el) {
 // IntersectionObserver a recompute, so it stays at opacity:0 forever. When the browser actually
 // renders the element (skipped → false ⇒ it's near the viewport), reveal it. No-op on elements
 // without content-visibility (the event never fires there), so the scroll stagger is preserved.
+// NOTE: this event is Chromium-only — WebKit / iOS Safari rely on revealInView() below instead.
 function onCVStateChange(e) { if (!e.skipped) reveal(e.currentTarget); }
+
+// WebKit / iOS Safari jump-scroll & scroll-restoration fallback.
+// `contentvisibilityautostatechange` is Chromium-only, so on WebKit nothing catches a section that
+// lands in the viewport WITHOUT a scroll gesture — scroll restoration on reload, a bfcache restore
+// (back/forward), a deep-link #anchor, or a programmatic jump. The IntersectionObserver never gets a
+// recompute for it, so it stays at opacity:0 forever and the whole search bar + device grid vanish.
+// Sweep on every event that follows such a jump and reveal anything already in (or entering) the
+// viewport. Idempotent with the observer; `:not(.in)` keeps the normal scroll-stagger intact.
+function revealInView() {
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  $$('.reveal:not(.in)').forEach((el) => {
+    const r = el.getBoundingClientRect();
+    if (r.top < vh && r.bottom > -1) reveal(el);
+  });
+}
+// Belt-and-suspenders for a stalled WebKit opacity transition: an element can carry `.in` yet still
+// compute opacity:0 if the 0→1 transition never composited (seen after a scroll jump). Snap those
+// in-view stragglers visible with a transition-free class — only fires on the timed/event sweeps,
+// never per scroll frame, and never touches anything already painted.
+function settleReveal() {
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  $$('.reveal.in:not(.reveal-shown)').forEach((el) => {
+    const r = el.getBoundingClientRect();
+    if (r.top < vh && r.bottom > -1 && getComputedStyle(el).opacity === '0') el.classList.add('reveal-shown');
+  });
+}
 function initReveal() {
   revealIO = new IntersectionObserver((ents) => {
     ents.forEach((en) => { if (en.isIntersecting) reveal(en.target); });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   observeReveal(document);
+
+  // Drive the WebKit fallback from the events that follow a jump. rAF-throttled; passive listeners.
+  let ticking = false;
+  const onScroll = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; revealInView(); }); };
+  const settle = () => { revealInView(); settleReveal(); };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll, { passive: true });
+  addEventListener('hashchange', settle);
+  addEventListener('pageshow', settle);   // bfcache restore (iOS back/forward) reinstates scroll first
+  addEventListener('load', settle);
+  // Scroll restoration is applied AFTER load on iOS, so a single pass can miss it — sweep a few times.
+  settle();
+  setTimeout(settle, 300);
+  setTimeout(settle, 1200);
 }
 function observeReveal(root) {
   $$('.reveal:not(.in)', root).forEach((el) => {
     revealIO.observe(el);
     el.addEventListener('contentvisibilityautostatechange', onCVStateChange);
   });
+  // A grid built while the viewport is already parked on it (jump/scroll-restore) needs an
+  // immediate sweep — its cards were added after the load-time passes already ran.
+  if (root !== document) revealInView();
 }
 
 // ---- utils ----
