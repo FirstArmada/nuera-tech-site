@@ -65,7 +65,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const money = (n) => '$' + Number(n).toFixed(Number.isInteger(n) ? 0 : 2);
 const moneyExact = (n) => '$' + Number(n).toFixed(2);
-// Percent cheaper than the compared (Mobile Klinik) price. Callers guard base > 0.
+// Percent cheaper than the compared (typical) price. Callers guard base > 0.
 const pctLess = (saved, base) => Math.round((saved / base) * 100);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') ? '' : v.trim();
@@ -291,7 +291,7 @@ function renderStats(stats) {
   if (best) {
     const what = (CHIP_LABEL[best.chip] || best.repair_type).toLowerCase();
     $('#cta-headline').textContent =
-      `Why pay Mobile Klinik ${moneyExact(best.mk_price)} for a ${best.model} ${what}?`;
+      `Why pay ${moneyExact(best.mk_price)} elsewhere for a ${best.model} ${what}?`;
     $('#cta-sub').textContent =
       `Nuera does it for ${moneyExact(best.price)} — that's ${money(Math.round(best.savings))} back in your pocket, same quality parts. Find your device and book in under a minute.`;
   }
@@ -582,7 +582,7 @@ function initCardSpotlight(grid) {
 function cardHTML(d) {
   const chips = [...d.types].map((t) => `<span class="rt-chip ${t}">${CHIP_LABEL[t] || t}</span>`).join('');
   const save = d.maxSaving > 0
-    ? `<div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs Mobile Klinik</span></div>`
+    ? `<div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs other shops</span></div>`
     : '';
   return `<button class="card reveal" type="button" data-model="${esc(d.model)}" aria-label="View pricing for ${esc(d.model)}">
     <div class="card-top">
@@ -666,7 +666,7 @@ function subText(g) {
 function compareHTML(r) {
   const hasSave = r.mk_price != null && r.mk_price > 0 && r.savings != null && r.savings > 0;
   return hasSave
-    ? `<span class="mk">Mobile Klinik ${moneyExact(r.mk_price)}</span><span class="save">Save ${money(Math.round(r.savings))} · ${pctLess(r.savings, r.mk_price)}% less</span>`
+    ? `<span class="mk">Typical price ${moneyExact(r.mk_price)}</span><span class="save">Save ${money(Math.round(r.savings))} · ${pctLess(r.savings, r.mk_price)}% less</span>`
     : '';
 }
 
@@ -674,7 +674,7 @@ function bookMsg(r, model) {
   const v = cleanVariant(r.variant);
   const hasSave = r.mk_price != null && r.mk_price > 0 && r.savings != null && r.savings > 0;
   return `Hi Nuera Tech! I'd like to book:\n• ${r.repair_type}${v ? ' (' + v + ')' : ''} for my ${model}\n• Your price: ${moneyExact(r.price)}`
-    + (hasSave ? `\n• (Mobile Klinik: ${moneyExact(r.mk_price)} — I save ${money(Math.round(r.savings))})` : '');
+    + (hasSave ? `\n• (Typical price: ${moneyExact(r.mk_price)} — I save ${money(Math.round(r.savings))})` : '');
 }
 
 function optionsHTML(g, gi) {
@@ -749,7 +749,7 @@ function quoteText() {
     const tier = g.swatch ? (g.colors[g.selected]?.name || '') : cleanVariant(r.variant);
     const hasSave = r.mk_price != null && r.mk_price > 0 && r.savings != null && r.savings > 0;
     lines.push(`• ${g.rtype}${tier ? ` (${tier})` : ''}: ${moneyExact(r.price)}`
-      + (hasSave ? ` — save ${money(Math.round(r.savings))} vs Mobile Klinik` : ''));
+      + (hasSave ? ` — save ${money(Math.round(r.savings))} vs other shops` : ''));
   }
   lines.push('', 'Book on WhatsApp: ' + waLink(`Hi Nuera Tech! I'd like to book a repair for my ${model}.`), 'https://nuera.talha-k.com/');
   return lines.join('\n');
@@ -805,7 +805,7 @@ function buildSpotlight(stats) {
     save.innerHTML =
       `<span class="spot-save-eyebrow"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>You save</span>`
       + `<span class="save-amt">$${saving}</span>`
-      + `<span class="save-pct">${pct}% less than Mobile Klinik</span>`;
+      + `<span class="save-pct">${pct}% less than other shops</span>`;
     countUp($('.save-amt', save), saving);
     const max = r.mk_price;
     const nueraW = (r.price / max) * 100;
@@ -813,7 +813,7 @@ function buildSpotlight(stats) {
     // 0 → --bar-w. The double-rAF below sets the resting inline width as the universal baseline;
     // the two agree on the final value, so there's no jump when the scroll animation lands.
     $('#spot-bars').innerHTML = `
-      <div class="bar-row"><span class="bar-name">Mobile Klinik</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100" style="--bar-w:100%"><span class="bar-was">${moneyExact(r.mk_price)}</span></div></div></div>
+      <div class="bar-row"><span class="bar-name">Typical price</span><div class="bar-track"><div class="bar-fill bar-mk" data-w="100" style="--bar-w:100%"><span class="bar-was">${moneyExact(r.mk_price)}</span></div></div></div>
       <div class="bar-row"><span class="bar-name">Nuera</span><div class="bar-track"><div class="bar-fill bar-nuera" data-w="${nueraW}" style="--bar-w:${nueraW}%">${moneyExact(r.price)}</div></div></div>`;
     requestAnimationFrame(() => requestAnimationFrame(() => {
       $$('#spot-bars .bar-fill').forEach((el) => { el.style.width = el.dataset.w + '%'; });

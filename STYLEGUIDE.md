@@ -218,8 +218,8 @@ All JS is self-hosted and the motion layer adds no script origin to the CSP. Eve
 - **`.actionbar`** — mobile-only (`≤559px`) sticky bottom bar holding the primary
   *Book on WhatsApp* CTA (a `data-wa="general"` link, so `initWhatsAppDefaults()` fills it)
   + a *Find* shortcut to `#finder`. `z-index:75` (above `.fab` 70, below the chat panel 80).
-  On mobile it hides `.fab-wa`, lifts the `.fab` stack by `var(--actionbar-h)`, and pads
-  `body` so the footer isn't occluded.
+  On mobile it lifts the `.fab` stack by `var(--actionbar-h)` and pads `body` so the footer
+  isn't occluded.
 - **`.wa-cue`** — a small "Opens WhatsApp with a pre-filled message" line placed beside
   WhatsApp CTAs (hero, CTA banner, modal foot) to reduce app-switch drop-off.
 - **`.trust-strip`** — reassurance row (90-day warranty · same-day · OEM-grade parts) in the

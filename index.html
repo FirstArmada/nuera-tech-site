@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
-  <title>Nuera Tech — Guelph Phone Repair | Beat Mobile Klinik Pricing</title>
-  <meta name="description" content="Guelph's transparent phone repair shop. iPhone, Samsung, Pixel & iPad screen and battery repair — up to $115 cheaper than Mobile Klinik. Same-day service, 90-day warranty, book on WhatsApp." />
+  <title>Nuera Tech — Guelph Phone Repair | Beat Other Shops' Pricing</title>
+  <meta name="description" content="Guelph's transparent phone repair shop. iPhone, Samsung, Pixel & iPad screen and battery repair — up to $115 cheaper than other shops. Same-day service, 90-day warranty, book on WhatsApp." />
   <meta name="theme-color" content="#07070c" />
   <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://nuera.talha-k.com/" />
@@ -13,14 +13,14 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Nuera Tech" />
   <meta property="og:title" content="Nuera Tech — Guelph Phone Repair, Always Cheaper" />
-  <meta property="og:description" content="iPhone, Samsung, Pixel & iPad repair in Guelph — up to $115 cheaper than Mobile Klinik. Same-day, 90-day warranty." />
+  <meta property="og:description" content="iPhone, Samsung, Pixel & iPad repair in Guelph — up to $115 cheaper than other shops. Same-day, 90-day warranty." />
   <meta property="og:url" content="https://nuera.talha-k.com/" />
   <meta property="og:image" content="https://nuera.talha-k.com/assets/icons/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Nuera Tech — Guelph Phone Repair, Always Cheaper" />
-  <meta name="twitter:description" content="iPhone, Samsung, Pixel & iPad repair in Guelph — up to $115 cheaper than Mobile Klinik." />
+  <meta name="twitter:description" content="iPhone, Samsung, Pixel & iPad repair in Guelph — up to $115 cheaper than other shops." />
   <meta name="twitter:image" content="https://nuera.talha-k.com/assets/icons/og-image.png" />
 
   <!-- Icons / PWA -->
@@ -506,26 +506,15 @@
     @media (max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
     @media (max-width:520px){.foot-grid{grid-template-columns:1fr}}
 
-    /* Floating actions */
+    /* Floating actions — the chat launcher (injected by chat.js) is the primary
+       conversion action here; the stack also carries a back-to-top control. */
     .fab{position:fixed;right:calc(clamp(14px,3vw,22px) + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-    /* one-time entrance, then a low-frequency glow swell so the primary conversion action stays
-       "alive". box-shadow only — no layout/scale change — so it can never intrude on the chat
-       launcher stacked beside it in the .fab column. Gated for reduced motion just below. */
-    @keyframes fab-in{from{opacity:0;transform:translateY(14px) scale(.92)}to{opacity:1;transform:none}}
-    @keyframes fab-pulse{0%,72%,100%{box-shadow:var(--glow-success)}82%{box-shadow:0 16px 40px -10px hsl(var(--hue-green) var(--sat-success) 52% / .9)}}
-    .fab-wa{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;background:var(--color-success);color:var(--color-on-success);font-weight:700;text-decoration:none;box-shadow:var(--glow-success);transition:transform var(--dur-base) ease,box-shadow var(--dur-base) ease;animation:fab-in var(--dur-300) var(--ease-entrance) backwards,fab-pulse 6.5s var(--ease-default) 2.5s infinite}
-    .fab-wa svg{width:22px;height:22px}
-    .fab-wa .fab-txt{display:none}
-    @media (min-width:560px){.fab-wa .fab-txt{display:inline}}
-    .fab-wa:hover{transform:translateY(-2px);box-shadow:0 18px 42px -8px rgba(52,211,153,.7)}
-    .fab-wa:active{transform:translateY(0) scale(.97);box-shadow:0 8px 20px -8px rgba(52,211,153,.6)}
-    .fab-wa:focus-visible{outline:none;box-shadow:var(--ring),0 14px 34px -8px rgba(52,211,153,.6)}
     .fab-top{width:48px;height:48px;align-self:flex-end;border:0;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .25s,transform .25s,background .18s;backdrop-filter:blur(10px)}
     .fab-top.show{opacity:1;transform:none;pointer-events:auto}
     .fab-top:hover{background:rgba(255,255,255,.16)}
     .fab-top:active{transform:scale(.94)}
     .fab-top:focus-visible{outline:none;box-shadow:var(--ring)}
-    @media (prefers-reduced-motion:reduce){.fab-wa{animation:none}.fab-wa:hover,.fab-wa:active,.fab-top:active{transform:none}}
+    @media (prefers-reduced-motion:reduce){.fab-top:active{transform:none}}
 
     /* Dialog (device detail) */
     dialog{padding:0;border:0;background:transparent;max-width:none;max-height:none;color:var(--text)}
@@ -658,8 +647,7 @@
       .actionbar-find{flex:0 0 auto;padding:0 18px;color:var(--text);background:var(--color-surface-3);border:1px solid var(--border-2)}
       .actionbar-book{flex:1 1 auto;padding:0 18px;color:var(--color-on-success);background:var(--grad-wa);box-shadow:var(--glow-success)}
       .actionbar-book:active,.actionbar-find:active{transform:translateY(1px)}
-      /* the bar carries WhatsApp now: hide the floating FAB WA button; lift the FAB stack (back-to-top + chat launcher) above the bar */
-      .fab-wa{display:none}
+      /* the bar carries WhatsApp here; lift the FAB stack (back-to-top + chat launcher) above the bar */
       .fab{bottom:calc(16px + env(safe-area-inset-bottom) + var(--actionbar-h))}
       /* clear the bar so it never occludes the footer */
       body{padding-bottom:calc(var(--actionbar-h) + env(safe-area-inset-bottom))}
@@ -765,19 +753,19 @@
     @media (forced-colors:active){
       /* gradient/clipped text would otherwise vanish (its painted background is dropped) — force a system colour */
       .grad-text,.brand-name .t,.spot-save .save-amt,.rating-summary .rating-score{-webkit-text-fill-color:currentColor;color:CanvasText;background:none}
-      .btn,.pill,.card,.opt,.book,.actionbar a,.fab-wa,.fab-top,.spot-pill{border:1px solid}
+      .btn,.pill,.card,.opt,.book,.actionbar a,.fab-top,.spot-pill{border:1px solid}
       .bar-fill,.spot-save .save-pct,.save-tag{forced-color-adjust:none}
     }
 
     /* Mobile interaction hardening (iOS Safari / Android Chrome / in-app browsers) */
     /* Kill the 300ms tap delay + stray double-tap-zoom on interactive targets. */
     .btn,.pill,.card,.swatch,.book,.opt,.spot-pill,.card-view,.sheet-close,.hburger,
-    .fab-wa,.fab-top,.actionbar a,.qa summary,.hnav a,.mobile-nav a,.search .clear,.share-quote{touch-action:manipulation}
+    .fab-top,.actionbar a,.qa summary,.hnav a,.mobile-nav a,.search .clear,.share-quote{touch-action:manipulation}
     /* Sticky-hover guard: on touch devices (no true hover) neutralize hover-only lifts/glows so a
        tapped control never stays "hovered" until the next tap. :active provides the press feedback. */
     @media (hover:none){
       .btn:hover,.btn-primary:hover,.btn-secondary:hover,.btn-wa:hover,.btn-ghost:hover,
-      .feature:hover,.step:hover,.review:hover,.fab-wa:hover,.fab-top:hover,.swatch:hover{transform:none}
+      .feature:hover,.step:hover,.review:hover,.fab-top:hover,.swatch:hover{transform:none}
       .feature:hover,.step:hover,.review:hover{box-shadow:none;border-color:var(--border)}
       .search input:hover{border-color:var(--border-2)}
     }
@@ -790,7 +778,7 @@
     "@type":["LocalBusiness","ElectronicsStore"],
     "@id":"https://nuera.talha-k.com/#business",
     "name":"Nuera Tech",
-    "description":"Phone and tablet repair shop in Guelph, Ontario. Same-day iPhone, Samsung, Pixel and iPad screen, battery, back glass and charge port repair at transparent prices that beat Mobile Klinik.",
+    "description":"Phone and tablet repair shop in Guelph, Ontario. Same-day iPhone, Samsung, Pixel and iPad screen, battery, back glass and charge port repair at transparent prices that beat other shops.",
     "url":"https://nuera.talha-k.com/",
     "telephone":"+12269784666",
     "image":"https://nuera.talha-k.com/assets/icons/og-image.png",
@@ -814,7 +802,7 @@
   {
     "@context":"https://schema.org","@type":"FAQPage","mainEntity":[
       {"@type":"Question","name":"How long does a phone repair take at Nuera Tech?","acceptedAnswer":{"@type":"Answer","text":"Most common repairs — like iPhone and Samsung screen or battery replacements — are completed the same day, usually within about two hours. Bring your device in to Guelph and we will give you an exact turnaround time up front."}},
-      {"@type":"Question","name":"Is Nuera Tech really cheaper than Mobile Klinik?","acceptedAnswer":{"@type":"Answer","text":"Yes. On comparable repairs we publish both our price and Mobile Klinik's price side by side. We are consistently cheaper — up to $115 less on popular iPhone screen replacements — because we don't carry mall-rent overhead."}},
+      {"@type":"Question","name":"Is Nuera Tech really cheaper than other shops?","acceptedAnswer":{"@type":"Answer","text":"Yes. On comparable repairs we publish both our price and the typical price side by side. We are consistently cheaper — up to $115 less on popular iPhone screen replacements — because we don't carry mall-rent overhead."}},
       {"@type":"Question","name":"What warranty do you offer on repairs?","acceptedAnswer":{"@type":"Answer","text":"Every repair is backed by a 90-day warranty covering both parts and labour. If something related to the repair fails within that window, we make it right."}},
       {"@type":"Question","name":"What devices do you repair?","acceptedAnswer":{"@type":"Answer","text":"We repair iPhone, Samsung Galaxy phones and tablets, Google Pixel, and iPad — screens, batteries, back glass and charge ports. Search your exact model on our site to see live pricing."}},
       {"@type":"Question","name":"How do I book a repair?","acceptedAnswer":{"@type":"Answer","text":"Find your device and repair on the site, then tap Book on WhatsApp. Your message is pre-filled with the device and repair so we can confirm price and timing in seconds."}},
@@ -906,7 +894,7 @@
         </span>
       </div>
       <h1>Phone repair that's<br><span class="grad-text">always cheaper.</span></h1>
-      <p class="lead">Nuera Tech fixes iPhone, Samsung, Pixel &amp; iPad in Guelph — at transparent prices that beat Mobile Klinik <strong>every time</strong>. Same quality parts. No mall-rent markup. Walk in, get fixed, save.</p>
+      <p class="lead">Nuera Tech fixes iPhone, Samsung, Pixel &amp; iPad in Guelph — at transparent prices that beat other shops <strong>every time</strong>. Same quality parts. No mall-rent markup. Walk in, get fixed, save.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#finder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -920,7 +908,7 @@
       </p>
       <div class="stats" aria-label="Nuera Tech at a glance">
         <div class="stat" style="--i:0"><div class="num"><span class="grad-text" data-stat="devices">—</span></div><div class="lbl">devices priced live</div></div>
-        <div class="stat" style="--i:1"><div class="num">up to <span class="grad-text" data-stat="maxSaving">—</span></div><div class="lbl">cheaper than Mobile Klinik</div></div>
+        <div class="stat" style="--i:1"><div class="num">up to <span class="grad-text" data-stat="maxSaving">—</span></div><div class="lbl">cheaper than other shops</div></div>
         <div class="stat" style="--i:2"><div class="num"><span class="grad-text" data-stat="avgPct">—</span></div><div class="lbl">average saving on compared repairs</div></div>
         <div class="stat" style="--i:3"><div class="num">&lt; 2 hrs</div><div class="lbl">typical repair turnaround</div></div>
       </div>
@@ -929,7 +917,7 @@
     <!-- SAVINGS SPOTLIGHT -->
     <section class="spotlight wrap reveal reserving" aria-labelledby="spot-h">
       <span class="eyebrow">The savings, side by side</span>
-      <h2 id="spot-h" class="sr-only">Price comparison versus Mobile Klinik</h2>
+      <h2 id="spot-h" class="sr-only">Price comparison versus other shops</h2>
       <div class="spot-card" id="spotlight" hidden>
         <div class="spot-head">
           <div>
@@ -947,7 +935,7 @@
     <section id="finder" class="finder wrap reveal" aria-labelledby="finder-h">
       <span class="eyebrow">Live pricing</span>
       <h2 id="finder-h">Find your device &amp; price</h2>
-      <p class="lead-muted">Search 150+ devices. Real Mobile Klinik comparison shown wherever we have it — and we're always under.</p>
+      <p class="lead-muted">Search 150+ devices. Real price comparison shown wherever we have it — and we're always under.</p>
 
       <div class="controls">
         <div class="controls-inner">
@@ -1000,7 +988,7 @@
         <div class="feature reveal">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
           <h3>Transparent pricing</h3>
-          <p>Every price is published — with the Mobile Klinik comparison where we have it. What you see is what you pay.</p>
+          <p>Every price is published — with the typical price shown side by side where we have it. What you see is what you pay.</p>
         </div>
         <div class="feature reveal">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></span>
@@ -1019,7 +1007,7 @@
           <span class="step-n">1</span>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
           <h3>Find your price</h3>
-          <p>Search your device and see the exact repair price — plus how much you save vs Mobile Klinik.</p>
+          <p>Search your device and see the exact repair price — plus how much you save vs other shops.</p>
         </div>
         <div class="step reveal">
           <span class="step-n">2</span>
@@ -1078,7 +1066,7 @@
         </figure>
         <figure class="review">
           <div class="review-stars" role="img" aria-label="Rated 5 out of 5"><span class="stars-on" style="--fill:100%">★★★★★</span><span class="stars-off">★★★★★</span></div>
-          <blockquote>Friendly, fast and local. Compared their iPhone 12 screen price to Mobile Klinik right on the site before I even messaged — saved over $100. Easy recommend.</blockquote>
+          <blockquote>Friendly, fast and local. Compared their iPhone 12 screen price to other shops right on the site before I even messaged — saved over $100. Easy recommend.</blockquote>
           <figcaption><span class="review-avatar" aria-hidden="true">TN</span><span class="review-who"><b>Thanh&nbsp;N.</b><span class="review-device">iPhone 12 · screen</span></span></figcaption>
         </figure>
       </div>
@@ -1088,7 +1076,7 @@
     <section class="wrap reveal">
       <div class="cta">
         <span class="eyebrow">Save today</span>
-        <h2 id="cta-headline">Why pay Mobile Klinik more?</h2>
+        <h2 id="cta-headline">Why pay other shops more?</h2>
         <p id="cta-sub">Same quality parts. Honest pricing. You just don't pay for their mall rent. Find your device and book in under a minute.</p>
         <div class="cta-trust" aria-label="Why choose Nuera">
           <span class="cta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg> 90-day warranty</span>
@@ -1159,7 +1147,7 @@
           <div class="qa-wrap"><div class="body">Most common repairs — iPhone and Samsung screens or batteries — are done the same day, usually within about two hours. We'll give you an exact turnaround when you book.</div></div>
         </details>
         <details class="qa">
-          <summary><span>Are you really cheaper than Mobile Klinik?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <summary><span>Are you really cheaper than other shops?</span><span class="qa-ic" aria-hidden="true"></span></summary>
           <div class="qa-wrap"><div class="body">Yes. On comparable repairs we show both prices side by side, and we're consistently cheaper — up to $115 less on popular iPhone screen replacements. No mall-rent overhead means a lower price for you.</div></div>
         </details>
         <details class="qa">
@@ -1214,10 +1202,6 @@
     <button class="fab-top" id="fab-top" type="button" aria-label="Back to top">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
     </button>
-    <a class="fab-wa" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener" aria-label="Book a repair on WhatsApp">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
-      <span class="fab-txt">Book on WhatsApp</span>
-    </a>
   </div>
 
   <!-- Mobile-only sticky action bar — keeps the primary WhatsApp CTA in thumb's reach -->

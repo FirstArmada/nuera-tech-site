@@ -7,6 +7,9 @@ package-lock.json
 .DS_Store
 *.log
 
+# Playwright test screenshots written by tests/cross-platform.cjs (debug artifacts).
+tests/shots/
+
 # Server code under cloud/ has its own manifests and must be tracked, even
 # though the root site stays build-less. (node_modules stays ignored below.)
 !cloud/**/package.json
