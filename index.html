@@ -471,6 +471,7 @@
     .qa[open] .qa-ic::after{transform:translate(-50%,-50%) rotate(90deg);opacity:0}
     .qa-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
     .qa[open] .qa-wrap{grid-template-rows:1fr}
+    .qa.closing .qa-wrap{grid-template-rows:0fr} /* collapse to 0fr while [open] still renders the body, so the close animates */
     .qa-wrap>.body{overflow:hidden;min-height:0}
     .qa .body{padding:0 20px 18px;color:var(--muted);line-height:1.6}
     @media (prefers-reduced-motion:reduce){.qa-wrap,.qa-ic::before,.qa-ic::after{transition:none}}
