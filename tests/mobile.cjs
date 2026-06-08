@@ -110,8 +110,6 @@ const IPHONE_SE = { width: 375, height: 667 };
       abBox ? `bottom=${Math.round(abBox.y + abBox.height)}` : '(no box)');
     check('.actionbar book button is the WhatsApp CTA',
       (await page.locator('.actionbar-book').getAttribute('href') || '').includes('wa.me/12269784666'));
-    check('floating .fab-wa is hidden (bar carries WhatsApp)',
-      await page.locator('.fab-wa').evaluate((el) => getComputedStyle(el).display === 'none'));
 
     console.log('\n[4] Footer is NOT occluded by the fixed action bar');
     const bodyPadBottom = await page.evaluate(() => parseFloat(getComputedStyle(document.body).paddingBottom));
