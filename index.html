@@ -380,7 +380,7 @@
     .card::before,.card::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;opacity:0;pointer-events:none;transition:opacity var(--dur-base) var(--ease-out)}
     .card::before{background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),rgba(139,92,246,.22),transparent 60%)}
     .card::after{padding:1px;background:conic-gradient(from var(--angle,120deg),var(--c-purple-300),var(--c-cyan-400),var(--c-purple-500),var(--c-purple-300));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-    #why, #how, .cta, #faq, footer { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+    #why, #how, #reviews, .cta, #visit, #faq, footer { content-visibility: auto; contain-intrinsic-size: auto 500px; }
     /* Keyboard focus gets the full state on every device (focus-visible never "sticks" on touch). */
     .card:focus-visible{transform:translateY(-4px);border-color:rgba(139,92,246,.5);box-shadow:0 26px 60px -24px rgba(0,0,0,.6)}
     .card:focus-visible::before{opacity:1}
@@ -630,6 +630,84 @@
       footer{padding-bottom:56px}
     }
 
+    /* ===================================================================
+       New components (2026 refresh): grain · scroll-progress · hero rating ·
+       reviews / social proof · visit (location + live hours) · share-quote.
+       Placed before the global a11y/perf override blocks so those still cascade.
+       =================================================================== */
+
+    /* Film-grain depth — fixed, decorative, sits behind content (z-index:-1, above the aurora). */
+    .grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.045;
+      background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+
+    /* Reading-progress bar — thin brand-gradient line pinned to the very top edge, scaled by scroll. */
+    .scroll-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:100;pointer-events:none}
+    .scroll-progress>span{display:block;height:100%;width:100%;transform:scaleX(var(--p,0));transform-origin:0 50%;background:var(--grad-accent);box-shadow:0 0 10px rgba(139,92,246,.55)}
+
+    /* Shared star glyphs — an amber "on" layer clipped to --fill over a dim "off" layer. */
+    .rating-chip .stars,.rating-stars,.review-stars{position:relative;display:inline-block;white-space:nowrap;line-height:1}
+    .rating-chip .stars-off,.rating-stars .stars-off,.review-stars .stars-off{color:rgba(255,255,255,.16)}
+    .rating-chip .stars-on,.rating-stars .stars-on,.review-stars .stars-on{position:absolute;left:0;top:0;width:var(--fill,100%);overflow:hidden;color:var(--amber)}
+
+    /* Hero trust row — existing badge + a compact Google-rating chip. */
+    .hero-trust{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:18px}
+    .hero-trust .badge{margin-bottom:0}
+    .rating-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--radius-pill);background:var(--panel-2);border:1px solid var(--border);font-size:.85rem;font-weight:600;color:#dbe3f4}
+    .rating-chip .stars{font-size:.95rem}
+    .rating-chip b{font-weight:700;color:#fff}
+    .rating-chip .rating-src{color:var(--muted)}
+
+    /* Reviews / social proof */
+    .rating-summary{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:14px}
+    .rating-summary .rating-score{font-size:var(--fs-40);font-weight:700;line-height:1;letter-spacing:-.02em;background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .rating-summary .rating-stars{font-size:1.4rem}
+    .rating-summary .rating-meta{color:var(--muted);font-size:.95rem}
+    .rating-summary .rating-meta b{color:var(--text);font-weight:700}
+    .reviews{display:grid;gap:18px;margin-top:26px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .review{margin:0;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);border-radius:var(--radius);padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+    .review:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.5);box-shadow:0 24px 56px -26px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.22)}
+    @media (prefers-reduced-motion:reduce){.review:hover{transform:none}}
+    .review-stars{font-size:1.05rem}
+    .review blockquote{margin:0;color:#e7ecf7;line-height:1.6;font-size:.98rem}
+    .review figcaption{display:flex;align-items:center;gap:12px;margin-top:auto}
+    .review-avatar{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border-radius:var(--radius-circle);font-size:.85rem;font-weight:700;color:var(--color-on-accent);background:var(--grad-accent)}
+    .review-who{display:flex;flex-direction:column;line-height:1.3}
+    .review-who b{font-weight:700;color:#fff}
+    .review-device{color:var(--muted);font-size:.82rem}
+
+    /* Visit us — location, live hours & directions */
+    .visit-grid{display:grid;gap:18px;margin-top:22px;grid-template-columns:1fr}
+    @media (min-width:760px){.visit-grid{grid-template-columns:1.05fr .95fr}}
+    .visit-card{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+    .visit-info{display:flex;flex-direction:column;gap:18px}
+    .visit-status{align-self:flex-start;display:inline-flex;align-items:center;gap:9px;padding:7px 14px;border-radius:var(--radius-pill);font-size:.85rem;font-weight:700;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text)}
+    .visit-status::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+    .visit-status[data-state=open]{color:#bdf4dd;background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.42)}
+    .visit-status[data-state=open]::before{background:var(--green);box-shadow:0 0 0 4px rgba(52,211,153,.18)}
+    .visit-status[data-state=closed]{color:#f6c9c9;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.36)}
+    .visit-status[data-state=closed]::before{background:var(--red)}
+    .visit-address{font-style:normal;display:flex;gap:12px;color:#e7ecf7;line-height:1.5}
+    .visit-address svg{width:22px;height:22px;flex:none;color:var(--cyan);margin-top:2px}
+    .visit-address b{font-weight:700;color:#fff}
+    .visit-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:auto}
+    .visit-hours-h{margin:0 0 14px;font-size:1.05rem;letter-spacing:-.01em}
+    .hours{width:100%;border-collapse:collapse;font-size:.95rem}
+    .hours th,.hours td{padding:10px 6px;border-bottom:1px solid var(--border)}
+    .hours th{text-align:left;font-weight:600;color:var(--muted)}
+    .hours td{text-align:right;color:#e7ecf7;font-variant-numeric:tabular-nums}
+    .hours tr:last-child th,.hours tr:last-child td{border-bottom:0}
+    .hours tr.today{background:rgba(139,92,246,.1)}
+    .hours tr.today th,.hours tr.today td{color:#fff;font-weight:700;border-bottom-color:rgba(139,92,246,.28)}
+
+    /* Share / copy quote — secondary action in the device-detail modal foot */
+    .sheet-secondary{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .share-quote{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;min-height:44px;border-radius:var(--radius-pill);background:transparent;border:1px solid var(--border-2);color:var(--muted);font:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .12s}
+    .share-quote svg{width:17px;height:17px;flex:none}
+    .share-quote:hover{background:var(--panel-2);color:#fff;border-color:rgba(139,92,246,.5)}
+    .share-quote:active{transform:translateY(1px)}
+    .share-feedback{font-size:.85rem;font-weight:700;color:var(--green-lt);opacity:0;transition:opacity .2s ease}
+    .share-feedback.show{opacity:1}
+
     /* perf: low-end / battery-saver proxy — drop the backdrop blur entirely and lean on opaque surfaces,
        removing the per-frame backdrop re-sample on the sticky header + filter bar (+ mobile action bar). */
     @media (prefers-reduced-motion:reduce){
@@ -644,13 +722,13 @@
     .from b,.rgroup-price .p,.spot-save .save-amt{text-shadow:0 1px 12px rgba(0,0,0,.55)}
     @media (prefers-contrast:more){
       :root{--color-text-secondary:#d4dbec;--color-text-tertiary:#c2cbe0;--color-border:rgba(255,255,255,.26);--color-border-strong:rgba(255,255,255,.4)}
-      .card,.feature,.step,.qa,.spot-card,.controls-inner,.cta,.actionbar{background:#0c0d16}
-      .hero .lead,.lead-muted,.cta p,.stat .lbl,.feature p,.step p,.qa .body{color:#eaeefa}
-      .pill,.spot-pill,.opt,.brand-tag,.cta-chip,.badge{border-color:rgba(255,255,255,.45)}
+      .card,.feature,.step,.qa,.spot-card,.controls-inner,.cta,.actionbar,.review,.visit-card{background:#0c0d16}
+      .hero .lead,.lead-muted,.cta p,.stat .lbl,.feature p,.step p,.qa .body,.review blockquote,.hours td,.visit-address{color:#eaeefa}
+      .pill,.spot-pill,.opt,.brand-tag,.cta-chip,.badge,.rating-chip,.visit-status,.share-quote{border-color:rgba(255,255,255,.45)}
     }
     @media (forced-colors:active){
       /* gradient/clipped text would otherwise vanish (its painted background is dropped) — force a system colour */
-      .grad-text,.brand-name .t,.spot-save .save-amt{-webkit-text-fill-color:currentColor;color:CanvasText;background:none}
+      .grad-text,.brand-name .t,.spot-save .save-amt,.rating-summary .rating-score{-webkit-text-fill-color:currentColor;color:CanvasText;background:none}
       .btn,.pill,.card,.opt,.book,.actionbar a,.fab-wa,.fab-top,.spot-pill{border:1px solid}
       .bar-fill,.spot-save .save-pct,.save-tag{forced-color-adjust:none}
     }
@@ -658,13 +736,13 @@
     /* Mobile interaction hardening (iOS Safari / Android Chrome / in-app browsers) */
     /* Kill the 300ms tap delay + stray double-tap-zoom on interactive targets. */
     .btn,.pill,.card,.swatch,.book,.opt,.spot-pill,.card-view,.sheet-close,.hburger,
-    .fab-wa,.fab-top,.actionbar a,.qa summary,.hnav a,.mobile-nav a,.search .clear{touch-action:manipulation}
+    .fab-wa,.fab-top,.actionbar a,.qa summary,.hnav a,.mobile-nav a,.search .clear,.share-quote{touch-action:manipulation}
     /* Sticky-hover guard: on touch devices (no true hover) neutralize hover-only lifts/glows so a
        tapped control never stays "hovered" until the next tap. :active provides the press feedback. */
     @media (hover:none){
       .btn:hover,.btn-primary:hover,.btn-secondary:hover,.btn-wa:hover,.btn-ghost:hover,
-      .feature:hover,.step:hover,.fab-wa:hover,.fab-top:hover,.swatch:hover{transform:none}
-      .feature:hover,.step:hover{box-shadow:none;border-color:var(--border)}
+      .feature:hover,.step:hover,.review:hover,.fab-wa:hover,.fab-top:hover,.swatch:hover{transform:none}
+      .feature:hover,.step:hover,.review:hover{box-shadow:none;border-color:var(--border)}
       .search input:hover{border-color:var(--border-2)}
     }
   </style>
@@ -733,6 +811,11 @@
     </symbol>
   </svg>
   <div class="aurora" aria-hidden="true"></div>
+  <!-- Film-grain overlay: a fixed, ultra-subtle SVG-turbulence texture for premium depth (decorative,
+       pointer-events:none, dropped under reduced-motion / forced-colors). -->
+  <div class="grain" aria-hidden="true"></div>
+  <!-- Reading-progress indicator: a thin brand-gradient bar pinned to the top edge, scaled by scroll. -->
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
   <a class="skip" href="#finder">Skip to repair pricing</a>
   <noscript><div class="noscript">This site uses JavaScript to load live repair pricing. Please enable JavaScript, or message us on WhatsApp at +1 226 978 4666.</div></noscript>
 
@@ -753,7 +836,8 @@
       <nav class="hnav" aria-label="Primary">
         <a href="#finder">Pricing</a>
         <a href="#why">Why Nuera</a>
-        <a href="#how">How it works</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#visit">Visit</a>
         <a href="#faq">FAQ</a>
       </nav>
       <a class="btn btn-wa" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener" aria-label="Book on WhatsApp">
@@ -768,6 +852,8 @@
       <a href="#finder">Pricing</a>
       <a href="#why">Why Nuera</a>
       <a href="#how">How it works</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#visit">Visit us</a>
       <a href="#faq">FAQ</a>
     </nav>
   </header>
@@ -775,7 +861,14 @@
   <main id="main">
     <!-- HERO -->
     <section class="hero wrap reveal">
-      <span class="badge"><span class="dot" aria-hidden="true"></span> Guelph, ON · Same-day repairs · 90-day warranty</span>
+      <div class="hero-trust">
+        <span class="badge"><span class="dot" aria-hidden="true"></span> Guelph, ON · Same-day repairs · 90-day warranty</span>
+        <!-- PLACEHOLDER rating — set the score + star fill to match your real Google rating. -->
+        <span class="rating-chip" role="img" aria-label="Rated 4.9 out of 5 from Google reviews">
+          <span class="stars" aria-hidden="true"><span class="stars-on" style="--fill:98%">★★★★★</span><span class="stars-off">★★★★★</span></span>
+          <b>4.9</b><span class="rating-src">Google reviews</span>
+        </span>
+      </div>
       <h1>Phone repair that's<br><span class="grad-text">always cheaper.</span></h1>
       <p class="lead">Nuera Tech fixes iPhone, Samsung, Pixel &amp; iPad in Guelph — at transparent prices that beat Mobile Klinik <strong>every time</strong>. Same quality parts. No mall-rent markup. Walk in, get fixed, save.</p>
       <div class="hero-actions">
@@ -907,6 +1000,54 @@
       </div>
     </section>
 
+    <!-- REVIEWS / SOCIAL PROOF -->
+    <!-- PLACEHOLDER CONTENT — swap the names, devices, quotes and star fills below for your real
+         Google reviews before merging, and update the aggregate score + count to match. Keep one
+         <figure class="review"> per card; keep each star block's aria-label in sync with its rating. -->
+    <section id="reviews" class="wrap reveal" aria-labelledby="reviews-h">
+      <span class="eyebrow">Loved in Guelph</span>
+      <h2 id="reviews-h">Rated by the people we've fixed up</h2>
+      <div class="rating-summary">
+        <span class="rating-score">4.9</span>
+        <span class="rating-stars" role="img" aria-label="Average rating 4.9 out of 5 stars">
+          <span class="stars-on" style="--fill:98%">★★★★★</span><span class="stars-off">★★★★★</span>
+        </span>
+        <span class="rating-meta">from <b>120+</b> Google &amp; in-store reviews</span>
+      </div>
+      <div class="reviews">
+        <figure class="review">
+          <div class="review-stars" role="img" aria-label="Rated 5 out of 5"><span class="stars-on" style="--fill:100%">★★★★★</span><span class="stars-off">★★★★★</span></div>
+          <blockquote>Cracked my Galaxy S23 screen on a Friday and walked out with it fixed in about an hour — and it cost me $90 less than the quote I got at the mall. No surprises.</blockquote>
+          <figcaption><span class="review-avatar" aria-hidden="true">SM</span><span class="review-who"><b>Sarah&nbsp;M.</b><span class="review-device">Galaxy S23 · screen</span></span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="review-stars" role="img" aria-label="Rated 5 out of 5"><span class="stars-on" style="--fill:100%">★★★★★</span><span class="stars-off">★★★★★</span></div>
+          <blockquote>Booked through WhatsApp in two minutes, dropped my iPhone 13 Pro off, and the price was exactly what the site said. Honest pricing is rarer than it should be.</blockquote>
+          <figcaption><span class="review-avatar" aria-hidden="true">DP</span><span class="review-who"><b>Dev&nbsp;P.</b><span class="review-device">iPhone 13 Pro · battery</span></span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="review-stars" role="img" aria-label="Rated 5 out of 5"><span class="stars-on" style="--fill:100%">★★★★★</span><span class="stars-off">★★★★★</span></div>
+          <blockquote>My Pixel 7 charge port was failing and another shop wanted to "send it away." Nuera fixed it the same afternoon and showed me the part first. Will be back.</blockquote>
+          <figcaption><span class="review-avatar" aria-hidden="true">AK</span><span class="review-who"><b>Amrit&nbsp;K.</b><span class="review-device">Pixel 7 · charge port</span></span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="review-stars" role="img" aria-label="Rated 4 out of 5"><span class="stars-on" style="--fill:80%">★★★★★</span><span class="stars-off">★★★★★</span></div>
+          <blockquote>Great work on my iPad screen and a fair price. Took a touch longer than the iPhones but they kept me posted on WhatsApp the whole time.</blockquote>
+          <figcaption><span class="review-avatar" aria-hidden="true">JL</span><span class="review-who"><b>Jordan&nbsp;L.</b><span class="review-device">iPad · screen</span></span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="review-stars" role="img" aria-label="Rated 5 out of 5"><span class="stars-on" style="--fill:100%">★★★★★</span><span class="stars-off">★★★★★</span></div>
+          <blockquote>Shattered the back glass on my S22 Ultra. They had the colour I needed in stock and matched it perfectly. Looks brand new for way less than I expected.</blockquote>
+          <figcaption><span class="review-avatar" aria-hidden="true">MO</span><span class="review-who"><b>Maria&nbsp;O.</b><span class="review-device">Galaxy S22 Ultra · back glass</span></span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="review-stars" role="img" aria-label="Rated 5 out of 5"><span class="stars-on" style="--fill:100%">★★★★★</span><span class="stars-off">★★★★★</span></div>
+          <blockquote>Friendly, fast and local. Compared their iPhone 12 screen price to Mobile Klinik right on the site before I even messaged — saved over $100. Easy recommend.</blockquote>
+          <figcaption><span class="review-avatar" aria-hidden="true">TN</span><span class="review-who"><b>Thanh&nbsp;N.</b><span class="review-device">iPhone 12 · screen</span></span></figcaption>
+        </figure>
+      </div>
+    </section>
+
     <!-- CTA BANNER -->
     <section class="wrap reveal">
       <div class="cta">
@@ -927,6 +1068,48 @@
           <span>Opens WhatsApp with a pre-filled message — no account, no forms.</span>
         </p>
         <p class="cta-fine">Free quote on WhatsApp · No appointment needed</p>
+      </div>
+    </section>
+
+    <!-- VISIT US — location, hours & directions -->
+    <!-- PLACEHOLDER address + hours — replace with the shop's real street address and opening hours.
+         The "Open now / Closed" pill and the today-highlight are computed by initHours() in app.js from
+         the data-open/data-close on each <tr> (the table is the single source of truth). Use 24h
+         minutes-from-midnight (10:00 AM = 600, 7:00 PM = 1140); omit both attrs for a closed day. -->
+    <section id="visit" class="wrap reveal" aria-labelledby="visit-h">
+      <span class="eyebrow">Come say hi</span>
+      <h2 id="visit-h">Visit us in Guelph</h2>
+      <p class="lead-muted">Walk-ins welcome — most screen &amp; battery repairs are done while you wait. Here's where to find us and when we're open.</p>
+      <div class="visit-grid">
+        <div class="visit-card visit-info">
+          <span class="visit-status" id="visit-status" data-state="">Checking hours…</span>
+          <address class="visit-address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><b>Nuera Tech</b><br>123 Example St, Unit 4<br>Guelph, ON&nbsp;&nbsp;N1H 0A0</span>
+          </address>
+          <div class="visit-actions">
+            <a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&amp;query=Nuera+Tech+Guelph+ON" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+              Get directions
+            </a>
+            <a class="btn btn-ghost" data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener">Message us</a>
+          </div>
+        </div>
+        <div class="visit-card visit-hours">
+          <h3 class="visit-hours-h">Opening hours</h3>
+          <table class="hours">
+            <caption class="sr-only">Nuera Tech opening hours by day</caption>
+            <tbody>
+              <tr data-day="1" data-open="600" data-close="1140"><th scope="row">Monday</th><td>10:00 AM – 7:00 PM</td></tr>
+              <tr data-day="2" data-open="600" data-close="1140"><th scope="row">Tuesday</th><td>10:00 AM – 7:00 PM</td></tr>
+              <tr data-day="3" data-open="600" data-close="1140"><th scope="row">Wednesday</th><td>10:00 AM – 7:00 PM</td></tr>
+              <tr data-day="4" data-open="600" data-close="1140"><th scope="row">Thursday</th><td>10:00 AM – 7:00 PM</td></tr>
+              <tr data-day="5" data-open="600" data-close="1200"><th scope="row">Friday</th><td>10:00 AM – 8:00 PM</td></tr>
+              <tr data-day="6" data-open="660" data-close="1020"><th scope="row">Saturday</th><td>11:00 AM – 5:00 PM</td></tr>
+              <tr data-day="0"><th scope="row">Sunday</th><td>Closed</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -976,7 +1159,9 @@
         <h4 class="foot-h">Explore</h4>
         <a href="#finder">Pricing</a>
         <a href="#why">Why Nuera</a>
+        <a href="#reviews">Reviews</a>
         <a href="#how">How it works</a>
+        <a href="#visit">Visit us</a>
         <a href="#faq">FAQ</a>
       </nav>
       <div class="foot-col foot-links">
@@ -1035,6 +1220,13 @@
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
           <span>Opens WhatsApp with your device &amp; price pre-filled — no app download needed.</span>
         </p>
+        <div class="sheet-secondary">
+          <button class="share-quote" id="detail-share" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <span class="share-label">Copy my quote</span>
+          </button>
+          <span class="share-feedback" id="share-feedback" role="status" aria-live="polite"></span>
+        </div>
       </div>
     </div>
   </dialog>

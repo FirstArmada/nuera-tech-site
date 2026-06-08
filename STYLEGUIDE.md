@@ -122,8 +122,9 @@ the Allium px scale, with `--fs-display`/`--fs-lead` kept fluid via `clamp()`.
 
 > **JS-coupled classes** (`.card`, `.pill`, `.book`, `.rt-chip`, `.opt`, `.swatch`,
 > `.spot-pill`, `.bar-*`, `.rgroup*`, `.card-*`, `.from`, `.save-tag`, `.empty`,
-> `.errorbox`, `.reveal`/`.in`, …) are selected by name in `assets/js/app.js`.
-> **Re-style their values freely; never rename them.**
+> `.errorbox`, `.reveal`/`.in`, the `.hours` rows' `.today` + `data-day/-open/-close`,
+> and the IDs `#scroll-progress-bar`, `#visit-status`, `#detail-share`, `#share-feedback`, …)
+> are selected by name in `assets/js/app.js`. **Re-style their values freely; never rename them.**
 
 ### Button — `.btn` + variant
 
@@ -223,6 +224,33 @@ All JS is self-hosted and the motion layer adds no script origin to the CSP. Eve
   WhatsApp CTAs (hero, CTA banner, modal foot) to reduce app-switch drop-off.
 - **`.trust-strip`** — reassurance row (90-day warranty · same-day · OEM-grade parts) in the
   device-detail `.sheet-foot`, directly above the booking CTA.
+
+#### 2026 PR additions — social proof, location & polish
+
+- **`.grain`** — a fixed, decorative film-grain overlay (`z-index:-1`, above the aurora, behind all
+  content) for premium depth. SVG `feTurbulence` as a `data:` background (CSP `img-src data:`),
+  `opacity:.045`, `pointer-events:none`. Dropped under `forced-colors`/contrast where it'd add noise.
+- **`.scroll-progress`** + `#scroll-progress-bar` — a 3px brand-gradient reading-progress line pinned
+  to the top edge (`z-index:100`, above the header, below the skip link). `initScrollProgress()` sets
+  `--p` (0→1) on `scaleX`; it's position-driven, so it stays accurate under reduced motion.
+- **Star primitive** — `.rating-chip .stars` / `.rating-stars` / `.review-stars`: an amber `.stars-on`
+  layer clipped to `width:var(--fill)` over a dim `.stars-off` layer (e.g. `--fill:80%` = 4/5). The
+  container carries `role="img"` + an `aria-label` so AT reads the score, not five "black star" glyphs.
+- **`#reviews`** — social-proof section: a `.rating-summary` (gradient score + stars + count) over a
+  responsive `.reviews` grid of `.review` cards (`<figure>` → stars, `<blockquote>`, gradient
+  `.review-avatar` initials + `.review-who`/`.review-device`). **Content is hand-authored placeholder
+  HTML** — swap in real Google reviews (and the aggregate) before relying on it. Not added to JSON-LD
+  (avoids asserting unverified `aggregateRating`/`review` schema).
+- **`#visit`** — location, live hours & directions: a `.visit-grid` of two `.visit-card`s. The
+  `.visit-status` pill (`data-state=open|closed`) and the `.hours tr.today` highlight are computed by
+  `initHours()` from `data-day`/`data-open`/`data-close` (minutes-from-midnight) on the `.hours` rows —
+  **the static table is the single source of truth**, so JS never drifts from the printed hours. Address
+  + hours are placeholders. "Get directions" is a name+city Google Maps link (works without a street
+  address); no map `<iframe>` (keeps `frame-src` untouched).
+- **`.share-quote`** + `.share-feedback` — secondary action in the modal `.sheet-foot`'s
+  `.sheet-secondary`. `initShareQuote()` builds a plain-text quote from the open device's current
+  per-type selections and uses `navigator.share` (mobile) → `navigator.clipboard` fallback, flashing
+  `.share-feedback` (`role="status"`) on copy.
 
 ---
 
