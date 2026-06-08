@@ -40,5 +40,8 @@ jobs:
       - name: User-flow checks (Playwright driver)
         run: NODE_PATH="$(npm root -g)" node .claude/skills/run-nuera-tech-site/driver.cjs
 
+      - name: Mobile layout integrity (Playwright · iPhone SE)
+        run: NODE_PATH="$(npm root -g)" node tests/mobile.cjs
+
       - name: Accessibility audit (axe-core WCAG 2.1 A/AA)
         run: NODE_PATH="$(npm root -g)" node tests/a11y.cjs
