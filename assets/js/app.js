@@ -169,7 +169,7 @@ function groupRepairs(repairs) {
 }
 
 // ---- state ----
-const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null, page: 1 };
+const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null, page: 1, sort: 'default' };
 const PAGE_SIZE = 12; // device cards revealed per page; "Load More" adds one page at a time
 
 // ===========================================================================
@@ -340,9 +340,14 @@ function buildFilters() {
     if (loadMore.hidden) $$('#grid .card:not([hidden])')[shownBefore]?.focus();
   });
 
-  // Deep link ?q= (WebSite SearchAction)
-  const urlQ = new URLSearchParams(location.search).get('q');
-  if (urlQ) { input.value = urlQ; state.q = urlQ.trim().toLowerCase(); clear.classList.add('show'); }
+  // Sort control — changing it re-renders (which writes the URL) and scrolls back to the finder top.
+  const sortSel = $('#sort');
+  if (sortSel) sortSel.addEventListener('change', () => { state.sort = sortSel.value; renderGrid(); resetFinderScroll(); });
+
+  // Restore brand/type/search/sort from the URL on load (replaces the old ?q=-only deep link), and
+  // re-sync on back/forward. The renderGrid() in the load flow then paints the restored state.
+  syncFromURL();
+  addEventListener('popstate', () => { syncFromURL(); renderGrid(); });
 }
 
 function setPressed(wrap, active) {
@@ -393,6 +398,44 @@ function resetFinderScroll() {
 // ===========================================================================
 // Grid — build all cards once, then filter by toggling [hidden] (instant, no re-parse)
 // ===========================================================================
+// ---- URL state (shareable filters) + sort ----
+// Sort the matching device list. 'default' preserves the natural (data) order.
+function sortDevices(list, sort) {
+  if (sort === 'savings') return [...list].sort((a, b) => b.maxSaving - a.maxSaving || a.minPrice - b.minPrice);
+  if (sort === 'price') return [...list].sort((a, b) => a.minPrice - b.minPrice || b.maxSaving - a.maxSaving);
+  return list;
+}
+
+// Write the active brand/type/search/sort to the URL in place (replaceState — shareable + reload-safe,
+// no history entries). Defaults are omitted so a pristine finder stays at a clean URL.
+function updateURL() {
+  const p = new URLSearchParams();
+  if (state.brand !== 'all') p.set('brand', state.brand);
+  if (state.type !== 'all') p.set('type', state.type);
+  const qv = ($('#search')?.value || '').trim();
+  if (qv) p.set('q', qv);
+  if (state.sort !== 'default') p.set('sort', state.sort);
+  const qs = p.toString();
+  history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+}
+
+// Read brand/type/search/sort from the URL, validate, set state, and reflect into the controls.
+// Does NOT render — callers (initial load / popstate) call renderGrid().
+function syncFromURL() {
+  const p = new URLSearchParams(location.search);
+  const brand = p.get('brand'); const type = p.get('type');
+  const q = p.get('q') || ''; const sort = p.get('sort');
+  state.brand = BRANDS.some((b) => b.id === brand) ? brand : 'all';
+  state.type = TYPES.some((t) => t.id === type) ? type : 'all';
+  state.q = q.trim().toLowerCase();
+  state.sort = ['savings', 'price'].includes(sort) ? sort : 'default';
+  const input = $('#search'); const clear = $('#search-clear');
+  if (input) { input.value = q; clear?.classList.toggle('show', q.length > 0); }
+  const sortSel = $('#sort'); if (sortSel) sortSel.value = state.sort;
+  const bw = $('#brand-filters'); const bb = bw && (bw.querySelector(`[data-brand="${state.brand}"]`) || bw.querySelector('[data-brand="all"]')); if (bb) setPressed(bw, bb);
+  const tw = $('#type-filters'); const tb = tw && (tw.querySelector(`[data-type="${state.type}"]`) || tw.querySelector('[data-type="all"]')); if (tb) setPressed(tw, tb);
+}
+
 let cardEls = null; // Map<model, HTMLElement>, built once
 let emptyEl = null; // reused empty-state node
 
@@ -412,30 +455,32 @@ function renderGrid({ resetPage = true } = {}) {
     firstBuild = true;
   }
 
-  const matching = [];
+  // Filter → sort → map to card elements. Sorting reorders the DOM (only when non-default) so the
+  // visual + keyboard order match; 'default' preserves the natural data order (no reorder needed).
+  const matchFn = (d) => (brand === 'all' || d.brand === brand)
+    && (type === 'all' || d.types.has(type))
+    && (!q || d.search.includes(q));
+  const matchDevices = sortDevices(state.devices.filter(matchFn), state.sort);
+  const matchingEls = matchDevices.map((d) => cardEls.get(d.model)).filter(Boolean);
+  const matchSet = new Set(matchingEls);
   const nonMatching = [];
-  for (const d of state.devices) {
-    const match = (brand === 'all' || d.brand === brand)
-      && (type === 'all' || d.types.has(type))
-      && (!q || d.search.includes(q));
-    const el = cardEls.get(d.model);
-    if (!el) continue;
-    (match ? matching : nonMatching).push(el);
-  }
+  cardEls.forEach((el) => { if (!matchSet.has(el)) nonMatching.push(el); });
+  if (state.sort !== 'default' && matchingEls.length) grid.append(...matchingEls);
+
   // Pagination: show only the first `visibleCount` matches; the rest stay [hidden] behind "Load
   // More". Animate the transition — never on first build (scroll-reveal handles those), and on a
   // Load-More click only the freshly revealed slice (not the cards already on screen).
   const visibleCount = state.page * PAGE_SIZE;
-  const show = matching.slice(0, visibleCount);
-  const hide = nonMatching.concat(matching.slice(visibleCount));
-  const animateEls = firstBuild ? [] : (resetPage ? show : matching.slice((state.page - 1) * PAGE_SIZE, visibleCount));
+  const show = matchingEls.slice(0, visibleCount);
+  const hide = nonMatching.concat(matchingEls.slice(visibleCount));
+  const animateEls = firstBuild ? [] : (resetPage ? show : matchingEls.slice((state.page - 1) * PAGE_SIZE, visibleCount));
   applyFilter(show, hide, animateEls);
-  const shown = matching.length;
+  const shown = matchingEls.length;
 
   // "Load More" is offered only while unshown matches remain.
   const loadMore = $('#load-more');
   if (loadMore) {
-    const remaining = matching.length - visibleCount;
+    const remaining = shown - visibleCount;
     loadMore.hidden = remaining <= 0;
     if (remaining > 0) loadMore.setAttribute('aria-label', `Load ${Math.min(PAGE_SIZE, remaining)} more devices — ${remaining} remaining`);
   }
@@ -460,6 +505,7 @@ function renderGrid({ resetPage = true } = {}) {
     : 'No matches';
   $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
   if (!firstBuild) pulseResultCount(count); // visual "results refreshed" cue; never on first paint
+  if (resetPage && !firstBuild) updateURL(); // keep the shareable URL in sync (replaceState)
 }
 
 // Animate the grid between filter states with a clean "results refresh" — fade + subtle scale the

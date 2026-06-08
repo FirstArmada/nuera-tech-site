@@ -355,7 +355,15 @@
     .pill[aria-checked=true]{background:linear-gradient(90deg,rgba(139,92,246,.32),rgba(34,211,238,.2));border-color:rgba(139,92,246,.6);color:#fff;box-shadow:0 0 18px -6px rgba(139,92,246,.5)}
     .pill[aria-checked=true] .cnt{opacity:.85}
     .pill.rt[aria-checked=true]{background:rgba(255,255,255,.14);border-color:var(--border-2)}
-    .results-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:.86rem;margin:6px 2px 16px}
+    .results-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:.86rem;margin:6px 2px 16px}
+    .results-meta-text{min-width:0}
+    #result-hint:not(:empty)::before{content:"·";margin:0 6px;opacity:.55} /* separator only when the hint has text */
+    /* Sort control — native <select> styled to the dark theme (build-less, keyboard-native). */
+    .sort-field{flex:none;display:inline-flex;align-items:center}
+    .sort-field select{appearance:none;-webkit-appearance:none;min-height:var(--touch-min);padding:0 38px 0 14px;border:1px solid var(--color-border);border-radius:var(--radius-pill);background-color:var(--panel-2);color:var(--text);font:inherit;font-weight:700;font-size:.86rem;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cdd6e8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;transition:border-color var(--dur-base) var(--ease-out),background-color var(--dur-base) var(--ease-out)}
+    .sort-field select:hover{border-color:var(--color-border-strong)}
+    .sort-field select:focus-visible{outline:none;box-shadow:var(--ring)}
+    .sort-field option{background:var(--panel-2);color:var(--text)}
 
     /* Card grid */
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:16px}
@@ -826,8 +834,14 @@
       </div>
 
       <div class="results-meta">
-        <span id="result-count" aria-live="polite" role="status">Loading pricing…</span>
-        <span id="result-hint"></span>
+        <span class="results-meta-text"><span id="result-count" aria-live="polite" role="status">Loading pricing…</span> <span id="result-hint"></span></span>
+        <label class="sort-field"><span class="sr-only">Sort devices by</span>
+          <select id="sort">
+            <option value="default">Featured</option>
+            <option value="savings">Biggest savings</option>
+            <option value="price">Price: low to high</option>
+          </select>
+        </label>
       </div>
 
       <div class="grid" id="grid" aria-busy="true">
