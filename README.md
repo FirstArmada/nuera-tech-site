@@ -1,7 +1,7 @@
 # Nuera Tech — Guelph Phone Repair
 
 Premium, dark/neon marketing + pricing site for **Nuera Tech**, a phone & tablet
-repair shop in Guelph, Ontario. The site's job: make the savings-vs-Mobile-Klinik
+repair shop in Guelph, Ontario. The site's job: make the savings-vs-other-shops
 story obvious and turn visitors into booked repairs over WhatsApp.
 
 **Live:** https://nuera.talha-k.com — auto-deploys from `main` via Vercel (~30s).
@@ -41,7 +41,7 @@ assets/
 
 ## Key features
 
-- **Savings spotlight** — animated side-by-side bars (Mobile Klinik vs Nuera) for
+- **Savings spotlight** — animated side-by-side bars (typical price vs Nuera) for
   the highest-savings repairs, with a device picker.
 - **Device finder** — instant brand + repair-type filters and debounced search over
   153 devices; accessible card grid; bottom-sheet detail modal on mobile.

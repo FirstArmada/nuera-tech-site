@@ -111,7 +111,7 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     check('result count matches grid', resultCount.startsWith(String(cardCount)), `"${resultCount}"`);
 
     const ctaHead = (await page.locator('#cta-headline').textContent() || '').trim();
-    check('CTA headline filled at runtime', ctaHead.toLowerCase().includes('mobile klinik'), `"${ctaHead.slice(0, 56)}…"`);
+    check('CTA headline filled at runtime', /\$\d/.test(ctaHead), `"${ctaHead.slice(0, 56)}…"`);
     const waGeneral = await page.locator('a[data-wa="general"]').first().getAttribute('href');
     check('WhatsApp number is 12269784666', !!waGeneral && waGeneral.includes('wa.me/12269784666'), waGeneral || '(none)');
     await page.screenshot({ path: `${SHOTS}/01-hero.png` });
