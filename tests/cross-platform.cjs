@@ -35,16 +35,17 @@ function startServer(dir) {
   const server = http.createServer((req, res) => {
     try {
       const urlPath = req.url === '/' ? 'index.html' : req.url.split('?')[0];
-      // Map the request onto disk, then confirm it stays inside `root` so a
-      // crafted path (e.g. "/../../etc/passwd") can't escape the served dir.
-      const filePath = path.join(root, path.normalize(decodeURIComponent(urlPath)));
-      if (filePath !== root && !filePath.startsWith(root + path.sep)) {
+      // Resolve request path against `root` and enforce containment to prevent traversal.
+      const decodedPath = decodeURIComponent(urlPath);
+      const relativePath = decodedPath.replace(/^[/\\]+/, '');
+      const safePath = path.resolve(root, relativePath);
+      if (safePath !== root && !safePath.startsWith(root + path.sep)) {
         res.writeHead(403);
         res.end('Forbidden');
         return;
       }
-      const data = fs.readFileSync(filePath);
-      const ext = path.extname(filePath);
+      const data = fs.readFileSync(safePath);
+      const ext = path.extname(safePath);
       res.writeHead(200, { 'Content-Type': mimes[ext] || 'application/octet-stream' });
       res.end(data);
     } catch (e) {
