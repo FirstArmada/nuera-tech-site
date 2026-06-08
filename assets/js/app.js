@@ -952,14 +952,33 @@ function initFaq() {
   if (!items.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Tear down any in-flight collapse on `d` (its transitionend listener + timeout fallback)
+  // so re-opening or closing again starts from a clean state.
+  const clearPending = (d) => {
+    if (d._faqDone) { $('.qa-wrap', d).removeEventListener('transitionend', d._faqDone); d._faqDone = null; }
+    if (d._faqTimer) { clearTimeout(d._faqTimer); d._faqTimer = null; }
+    d.classList.remove('closing');
+  };
+
   const closeItem = (d) => {
-    $('summary', d).setAttribute('aria-expanded', 'false');
+    const summary = $('summary', d);
+    summary.setAttribute('aria-expanded', 'false');
     const wrap = $('.qa-wrap', d);
-    if (reduce || !wrap) { d.open = false; return; }
-    // Let the 0fr collapse animation play, then drop the [open] attribute.
-    const done = () => { d.open = false; wrap.removeEventListener('transitionend', done); };
+    clearPending(d);
+    if (reduce || !wrap || !d.open) { d.open = false; return; }
+    // Start the collapse NOW: .closing drives the row to 0fr while [open] keeps the body
+    // rendered, so the close animates. Drop [open] once the row finishes collapsing.
+    d.classList.add('closing');
+    const done = () => { clearPending(d); d.open = false; };
+    d._faqDone = done;
     wrap.addEventListener('transitionend', done);
-    setTimeout(() => { if (d.open) { d.open = false; wrap.removeEventListener('transitionend', done); } }, 350);
+    d._faqTimer = setTimeout(done, 350);
+  };
+
+  const openItem = (d) => {
+    clearPending(d); // cancel a pending collapse so a re-open animates from where it is
+    d.open = true;
+    $('summary', d).setAttribute('aria-expanded', 'true');
   };
 
   items.forEach((d) => {
@@ -971,10 +990,11 @@ function initFaq() {
 
     summary.addEventListener('click', (e) => {
       e.preventDefault(); // we drive open/close so the close can animate
-      if (!d.open) {
-        items.forEach((o) => { if (o !== d && o.open) closeItem(o); });
-        d.open = true;
-        summary.setAttribute('aria-expanded', 'true');
+      // An item mid-collapse still has [open]; treat it as closed so a click re-opens it.
+      const isOpen = d.open && !d.classList.contains('closing');
+      if (!isOpen) {
+        items.forEach((o) => { if (o !== d) closeItem(o); });
+        openItem(d);
       } else {
         closeItem(d);
       }
