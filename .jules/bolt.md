@@ -57,3 +57,4 @@ the savings UI must degrade gracefully where `mk_price`/`savings` are null.
   The sync job (`cloud/pricing-sync/lib/transform.js` → `computeStats`) emits it.
 - Verify with the run-* driver (24/24) AND `tests/a11y.cjs` (axe 0 violations); CI runs both
   on every PR via `.github/workflows/verify.yml`. SW cache is `nuera-v3`.
+## 2026-06-08 - [Layout Thrashing] Learning: [Calling getBoundingClientRect() continuously inside requestAnimationFrame during hover events can cause layout thrashing and drop frames, as it forces the browser to synchronously recalculate layout.] Action: [Always cache expensive layout reads like getBoundingClientRect() during continuous interactions (like pointermove/scroll) and invalidate the cache only when necessary (e.g., on resize or scroll).]
