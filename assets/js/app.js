@@ -305,15 +305,13 @@ function buildModel(repairs) {
   for (const d of map.values()) {
     d.minPrice = Math.min(...d.repairs.map((r) => r.price));
     d.maxSaving = Math.max(0, ...d.repairs.map((r) => r.savings || 0));
-    // Per repair type: cheapest price + count of distinct options (drives the card's "from").
-    const byType = new Map();
+    // Per repair type: cheapest price, shown on the card.
+    const byType = new Map(); // Map<chip, minPrice>
     for (const r of d.repairs) {
-      let e = byType.get(r.chip);
-      if (!e) { e = { min: r.price, keys: new Set() }; byType.set(r.chip, e); }
-      else if (r.price < e.min) e.min = r.price;
-      e.keys.add((r.repair_type + '|' + cleanVariant(r.variant)).toLowerCase());
+      const cur = byType.get(r.chip);
+      if (cur == null || r.price < cur) byType.set(r.chip, r.price);
     }
-    d.priceByType = byType; // Map<chip, {min, keys:Set}>
+    d.priceByType = byType;
     // Search index — model + brand names + every repair type (id, chip label, full repair_type)
     // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
     const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
@@ -651,13 +649,11 @@ function initCardSpotlight(grid) {
 
 function cardHTML(d) {
   // Every repair type with its exact price (cheapest tier) — shown without a click (DoD #2).
-  const prices = TYPES.filter((t) => t.id !== 'all' && d.priceByType.has(t.id)).map((t) => {
-    const { min, keys } = d.priceByType.get(t.id);
-    const from = keys.size > 1 ? '<span class="cp-from">from</span>' : '';
-    return `<li class="cp-row ${t.id}"><span class="cp-type">${CHIP_LABEL[t.id] || t.id}</span><span class="cp-price">${from}${moneyExact(min)}</span></li>`;
-  }).join('');
+  const prices = TYPES.filter((t) => t.id !== 'all' && d.priceByType.has(t.id)).map((t) =>
+    `<li class="cp-row ${t.id}"><span class="cp-type">${CHIP_LABEL[t.id] || t.id}</span><span class="cp-price">${moneyExact(d.priceByType.get(t.id))}</span></li>`
+  ).join('');
   const save = d.maxSaving > 0
-    ? `<div class="card-foot"><div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs other shops</span></div></div>`
+    ? `<div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs other shops</span></div>`
     : '';
   return `<button class="card reveal" type="button" data-model="${esc(d.model)}" aria-label="View pricing for ${esc(d.model)}">
     <div class="card-top">
@@ -665,10 +661,12 @@ function cardHTML(d) {
       <span class="brand-tag">${esc(manufacturer(d.brand))}</span>
     </div>
     <ul class="card-prices">${prices}</ul>
-    ${save}
-    <span class="card-view">View options &amp; book
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-    </span>
+    <div class="card-cta">
+      ${save}
+      <span class="card-view">View options &amp; book
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </span>
+    </div>
   </button>`;
 }
 
