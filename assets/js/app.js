@@ -36,6 +36,10 @@ const TYPE_ORDER = Object.fromEntries(TYPES.filter((t) => t.id !== 'all').map((t
 // Inline SVG glyph reused on every WhatsApp "Book" link (keeps us off icon CDNs).
 const WA_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>';
 
+// "Add to booking" / "added" glyphs for the per-repair multi-select toggle.
+const ADD_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+
 // One glyph per repair type, shown beside each option group in the detail sheet.
 const RTYPE_ICON = {
   screen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2.4"/><path d="M11 18h2"/></svg>',
@@ -184,7 +188,7 @@ function groupRepairs(repairs) {
 }
 
 // ---- state ----
-const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], openModel: null, page: 1, sort: 'savings' };
+const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], selected: new Set(), openModel: null, page: 1, sort: 'default' };
 const PAGE_SIZE = 12; // device cards revealed per page; "Load More" adds one page at a time
 
 // ===========================================================================
@@ -237,6 +241,55 @@ async function loadData() {
 }
 
 // ===========================================================================
+// Chronological ordering (Definition of Done #1)
+// ===========================================================================
+// The source array is grouped alphabetically by brand, so it is NOT chronological.
+// We reorder state.devices once (newest first) so the default "Newest first" sort
+// reflects true recency, derived from a release-year estimate per model name.
+const BRAND_RANK = Object.fromEntries(BRANDS.filter((b) => b.id !== 'all').map((b, i) => [b.id, i]));
+
+// Approximate release year from a model name. iPads (and dated iPhone SE) carry an
+// explicit "(YYYY)"; otherwise the generation number maps to a year per family
+// (iPhone n→2008+n, Galaxy S/Note→2000+n, Z Flip/Fold→2018+n, Pixel→2015+n, Tab→2014+n).
+function deviceYear(model) {
+  const paren = model.match(/\((\d{4})\)/);
+  if (paren) return +paren[1];
+  const m = model.toLowerCase();
+  if (/iphone air/.test(m)) return 2025;
+  if (/iphone xs|iphone xr/.test(m)) return 2018;
+  if (/iphone x\b/.test(m)) return 2017;
+  if (/iphone se/.test(m)) return 2016;
+  const n = parseInt((model.match(/\d+/) || ['0'])[0], 10) || 0;
+  if (/galaxy z (flip|fold)/.test(m)) return 2018 + n;
+  if (/xcover/.test(m)) return 2016 + n;
+  if (/galaxy tab/.test(m)) return 2014 + n;
+  if (/galaxy (s|note)/.test(m)) return 2000 + n;
+  if (/pixel/.test(m)) return 2015 + n;
+  if (/iphone/.test(m)) return 2008 + n;
+  return 1900 + n;
+}
+
+// Within one brand+year, float the higher-end / later-positioned variant up.
+function tierWeight(model) {
+  const m = model.toLowerCase();
+  if (/pro max|ultra/.test(m)) return 6;
+  if (/\bfold\b|pro xl/.test(m)) return 5;
+  if (/\bpro\b/.test(m)) return 4;
+  if (/\bplus\b|\+|\bflip\b/.test(m)) return 3;
+  if (/edge/.test(m)) return 2;
+  if (/\bfe\b|\bse\b|\bmini\b|lite|xcover|\d+e\b/.test(m)) return 1;
+  return 2;
+}
+
+// Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
+function chronoCompare(a, b) {
+  return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
+    || deviceYear(b.model) - deviceYear(a.model)
+    || tierWeight(b.model) - tierWeight(a.model)
+    || a.model.localeCompare(b.model, undefined, { numeric: true });
+}
+
+// ===========================================================================
 // Model: group repairs by device
 // ===========================================================================
 function buildModel(repairs) {
@@ -252,10 +305,24 @@ function buildModel(repairs) {
   for (const d of map.values()) {
     d.minPrice = Math.min(...d.repairs.map((r) => r.price));
     d.maxSaving = Math.max(0, ...d.repairs.map((r) => r.savings || 0));
-    d.search = d.model.toLowerCase();
+    // Per repair type: cheapest price + count of distinct options (drives the card's "from").
+    const byType = new Map();
+    for (const r of d.repairs) {
+      let e = byType.get(r.chip);
+      if (!e) { e = { min: r.price, keys: new Set() }; byType.set(r.chip, e); }
+      else if (r.price < e.min) e.min = r.price;
+      e.keys.add((r.repair_type + '|' + cleanVariant(r.variant)).toLowerCase());
+    }
+    d.priceByType = byType; // Map<chip, {min, keys:Set}>
+    // Search index — model + brand names + every repair type (id, chip label, full repair_type)
+    // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
+    const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
+    const rtypeWords = d.repairs.map((r) => r.repair_type);
+    d.search = [d.model, manufacturer(d.brand), brandLabel(d.brand), ...typeWords, ...rtypeWords]
+      .join(' ').toLowerCase();
   }
   state.byModel = map;
-  state.devices = [...map.values()];
+  state.devices = [...map.values()].sort(chronoCompare); // newest first (default sort)
 }
 
 // ===========================================================================
@@ -432,7 +499,7 @@ function updateURL() {
   if (state.type !== 'all') p.set('type', state.type);
   const qv = ($('#search')?.value || '').trim();
   if (qv) p.set('q', qv);
-  if (state.sort !== 'savings') p.set('sort', state.sort);
+  if (state.sort !== 'default') p.set('sort', state.sort);
   const qs = p.toString();
   history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
 }
@@ -446,7 +513,7 @@ function syncFromURL() {
   state.brand = BRANDS.some((b) => b.id === brand) ? brand : 'all';
   state.type = TYPES.some((t) => t.id === type) ? type : 'all';
   state.q = q.trim().toLowerCase();
-  state.sort = ['savings', 'price', 'default'].includes(sort) ? sort : 'savings';
+  state.sort = ['savings', 'price', 'default'].includes(sort) ? sort : 'default';
   const input = $('#search'); const clear = $('#search-clear');
   if (input) { input.value = q; clear?.classList.toggle('show', q.length > 0); }
   const sortSel = $('#sort'); if (sortSel) sortSel.value = state.sort;
@@ -475,9 +542,12 @@ function renderGrid({ resetPage = true } = {}) {
 
   // Filter → sort → map to card elements. Sorting reorders the DOM (only when non-default) so the
   // visual + keyboard order match; 'default' preserves the natural data order (no reorder needed).
+  // Tokenised search: split on whitespace and require EVERY token to appear in the device's
+  // search index (model + repair types), so "iphone 12 battery" matches the iPhone 12 (DoD #3).
+  const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
   const matchFn = (d) => (brand === 'all' || d.brand === brand)
     && (type === 'all' || d.types.has(type))
-    && (!q || d.search.includes(q));
+    && tokens.every((t) => d.search.includes(t));
   const matchDevices = sortDevices(state.devices.filter(matchFn), state.sort);
   const matchingEls = matchDevices.map((d) => cardEls.get(d.model)).filter(Boolean);
   const matchSet = new Set(matchingEls);
@@ -580,21 +650,23 @@ function initCardSpotlight(grid) {
 }
 
 function cardHTML(d) {
-  const chips = [...d.types].map((t) => `<span class="rt-chip ${t}">${CHIP_LABEL[t] || t}</span>`).join('');
+  // Every repair type with its exact price (cheapest tier) — shown without a click (DoD #2).
+  const prices = TYPES.filter((t) => t.id !== 'all' && d.priceByType.has(t.id)).map((t) => {
+    const { min, keys } = d.priceByType.get(t.id);
+    const from = keys.size > 1 ? '<span class="cp-from">from</span>' : '';
+    return `<li class="cp-row ${t.id}"><span class="cp-type">${CHIP_LABEL[t.id] || t.id}</span><span class="cp-price">${from}${moneyExact(min)}</span></li>`;
+  }).join('');
   const save = d.maxSaving > 0
-    ? `<div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs other shops</span></div>`
+    ? `<div class="card-foot"><div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs other shops</span></div></div>`
     : '';
   return `<button class="card reveal" type="button" data-model="${esc(d.model)}" aria-label="View pricing for ${esc(d.model)}">
     <div class="card-top">
       <span class="card-model">${esc(stripManufacturer(d.model, d.brand))}</span>
       <span class="brand-tag">${esc(manufacturer(d.brand))}</span>
     </div>
-    <div class="rt-chips">${chips}</div>
-    <div class="card-foot">
-      <span class="from">from<b>${moneyExact(d.minPrice)}</b></span>
-      ${save}
-    </div>
-    <span class="card-view">View pricing &amp; options
+    <ul class="card-prices">${prices}</ul>
+    ${save}
+    <span class="card-view">View options &amp; book
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
     </span>
   </button>`;
@@ -619,8 +691,10 @@ function initDialog() {
   // still restores focus in every path.
   dlg.addEventListener('close', () => { if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); });
 
-  // Option/colour picking is event-delegated so it survives each re-render.
+  // Option/colour picking + bundle add/remove are event-delegated so they survive each re-render.
   body.addEventListener('click', (e) => {
+    const add = e.target.closest('[data-add]');
+    if (add) { toggleSelect(+add.dataset.add); return; }
     const opt = e.target.closest('[data-g][data-o]'); if (!opt) return;
     selectOption(+opt.dataset.g, +opt.dataset.o);
   });
@@ -642,6 +716,7 @@ function openDevice(model, trigger) {
   lastFocus = trigger || document.activeElement;
   state.openModel = model;
   const groups = state.groups = groupRepairs(d.repairs);
+  state.selected = new Set(); // fresh multi-select bundle per device
 
   $('#detail-title').textContent = d.model;
   const gc = groups.length;
@@ -649,7 +724,7 @@ function openDevice(model, trigger) {
     `${gc} repair type${gc === 1 ? '' : 's'} · ${brandLabel(d.brand)} · from ${moneyExact(d.minPrice)}`;
   $('#detail-body').innerHTML = groups.map((g, i) => groupHTML(g, i, d.model)).join('');
 
-  $('#detail-book-all').href = waLink(`Hi Nuera Tech! I'd like to book a repair for my ${d.model}.`);
+  updateBundle(); // nothing selected yet → foot CTA books the whole device
   // The sheet is already populated above, so the View Transition captures the filled "new" state.
   withViewTransition(() => { $('#detail').showModal(); $('#detail-body').scrollTop = 0; });
 }
@@ -670,11 +745,93 @@ function compareHTML(r) {
     : '';
 }
 
-function bookMsg(r, model) {
-  const v = cleanVariant(r.variant);
-  const hasSave = r.mk_price != null && r.mk_price > 0 && r.savings != null && r.savings > 0;
-  return `Hi Nuera Tech! I'd like to book:\n• ${r.repair_type}${v ? ' (' + v + ')' : ''} for my ${model}\n• Your price: ${moneyExact(r.price)}`
-    + (hasSave ? `\n• (Typical price: ${moneyExact(r.mk_price)} — I save ${money(Math.round(r.savings))})` : '');
+// ---- multi-select bundle (Definition of Done #4) ----
+// state.selected holds the indices of the repair groups the user added. Two or more selected
+// repairs earn a flat $20 bundle discount. bundleTotals() does the math; bundleMsg() formats the
+// strictly-laid-out WhatsApp payload (URL-encoded by waLink) summarising it.
+const BUNDLE_DISCOUNT = 20;
+
+function bundleTotals(sel) {
+  const original = sel.reduce((s, gi) => s + selOpt(state.groups[gi]).price, 0);
+  const discount = sel.length >= 2 ? BUNDLE_DISCOUNT : 0;
+  return { original, discount, final: original - discount };
+}
+
+// Variant / colour label for a selected group (mirrors quoteText()).
+function selLabel(g) {
+  return g.swatch ? (g.colors[g.selected]?.name || '') : cleanVariant(selOpt(g).variant);
+}
+
+function bundleMsg(model, sel) {
+  const { original, discount, final } = bundleTotals(sel);
+  const lines = sel.map((gi) => {
+    const g = state.groups[gi]; const r = selOpt(g); const v = selLabel(g);
+    return `• ${r.repair_type}${v ? ` (${v})` : ''} — ${moneyExact(r.price)}`;
+  });
+  if (sel.length < 2) {
+    return `Hi Nuera Tech! I'd like to book for my ${model}:\n${lines.join('\n')}\n• Total: ${moneyExact(final)}`;
+  }
+  return [
+    `Hi Nuera Tech! I'd like to book a bundle for my ${model}:`,
+    ...lines,
+    '',
+    `Original total: ${moneyExact(original)}`,
+    `Bundle discount: -${moneyExact(discount)}`,
+    `You pay: ${moneyExact(final)}`,
+  ].join('\n');
+}
+
+// Add/remove a repair group from the bundle, sync its toggle button, refresh the summary.
+function toggleSelect(gi) {
+  if (!state.groups[gi]) return;
+  const on = !state.selected.has(gi);
+  if (on) state.selected.add(gi); else state.selected.delete(gi);
+  const btn = $(`#detail-body [data-add="${gi}"]`);
+  if (btn) {
+    btn.setAttribute('aria-pressed', String(on));
+    const ic = btn.querySelector('.rgroup-add-ic'); if (ic) ic.innerHTML = on ? CHECK_SVG : ADD_SVG;
+    const tx = btn.querySelector('.rgroup-add-tx'); if (tx) tx.textContent = on ? 'Added' : 'Add';
+    const name = state.groups[gi].rtype;
+    btn.setAttribute('aria-label', on ? `Remove ${name} from your booking` : `Add ${name} to your booking`);
+  }
+  updateBundle();
+}
+
+// Render the live bundle summary + adapt the foot CTA. Nothing selected → device-level booking.
+function updateBundle() {
+  const model = state.openModel;
+  const box = $('#detail-bundle');
+  const cta = $('#detail-book-all');
+  const label = $('#detail-book-label');
+  if (!model || !cta) return;
+  const sel = [...state.selected].sort((a, b) => a - b);
+  if (!sel.length) {
+    if (box) { box.hidden = true; box.innerHTML = ''; }
+    if (label) label.textContent = 'Book this device on WhatsApp';
+    cta.href = waLink(`Hi Nuera Tech! I'd like to book a repair for my ${model}.`);
+    cta.setAttribute('aria-label', `Book ${model} on WhatsApp`);
+    return;
+  }
+  const { original, discount, final } = bundleTotals(sel);
+  if (box) {
+    const items = sel.map((gi) => {
+      const g = state.groups[gi]; const v = selLabel(g);
+      return `<li><span>${esc(g.rtype)}${v ? ` · ${esc(v)}` : ''}</span><b>${moneyExact(selOpt(g).price)}</b></li>`;
+    }).join('');
+    box.hidden = false;
+    box.innerHTML = `<ul class="bundle-list">${items}</ul>
+      <div class="bundle-tot">
+        <div class="bundle-row"><span>Original total</span><span>${moneyExact(original)}</span></div>
+        ${discount ? `<div class="bundle-row bundle-save"><span>Bundle discount (2+ repairs)</span><span>-${moneyExact(discount)}</span></div>` : ''}
+        <div class="bundle-row bundle-final"><span>${discount ? 'You pay' : 'Total'}</span><b>${moneyExact(final)}</b></div>
+      </div>
+      ${sel.length === 1 ? `<p class="bundle-hint">Add one more repair to save ${money(BUNDLE_DISCOUNT)}.</p>` : ''}`;
+  }
+  if (label) label.textContent = sel.length === 1
+    ? `Book this repair — ${moneyExact(final)}`
+    : `Book ${sel.length} repairs — ${moneyExact(final)}`;
+  cta.href = waLink(bundleMsg(model, sel));
+  cta.setAttribute('aria-label', `Book ${sel.length} selected repair${sel.length === 1 ? '' : 's'} for ${model} on WhatsApp`);
 }
 
 function optionsHTML(g, gi) {
@@ -712,7 +869,7 @@ function groupHTML(g, gi, model) {
             <div class="p"><span class="cur">$</span><span data-price="${gi}">${Number(r.price).toFixed(2)}</span></div>
             <div class="rgroup-compare" data-compare="${gi}">${compareHTML(r)}</div>
           </div>
-          <a class="book" data-book="${gi}" href="${waLink(bookMsg(r, model))}" target="_blank" rel="noopener" aria-label="Book ${esc(g.rtype)} for ${esc(model)} on WhatsApp">${WA_SVG}Book</a>
+          <button class="rgroup-add" type="button" data-add="${gi}" aria-pressed="false" aria-label="Add ${esc(g.rtype)} to your booking"><span class="rgroup-add-ic" aria-hidden="true">${ADD_SVG}</span><span class="rgroup-add-tx">Add</span></button>
         </div>
       </div>
     </div>
@@ -734,7 +891,7 @@ function selectOption(gi, oi) {
   set(`[data-sub="${gi}"]`, (el) => { el.textContent = subText(g); });
   set(`[data-price="${gi}"]`, (el) => { el.textContent = Number(r.price).toFixed(2); });
   set(`[data-compare="${gi}"]`, (el) => { el.innerHTML = compareHTML(r); });
-  set(`[data-book="${gi}"]`, (el) => { el.href = waLink(bookMsg(r, state.openModel)); });
+  if (state.selected.has(gi)) updateBundle(); // a selected repair's tier changed → refresh totals + payload
 }
 
 // ---- share / copy the current quote ----

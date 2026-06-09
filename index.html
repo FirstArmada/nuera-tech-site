@@ -391,7 +391,7 @@
     .load-more{display:flex;justify-content:center;margin-top:var(--space-5)}
     #load-more[hidden]{display:none} /* .btn sets display:inline-flex, which would override [hidden] */
     /* perf: Add content-visibility to defer rendering of offscreen cards and below-the-fold sections, improving initial load and TTI */
-    .card{content-visibility:auto;contain-intrinsic-size:auto 242px;position:relative;isolation:isolate;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--color-surface-2),var(--color-surface-1));border:1px solid var(--color-border);border-radius:var(--radius-md);padding:18px;text-align:left;cursor:pointer;color:inherit;font:inherit;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
+    .card{content-visibility:auto;contain-intrinsic-size:auto 320px;position:relative;isolation:isolate;min-width:0;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--color-surface-2),var(--color-surface-1));border:1px solid var(--color-border);border-radius:var(--radius-md);padding:18px;text-align:left;cursor:pointer;color:inherit;font:inherit;transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out)}
     /* Layered interactive states: content above two glow layers.
        ::before = pointer-tracked spotlight (--mx/--my from app.js); ::after = animated gradient border. */
     .card>*{position:relative;z-index:1}
@@ -421,7 +421,18 @@
     .rt-chip.battery{background:rgba(34,211,238,.14);color:#aef0ff;border-color:rgba(34,211,238,.28)}
     .rt-chip.backglass{background:rgba(251,191,36,.14);color:#ffe2a3;border-color:rgba(251,191,36,.28)}
     .rt-chip.chargeport{background:rgba(52,211,153,.14);color:#a9f3d4;border-color:rgba(52,211,153,.28)}
-    .card-foot{margin-top:auto;padding-top:var(--space-3);display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+    .card-foot{margin-top:auto;padding-top:var(--space-3);display:flex;align-items:flex-end;justify-content:flex-end;gap:10px}
+    /* All repair options + exact prices, shown on the card itself (no click required). */
+    .card-prices{list-style:none;margin:var(--space-3) 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+    .cp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.84rem;line-height:1.2}
+    .cp-type{display:inline-flex;align-items:center;gap:8px;color:#c6cfe1;font-weight:600;min-width:0}
+    .cp-type::before{content:"";width:8px;height:8px;border-radius:3px;background:var(--cp-dot,#8b5cf6);flex:none}
+    .cp-row.screen{--cp-dot:#8b5cf6}
+    .cp-row.battery{--cp-dot:#22d3ee}
+    .cp-row.backglass{--cp-dot:#fbbf24}
+    .cp-row.chargeport{--cp-dot:#34d399}
+    .cp-price{font-weight:700;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums}
+    .cp-price .cp-from{color:var(--muted);font-weight:600;font-size:.82em;margin-right:3px}
     .from{font-size:.78rem;color:var(--muted)}
     .from b{display:block;font-size:1.5rem;color:var(--text);font-weight:700;letter-spacing:-.02em;margin-top:2px}
     .save-tag{font-size:.74rem;font-weight:700;color:var(--green-lt);text-align:right;line-height:1.3;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);border-radius:12px;padding:6px 10px;box-shadow:0 0 22px -12px rgba(52,211,153,.7)}
@@ -598,6 +609,26 @@
     .book svg{width:15px;height:15px}
     .book:hover{filter:brightness(1.06);box-shadow:0 12px 30px -12px rgba(52,211,153,.7)}
     .book:active{transform:translateY(1px)}
+    /* Per-repair "Add to booking" toggle (multi-select bundle). Outline → solid green when added. */
+    .rgroup-add{display:inline-flex;align-items:center;gap:7px;padding:11px 16px;min-height:var(--touch-min);border-radius:var(--radius-pill);border:1px solid var(--border-2);background:var(--panel-2);color:var(--text);font:inherit;font-weight:700;font-size:.84rem;white-space:nowrap;cursor:pointer;transition:border-color .15s,background .15s,color .15s,box-shadow .15s,transform .12s ease}
+    .rgroup-add svg{width:16px;height:16px}
+    .rgroup-add .rgroup-add-ic{display:inline-flex}
+    .rgroup-add:hover{background:rgba(255,255,255,.08);border-color:var(--color-border-strong)}
+    .rgroup-add:active{transform:translateY(1px)}
+    .rgroup-add[aria-pressed=true]{background:var(--grad-wa);color:var(--color-on-success);border-color:transparent;box-shadow:0 10px 26px -14px rgba(52,211,153,.8)}
+    /* Live bundle summary in the sheet foot: selected repairs, original total, −$20 discount, total. */
+    .bundle{margin-bottom:12px;padding:13px 15px;border:1px solid var(--border);border-radius:14px;background:rgba(139,92,246,.07)}
+    .bundle-list{list-style:none;margin:0 0 10px;padding:0 0 10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+    .bundle-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.86rem}
+    .bundle-list li span{color:#cdd6e8;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bundle-list li b{color:var(--text);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+    .bundle-tot{display:flex;flex-direction:column;gap:5px}
+    .bundle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.84rem;color:var(--muted)}
+    .bundle-row>span:last-child{font-variant-numeric:tabular-nums;font-weight:700;color:#cdd6e8}
+    .bundle-save,.bundle-save>span:last-child{color:var(--green-lt)}
+    .bundle-final{font-size:1rem;color:var(--text);margin-top:2px}
+    .bundle-final b{font-size:1.18rem;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+    .bundle-hint{margin:10px 0 0;font-size:.8rem;color:var(--green-lt);font-weight:600}
     .sheet-foot{padding:14px 22px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:rgba(255,255,255,.02)}
     .sheet-foot .btn{width:100%}
 
@@ -957,8 +988,8 @@
         <span class="results-meta-text"><span id="result-count" aria-live="polite" role="status">Loading pricing…</span> <span id="result-hint"></span></span>
         <label class="sort-field"><span class="sr-only">Sort devices by</span>
           <select id="sort">
-            <option value="default">Featured</option>
-            <option value="savings" selected>Biggest savings</option>
+            <option value="default" selected>Newest first</option>
+            <option value="savings">Biggest savings</option>
             <option value="price">Price: low to high</option>
           </select>
         </label>
@@ -1235,9 +1266,10 @@
           <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Same-day repair</span>
           <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>OEM-grade parts</span>
         </div>
+        <div class="bundle" id="detail-bundle" aria-live="polite" hidden></div>
         <a class="btn btn-wa" id="detail-book-all" href="https://wa.me/12269784666" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
-          Book this device on WhatsApp
+          <span id="detail-book-label">Book this device on WhatsApp</span>
         </a>
         <p class="wa-cue">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
