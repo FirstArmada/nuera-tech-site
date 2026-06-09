@@ -2,7 +2,7 @@
  * pricing-data.json uses stale-while-revalidate: still fetched at runtime,
  * just served fast from cache then refreshed in the background (Rule 1 intact).
  */
-const VERSION = 'nuera-v5';
+const VERSION = 'nuera-v6';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 

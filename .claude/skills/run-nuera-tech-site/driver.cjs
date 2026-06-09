@@ -181,27 +181,43 @@ const check = (n, c, x = '') => (c ? ok(n, x) : bad(n, x));
     const firstModel = (await page.locator('#grid .card:visible .card-model').first().textContent() || '').trim();
     check('search narrows to the model', searchCards >= 1 && firstModel === 'iPhone 12 Mini', `${searchCards} card(s), first="${firstModel}"`);
 
-    console.log('\n[6] Open device modal + switch screen tier');
+    console.log('\n[6] Open device modal + tier switch + multi-select bundle');
     await cardByModel(/^iPhone 12 Mini$/).first().click();
     await page.waitForSelector('#detail[open]', { timeout: 5000 });
     await page.waitForTimeout(SETTLE);                          // let the open animation finish before the shot
     check('modal opens with device title', (await page.locator('#detail-title').textContent() || '').trim() === 'iPhone 12 Mini');
     await page.screenshot({ path: `${SHOTS}/03-modal.png` });
+    const ctaEl = page.locator('#detail-book-all');
+    const ctaDefault = await ctaEl.getAttribute('href');
+    check('foot CTA defaults to a WhatsApp device booking', !!ctaDefault && ctaDefault.startsWith('https://wa.me/12269784666?text='));
+    check('bundle summary hidden until a repair is added', (await page.locator('#detail-bundle').isVisible()) === false);
+    // Switching a tier (where a group exposes multiple options) updates the live price.
     if ((await page.locator('#detail-body .opts').count()) > 0) {
       const priceEl = page.locator('#detail-body [data-price]').first();
-      const bookEl = page.locator('#detail-body [data-book]').first();
       const priceBefore = (await priceEl.textContent() || '').trim();
-      const bookBefore = await bookEl.getAttribute('href');
       await page.locator('#detail-body .opts').first().locator('.opt[aria-checked="false"]').first().click();
       await page.waitForTimeout(150);
       const priceAfter = (await priceEl.textContent() || '').trim();
-      const bookAfter = await bookEl.getAttribute('href');
       check('switching tier updates price', priceBefore !== priceAfter, `${priceBefore} -> ${priceAfter}`);
-      check('switching tier updates Book link', bookBefore !== bookAfter);
-      check('Book link is a WhatsApp deep-link', !!bookAfter && bookAfter.startsWith('https://wa.me/12269784666?text='));
-      await page.screenshot({ path: `${SHOTS}/03b-modal-switched.png` });
     } else {
       bad('modal had a multi-option group', 'no .opts found');
+    }
+    // Multi-select bundle: add repairs → live summary + a bundled WhatsApp payload with the $20 discount.
+    const addCount = await page.locator('#detail-body [data-add]').count();
+    check('per-repair add-to-booking toggles present', addCount >= 1, `${addCount} toggle(s)`);
+    await page.locator('#detail-body [data-add]').first().click();
+    await page.waitForTimeout(120);
+    check('bundle summary shows after adding a repair', await page.locator('#detail-bundle').isVisible());
+    const cta1 = await ctaEl.getAttribute('href');
+    check('foot CTA becomes a WhatsApp bundle link', !!cta1 && cta1.startsWith('https://wa.me/12269784666?text=') && cta1 !== ctaDefault);
+    if (addCount >= 2) {
+      await page.locator('#detail-body [data-add]').nth(1).click();
+      await page.waitForTimeout(120);
+      const summary = (await page.locator('#detail-bundle').textContent() || '').replace(/\s+/g, ' ').trim();
+      check('bundle summary shows the $20 discount for 2+ repairs', /-\$20\.00/.test(summary) && /Original total/i.test(summary), summary.slice(0, 90));
+      const payload = decodeURIComponent((await ctaEl.getAttribute('href') || '').split('text=')[1] || '');
+      check('bundle WhatsApp payload states the $20 discount + original total', /Bundle discount: -\$20\.00/.test(payload) && /Original total: \$/.test(payload));
+      await page.screenshot({ path: `${SHOTS}/03b-modal-bundle.png` });
     }
     await page.keyboard.press('Escape');
     await page.waitForTimeout(150);
