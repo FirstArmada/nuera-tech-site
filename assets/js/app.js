@@ -564,6 +564,17 @@ function initCardSpotlight(grid) {
   if (reduceMotion() || !canHover()) return;
   let raf = 0;
   let pending = null;
+
+  // Cache the bounding rect so continuous pointer movement over the same card
+  // doesn't trigger a synchronous layout calculation (getBoundingClientRect) on every frame.
+  let cachedRect = null;
+  let cachedCard = null;
+
+  // Invalidate cache when layout might have changed
+  const invalidate = () => { cachedRect = null; cachedCard = null; };
+  addEventListener('scroll', invalidate, { capture: true, passive: true });
+  addEventListener('resize', invalidate, { passive: true });
+
   grid.addEventListener('pointermove', (e) => {
     const card = e.target.closest('.card');
     if (!card) return;
@@ -572,7 +583,13 @@ function initCardSpotlight(grid) {
     raf = requestAnimationFrame(() => {
       raf = 0;
       const { card, x, y } = pending;
-      const r = card.getBoundingClientRect();
+
+      if (card !== cachedCard || !cachedRect) {
+        cachedCard = card;
+        cachedRect = card.getBoundingClientRect();
+      }
+
+      const r = cachedRect;
       card.style.setProperty('--mx', `${((x - r.left) / r.width) * 100}%`);
       card.style.setProperty('--my', `${((y - r.top) / r.height) * 100}%`);
     });
