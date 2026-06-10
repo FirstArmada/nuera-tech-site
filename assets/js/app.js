@@ -377,10 +377,19 @@ function usePrecomputedStats(data) {
 
 function computeSavingsStats(repairs) {
   const withMk = repairs.filter((r) => r.mk_price != null && r.mk_price > 0 && r.savings != null);
-  const maxSaving = withMk.length ? Math.max(...withMk.map((r) => r.savings)) : 0;
-  const avgPct = withMk.length
-    ? Math.round(withMk.reduce((a, r) => a + pctLess(r.savings, r.mk_price), 0) / withMk.length)
-    : 0;
+
+  let maxSaving = 0;
+  let totalPct = 0;
+
+  for (let i = 0; i < withMk.length; i++) {
+    const r = withMk[i];
+    if (r.savings > maxSaving) {
+      maxSaving = r.savings;
+    }
+    totalPct += pctLess(r.savings, r.mk_price);
+  }
+
+  const avgPct = withMk.length ? Math.round(totalPct / withMk.length) : 0;
   const top = [...withMk].sort((a, b) => b.savings - a.savings);
   return { withMk, maxSaving, avgPct, top };
 }
