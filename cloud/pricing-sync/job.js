@@ -45,14 +45,11 @@ async function main() {
   const range = process.env.MASTER_SHEET_RANGE || 'Master!A1:Z10000';
   if (!sheetId) throw new Error('MASTER_SHEET_ID is required');
 
-  console.log(`[sync] reading sheet ${sheetId} (${range})`);
   const rows = await readSheetObjects(sheetId, range);
-  console.log(`[sync] ${rows.length} data rows`);
 
   const data = transform(rows);
   applyMkOverlay(data, await loadMkOverlay());
   const mkCount = data.repairs.filter((r) => r.mk_price != null).length;
-  console.log(`[sync] transformed ${data.repairs.length} repairs (${mkCount} with MK comparison)`);
 
   // GitHub: needed to diff against the live file and to open the PR.
   const haveCreds = !!(process.env.GITHUB_TOKEN || process.env.GITHUB_TOKEN_SECRET);
@@ -60,16 +57,13 @@ async function main() {
   const current = octokit ? await getCurrentPricing(octokit) : { json: null, sha: null, raw: null };
 
   validate(data, current.json);
-  console.log('[sync] validation passed');
 
   const nextContent = JSON.stringify(data, null, 2) + '\n';
   if (current.raw && current.raw.trim() === nextContent.trim()) {
-    console.log('[sync] no changes — pricing-data.json already current.');
     return;
   }
 
   if (DRY_RUN) {
-    console.log('[sync] DRY RUN — no PR opened.\n');
     console.log(diffSummary(data, current.json));
     return;
   }
@@ -80,7 +74,6 @@ async function main() {
     summary: diffSummary(data, current.json),
     date: data.generated,
   });
-  console.log(`[sync] opened PR: ${url}`);
 }
 
 main().catch((err) => { console.error('[sync] FAILED:', err?.message || err); process.exit(1); });
