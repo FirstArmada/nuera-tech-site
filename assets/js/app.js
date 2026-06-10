@@ -604,9 +604,57 @@ function syncFromURL() {
 let cardEls = null; // Map<model, HTMLElement>, built once
 let emptyEl = null; // reused empty-state node
 
+// Filter → sort the device list and split the prebuilt cards into matching / non-matching
+// sets. A non-default sort also reorders the matching cards in the DOM so the visual +
+// keyboard order line up. Tokenised search: every whitespace token must appear in the
+// device's search index (model + repair types), so "iphone 12 battery" matches iPhone 12.
+function getMatchingEls(grid) {
+  const { brand, type, q, sort, devices } = state;
+  const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+  const matchFn = (d) => (brand === 'all' || d.brand === brand)
+    && (type === 'all' || d.types.has(type))
+    && tokens.every((t) => d.search.includes(t));
+  const matchDevices = sortDevices(devices.filter(matchFn), sort);
+  const matchingEls = matchDevices.map((d) => cardEls.get(d.model)).filter(Boolean);
+  const matchSet = new Set(matchingEls);
+  const nonMatching = [];
+  cardEls.forEach((el) => { if (!matchSet.has(el)) nonMatching.push(el); });
+  if (sort !== 'default' && matchingEls.length) grid.append(...matchingEls);
+  return { matchingEls, nonMatching };
+}
+
+// Show/refresh the empty-state node when nothing matches; remove it otherwise.
+function renderEmptyState(grid, shown) {
+  if (!shown) {
+    if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
+    emptyEl.innerHTML = `
+      <span class="empty-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+      <p class="empty-title">No devices match.</p>
+      <p>Try a different model, or message us — we repair more than we can list.</p>
+      <a class="btn btn-wa" href="${waLink('Hi Nuera Tech! Do you repair: ' + (state.q || 'my device') + '?')}" target="_blank" rel="noopener">Ask on WhatsApp</a>`;
+    if (!emptyEl.isConnected) grid.appendChild(emptyEl);
+  } else if (emptyEl && emptyEl.isConnected) {
+    emptyEl.remove();
+  }
+}
+
+// Update the live result count + hint, pulse the count on changes (never first paint),
+// and keep the shareable URL in sync.
+function updateResultCount(shown, firstBuild, resetPage) {
+  const { brand, q } = state;
+  const count = $('#result-count');
+  count.textContent = shown
+    ? `${shown} device${shown === 1 ? '' : 's'}`
+      + (brand !== 'all' ? ` · ${BRANDS.find((b) => b.id === brand)?.label}` : '')
+      + (q ? ` · “${q}”` : '')
+    : 'No matches';
+  $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
+  if (!firstBuild) pulseResultCount(count); // visual "results refreshed" cue; never on first paint
+  if (resetPage && !firstBuild) updateURL(); // keep the shareable URL in sync (replaceState)
+}
+
 function renderGrid({ resetPage = true } = {}) {
   const grid = $('#grid');
-  const { brand, type, q } = state;
   if (resetPage) state.page = 1; // a new filter/search always starts from the first page
 
   let firstBuild = false;
@@ -620,20 +668,8 @@ function renderGrid({ resetPage = true } = {}) {
     firstBuild = true;
   }
 
-  // Filter → sort → map to card elements. Sorting reorders the DOM (only when non-default) so the
-  // visual + keyboard order match; 'default' preserves the natural data order (no reorder needed).
-  // Tokenised search: split on whitespace and require EVERY token to appear in the device's
-  // search index (model + repair types), so "iphone 12 battery" matches the iPhone 12 (DoD #3).
-  const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
-  const matchFn = (d) => (brand === 'all' || d.brand === brand)
-    && (type === 'all' || d.types.has(type))
-    && tokens.every((t) => d.search.includes(t));
-  const matchDevices = sortDevices(state.devices.filter(matchFn), state.sort);
-  const matchingEls = matchDevices.map((d) => cardEls.get(d.model)).filter(Boolean);
-  const matchSet = new Set(matchingEls);
-  const nonMatching = [];
-  cardEls.forEach((el) => { if (!matchSet.has(el)) nonMatching.push(el); });
-  if (state.sort !== 'default' && matchingEls.length) grid.append(...matchingEls);
+  // Filter → sort → map to card elements (matching set reordered in the DOM for non-default sorts).
+  const { matchingEls, nonMatching } = getMatchingEls(grid);
 
   // Pagination: show only the first `visibleCount` matches; the rest stay [hidden] behind "Load
   // More". Animate the transition — never on first build (scroll-reveal handles those), and on a
@@ -653,27 +689,8 @@ function renderGrid({ resetPage = true } = {}) {
     if (remaining > 0) loadMore.setAttribute('aria-label', `Load ${Math.min(PAGE_SIZE, remaining)} more devices — ${remaining} remaining`);
   }
 
-  if (!shown) {
-    if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
-    emptyEl.innerHTML = `
-      <span class="empty-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-      <p class="empty-title">No devices match.</p>
-      <p>Try a different model, or message us — we repair more than we can list.</p>
-      <a class="btn btn-wa" href="${waLink('Hi Nuera Tech! Do you repair: ' + (state.q || 'my device') + '?')}" target="_blank" rel="noopener">Ask on WhatsApp</a>`;
-    if (!emptyEl.isConnected) grid.appendChild(emptyEl);
-  } else if (emptyEl && emptyEl.isConnected) {
-    emptyEl.remove();
-  }
-
-  const count = $('#result-count');
-  count.textContent = shown
-    ? `${shown} device${shown === 1 ? '' : 's'}`
-      + (brand !== 'all' ? ` · ${BRANDS.find((b) => b.id === brand)?.label}` : '')
-      + (q ? ` · “${state.q}”` : '')
-    : 'No matches';
-  $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
-  if (!firstBuild) pulseResultCount(count); // visual "results refreshed" cue; never on first paint
-  if (resetPage && !firstBuild) updateURL(); // keep the shareable URL in sync (replaceState)
+  renderEmptyState(grid, shown);
+  updateResultCount(shown, firstBuild, resetPage);
 }
 
 // Animate the grid between filter states with a clean "results refresh" — fade + subtle scale the
