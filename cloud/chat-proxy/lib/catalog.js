@@ -20,20 +20,33 @@ let inflight = null;
 
 function buildIndex(repairs) {
   const byModel = new Map();
+  const brandsSet = new Set();
+  const chipsSet = new Set();
+  let minPrice = Infinity;
+  let maxPrice = -Infinity;
+  let hasPrice = false;
+
   for (const r of repairs) {
     const key = String(r.model).toLowerCase();
     if (!byModel.has(key)) byModel.set(key, { model: r.model, brand: r.brand, repairs: [] });
     byModel.get(key).repairs.push(r);
+
+    brandsSet.add(r.brand);
+    chipsSet.add(r.chip);
+
+    if (typeof r.price === 'number') {
+      if (r.price < minPrice) minPrice = r.price;
+      if (r.price > maxPrice) maxPrice = r.price;
+      hasPrice = true;
+    }
   }
-  const brands = [...new Set(repairs.map((r) => r.brand))];
-  const chips = [...new Set(repairs.map((r) => r.chip))];
-  const prices = repairs.map((r) => r.price).filter((n) => typeof n === 'number');
+
   const summary = {
     deviceCount: byModel.size,
     repairCount: repairs.length,
-    brands: brands.map((b) => BRAND_LABEL[b] || b),
-    repairTypes: chips.map((c) => CHIP_LABEL[c] || c),
-    priceRange: prices.length ? { low: Math.min(...prices), high: Math.max(...prices) } : null,
+    brands: [...brandsSet].map((b) => BRAND_LABEL[b] || b),
+    repairTypes: [...chipsSet].map((c) => CHIP_LABEL[c] || c),
+    priceRange: hasPrice ? { low: minPrice, high: maxPrice } : null,
   };
   return { byModel, summary };
 }

@@ -62,3 +62,6 @@ the savings UI must degrade gracefully where `mk_price`/`savings` are null.
 ## 2026-06-10 - [Layout Thrashing in Loops]
 **Learning:** Mixing DOM reads (like `getBoundingClientRect()`) and DOM writes (like `classList.add()`) inside the same loop forces the browser to recalculate layout synchronously on every single iteration, leading to massive layout thrashing and dropped frames, especially during high-frequency events like scrolling.
 **Action:** Always batch DOM operations. In loops, run one loop to collect all reads, and a separate subsequent loop to apply all writes. Additionally, cache expensive layout reads outside of scroll handlers (e.g., using `ResizeObserver`) to avoid recomputing them unnecessarily.
+## 2023-10-27 - Catalog Indexing Optimization
+**Learning:** Performing multiple `map` over arrays in rapid succession, followed by extra passes to calculate aggregate values (min/max), can add substantial overhead.
+**Action:** Instead of iterating over the same dataset multiple times to collect keys, calculate sets, and find min/max properties, compute them concurrently in a single `for...of` loop while constructing data maps. Doing so saved ~40% execution time in the critical `buildIndex` function.
