@@ -10,6 +10,7 @@ served as part of the site. It is excluded from the static deploys
 |------|------------|---------|
 | `chat-proxy/` | Cloud Run **service** — the on-site AI assistant. Calls Vertex AI (Gemini) and resolves prices from `pricing-data.json` via function calling. The browser talks to it (whitelisted in the site CSP). | always-on HTTP |
 | `pricing-sync/` | Cloud Run **job** — regenerates `pricing-data.json` from the Google Sheets master list (+ authorized Mobile Klinik overlay) and opens a GitHub PR. | Cloud Scheduler (daily) |
+| `reviews-sync/` | Cloud Run **job** — fetches the shop's Google reviews (Places Details API), regenerates `reviews.json` and opens a GitHub PR. | Cloud Scheduler (e.g. weekly) |
 | `infra/` | `gcloud` runbook to provision the project, service accounts, IAM, Workload Identity Federation, secrets, scheduler, and domain. Docs only. |
 
 ## Key principles
@@ -37,6 +38,10 @@ curl -sN -X POST localhost:8080/chat -H 'content-type: application/json' \
 # pricing sync (dry run — reads the Sheet, validates, prints the PR diff, opens nothing)
 cd cloud/pricing-sync && npm install
 MASTER_SHEET_ID=<id> MASTER_SHEET_RANGE='Master!A1:Z10000' node job.js --dry-run
+
+# reviews sync (dry run — fetches Google reviews, validates, prints the PR diff, opens nothing)
+cd cloud/reviews-sync && npm install
+GOOGLE_PLACE_ID=<place_id> GOOGLE_PLACES_API_KEY=<places_api_key> node job.js --dry-run
 ```
 
 See `infra/README.md` for full provisioning and the required env/vars.
