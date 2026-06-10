@@ -1,8 +1,10 @@
 /* Nuera Tech service worker — offline-capable PWA shell.
- * pricing-data.json uses stale-while-revalidate: still fetched at runtime,
+ * App JS (/assets/js) is network-first so a deploy's HTML + JS always update together (no
+ * stale app.js running against a freshly-fetched index.html); fonts/icons stay cache-first
+ * (immutable). pricing-data.json uses stale-while-revalidate: still fetched at runtime,
  * just served fast from cache then refreshed in the background (Rule 1 intact).
  */
-const VERSION = 'nuera-v6';
+const VERSION = 'nuera-v7';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
@@ -60,7 +62,15 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Static assets: cache-first with background refresh
+  // App logic (JS): network-first so a freshly-deployed app.js / chat.js is never served stale
+  // against the network-first index.html — that hybrid runs a previous deploy's JS against this
+  // deploy's HTML + CSS. /assets/js is served max-age=0,must-revalidate so this stays cheap.
+  if (url.pathname.startsWith('/assets/js/')) {
+    e.respondWith(networkFirst(e));
+    return;
+  }
+
+  // Other static assets (fonts, icons — immutable): cache-first with background refresh
   if (url.pathname.startsWith('/assets/')) {
     e.respondWith(staleWhileRevalidate(e));
     return;
@@ -81,6 +91,18 @@ function staleWhileRevalidate(event) {
       return cached || network.then((res) => res || caches.match(request));
     })
   );
+}
+
+// Network-first: try the live copy (so a new deploy's JS matches the freshly-fetched HTML shell),
+// fall back to the cached/precached copy when offline.
+function networkFirst(event) {
+  const request = event.request;
+  return fetch(request)
+    .then((res) => {
+      if (res && res.ok) event.waitUntil(caches.open(SHELL).then((c) => c.put(request, res.clone())));
+      return res;
+    })
+    .catch(() => caches.match(request));
 }
 
 function cachePut(cacheName, key, res) {
