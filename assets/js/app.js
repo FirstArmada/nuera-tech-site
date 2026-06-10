@@ -44,9 +44,6 @@ const CHIP_LABEL = { screen: 'Screen', battery: 'Battery', backglass: 'Back Glas
 // Sort weight per repair type, derived from TYPES so the order lives in one place.
 const TYPE_ORDER = Object.fromEntries(TYPES.filter((t) => t.id !== 'all').map((t, i) => [t.id, i]));
 
-// Inline SVG glyph reused on every WhatsApp "Book" link (keeps us off icon CDNs).
-const WA_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>';
-
 // "Add to booking" / "added" glyphs for the per-repair multi-select toggle.
 const ADD_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
@@ -85,7 +82,6 @@ const pctLess = (saved, base) => Math.round((saved / base) * 100);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') ? '' : v.trim();
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
-const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = () => matchMedia('(hover: hover)').matches;
 // Run a DOM mutation inside a View Transition where supported; otherwise (or under reduced motion)
