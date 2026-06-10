@@ -4,6 +4,9 @@
 cloud
 tests
 
+# Agent learnings notes — kept in-repo but never part of the deployed site (mirrors .assetsignore).
+.jules
+
 # Unreferenced root social-card assets (the live OG image is assets/icons/og-image.png).
 social-card.png
 social-card.svg

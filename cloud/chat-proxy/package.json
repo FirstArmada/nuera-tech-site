@@ -4,13 +4,16 @@
   "private": true,
   "type": "module",
   "description": "Cloud Run proxy: Vertex AI (Gemini) repair-pricing assistant for the Nuera Tech site. Grounded in pricing-data.json via function calling. Auth via ADC — no API key.",
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=24" },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "@google-cloud/vertexai": "^1.9.0",
-    "cors": "^2.8.5",
-    "express": "^4.21.2"
+    "@google-cloud/vertexai": "^1.12.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  },
+  "overrides": {
+    "uuid": "^14.0.0"
   }
 }
