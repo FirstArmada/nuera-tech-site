@@ -28,6 +28,10 @@
 /pricing-data.json
   Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=86400
 
+# Runtime-fetched reviews: same caching policy as pricing.
+/reviews.json
+  Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=86400
+
 # Service worker must always revalidate and is allowed to control the whole origin.
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
