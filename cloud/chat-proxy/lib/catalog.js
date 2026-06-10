@@ -15,6 +15,19 @@ export const CHIP_LABEL = { screen: 'Screen', battery: 'Battery', backglass: 'Ba
 // Mirrors cleanVariant() in assets/js/app.js.
 export const cleanVariant = (v) => (!v || v === '-' || v === '—' || String(v).trim() === '') ? '' : String(v).trim();
 
+export function groupByChip(repairs) {
+  const byChip = new Map();
+  for (const r of repairs) {
+    if (!byChip.has(r.chip)) byChip.set(r.chip, new Map());
+    const key = r.repair_type.toLowerCase() + '|' + cleanVariant(r.variant).toLowerCase();
+    const cur = byChip.get(r.chip).get(key);
+    if (!cur || r.price < cur.price) byChip.get(r.chip).set(key, r);
+  }
+  const out = {};
+  for (const [chip, m] of byChip) out[chip] = [...m.values()].sort((a, b) => a.price - b.price);
+  return out;
+}
+
 let cache = { at: 0, repairs: [], byModel: new Map(), summary: null };
 let inflight = null;
 
@@ -24,6 +37,9 @@ function buildIndex(repairs) {
     const key = String(r.model).toLowerCase();
     if (!byModel.has(key)) byModel.set(key, { model: r.model, brand: r.brand, repairs: [] });
     byModel.get(key).repairs.push(r);
+  }
+  for (const d of byModel.values()) {
+    d.groupedRepairs = groupByChip(d.repairs);
   }
   const brands = [...new Set(repairs.map((r) => r.brand))];
   const chips = [...new Set(repairs.map((r) => r.chip))];
