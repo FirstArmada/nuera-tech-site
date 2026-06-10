@@ -1,0 +1,33 @@
+# Nuera Tech — Guelph Phone Repair
+
+> Independent phone and tablet repair shop in Guelph, Ontario, Canada. We fix iPhone, Samsung Galaxy, Google Pixel and iPad — screen, battery, back glass and charge-port repair — at transparent prices that beat other shops, with same-day service and a 90-day warranty. Booking is done over WhatsApp (no account, no forms).
+
+## About
+- Name: Nuera Tech
+- Type: Independent phone & tablet repair shop (LocalBusiness / ElectronicsStore)
+- Location: Guelph, Ontario, Canada — serving Guelph and Wellington County (incl. Fergus, Elora, Rockwood)
+- Phone / WhatsApp: +1 226 978 4666
+- Hours: Mon–Thu 10:00–19:00, Fri 10:00–20:00, Sat 11:00–17:00, Sun closed (local time)
+- Warranty: 90 days on parts and labour
+- Turnaround: most screen and battery repairs are same-day, usually under 2 hours
+- Currency: CAD
+
+## Services
+- Screen replacement — iPhone, Samsung Galaxy, Google Pixel, iPad, Samsung Tab
+- Battery replacement
+- Back glass replacement (with colour-matched options)
+- Charge port repair
+- Transparent, per-device pricing shown live on the homepage finder
+
+## Pricing
+- Live pricing data (machine-readable JSON): https://nuera.talha-k.com/pricing-data.json
+- For comparable repairs we publish our price next to the typical "other shop" price, so the saving is visible up front (up to ~$115 less on popular iPhone screen replacements).
+
+## Key links
+- Home and live pricing: https://nuera.talha-k.com/
+- Book on WhatsApp: https://wa.me/12269784666
+- Instagram: https://www.instagram.com/nueratech
+
+## Notes
+- Prices are in Canadian dollars and updated regularly.
+- This is a build-less static progressive web app; pricing is fetched at runtime from /pricing-data.json and is never hard-coded into the page.

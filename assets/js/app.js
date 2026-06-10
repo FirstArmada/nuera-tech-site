@@ -4,6 +4,9 @@
  */
 const WA = '12269784666';
 const DATA_URL = '/pricing-data.json';
+const REVIEWS_URL = '/reviews.json';
+// Schema.org Service names per repair type — used for the per-type Service structured data.
+const SERVICE_NAME = { screen: 'Screen replacement', battery: 'Battery replacement', backglass: 'Back glass replacement', chargeport: 'Charge port repair' };
 
 const BRANDS = [
   { id: 'all', label: 'All' },
@@ -18,9 +21,17 @@ const MANUFACTURER = { iphone: 'Apple', ipad: 'Apple', samsung: 'Samsung', 'sams
 const manufacturer = (b) => MANUFACTURER[b] || brandLabel(b);
 // Strip a leading manufacturer word so the card title doesn't echo the badge
 // ("Samsung Galaxy S20" → "Galaxy S20", "Google Pixel 10" → "Pixel 10"; Apple names are untouched).
+// Optimization: Cache RegExp objects per manufacturer to avoid recompiling on every card render.
+const _stripManufacturerRegexCache = new Map();
 const stripManufacturer = (model, b) => {
   const m = MANUFACTURER[b];
-  return m ? model.replace(new RegExp(`^${m}\\s+`, 'i'), '') : model;
+  if (!m) return model;
+  let reg = _stripManufacturerRegexCache.get(m);
+  if (!reg) {
+    reg = new RegExp(`^${m}\\s+`, 'i');
+    _stripManufacturerRegexCache.set(m, reg);
+  }
+  return model.replace(reg, '');
 };
 const TYPES = [
   { id: 'all', label: 'All repairs' },
@@ -128,37 +139,70 @@ function pulseResultCount(el) {
 // Pull a paint colour out of a back-glass variant string, e.g.
 // "Back Glass (No Logo) — Titanium Natural" → { name:"Titanium Natural", hex:"#b9a894" }.
 // Returns null when no known colour is found (caller falls back to text chips).
+// Optimization: Pre-compile regexes and memoize results. Since there are many duplicate variant
+// strings across devices, caching avoids redundant parsing and substring searching during render.
+const _parseColorRegexSplit = /—|–/;
+const _parseColorRegexParen = /\(.*?\)/g;
+const _parseColorRegexNoise = /no logo|large camera hole|back glass|service pack/gi;
+const _parseColorRegexWs = /\s+/g;
+const _parseColorCache = new Map();
+
 function parseColor(variant) {
   const v = cleanVariant(variant);
   if (!v) return null;
-  const parts = v.split(/—|–/); // text after the last em/en dash carries the colour
-  const seg = parts[parts.length - 1].replace(/\(.*?\)/g, ' ').replace(/no logo|large camera hole|back glass|service pack/gi, ' ').replace(/\s+/g, ' ').trim();
-  if (!seg) return null;
+  const cached = _parseColorCache.get(v);
+  if (cached !== undefined) return cached;
+
+  const parts = v.split(_parseColorRegexSplit); // text after the last em/en dash carries the colour
+  const seg = parts[parts.length - 1].replace(_parseColorRegexParen, ' ').replace(_parseColorRegexNoise, ' ').replace(_parseColorRegexWs, ' ').trim();
+  if (!seg) {
+    _parseColorCache.set(v, null);
+    return null;
+  }
   const low = seg.toLowerCase();
-  for (const k of SWATCH_KEYS) if (low.includes(k)) return { name: seg, hex: SWATCH_COLORS[k] };
+  for (const k of SWATCH_KEYS) {
+    if (low.includes(k)) {
+      const res = { name: seg, hex: SWATCH_COLORS[k] };
+      _parseColorCache.set(v, res);
+      return res;
+    }
+  }
+  _parseColorCache.set(v, null);
   return null;
 }
 
 // Short label for a quality/grade tier chip (screen & battery options).
 // The full variant text is still shown as the group subtitle and in the booking message.
+// Optimization: Pre-compile regexes and memoize results to bypass repeated execution
+// for the same variant string.
+const _tierLabelRegexDash = /^.*?[—–]\s*(.+)$/;
+const _tierLabelRegexNoun = /^(screen assembly|screen|battery|charge port)\b\s*/i;
+const _tierLabelRegexParenFull = /^\(.*\)$/;
+const _tierLabelCache = new Map();
+
 function tierLabel(r) {
   const original = cleanVariant(r.variant);
   if (!original) return 'Standard';
-  const dash = original.match(/^.*?[—–]\s*(.+)$/); // descriptor after the first em/en dash
+  const cached = _tierLabelCache.get(original);
+  if (cached !== undefined) return cached;
+
+  const dash = original.match(_tierLabelRegexDash); // descriptor after the first em/en dash
   let v;
   if (dash) {
     v = dash[1].trim();
     if (v.includes(' / ') && !v.includes('(')) v = v.split(' / ')[0].trim(); // drop "/ SOH 99–100%" specs
   } else {
     // No dash: strip only a bare leading repair noun, keep the distinguishing remainder.
-    let s = original.replace(/^(screen assembly|screen|battery|charge port)\b\s*/i, '').trim();
-    if (!s) return 'Standard';                       // variant was just "Battery", "Screen", …
-    if (/^\(.*\)$/.test(s)) s = s.slice(1, -1).trim();           // "(AMP)" → "AMP"
+    let s = original.replace(_tierLabelRegexNoun, '').trim();
+    if (!s) { _tierLabelCache.set(original, 'Standard'); return 'Standard'; } // variant was just "Battery", "Screen", …
+    if (_tierLabelRegexParenFull.test(s)) s = s.slice(1, -1).trim();           // "(AMP)" → "AMP"
     else if (s.includes(' (')) s = s.slice(0, s.indexOf(' (')).trim(); // "Inner Display (Main)" → "Inner Display"
     v = s;
   }
-  if (!v) return 'Standard';
-  return v.length > 30 ? v.slice(0, 29).trim() + '…' : v;
+  if (!v) { _tierLabelCache.set(original, 'Standard'); return 'Standard'; }
+  const res = v.length > 30 ? v.slice(0, 29).trim() + '…' : v;
+  _tierLabelCache.set(original, res);
+  return res;
 }
 
 // Group a device's repairs by repair type, cheapest first, deciding per group
@@ -206,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDialog();
   initShareQuote();
   loadData();
+  loadReviews();
 });
 
 async function loadData() {
@@ -226,7 +271,7 @@ async function loadData() {
     buildFilters();
     buildSpotlight(stats);
     renderGrid();
-    injectPriceSchema(repairs);
+    injectStructuredData(data);
   } catch (err) {
     console.error('[nuera] failed to load pricing:', err);
     grid.setAttribute('aria-busy', 'false');
@@ -1020,15 +1065,20 @@ function buildSpotlight(stats) {
 }
 
 // ===========================================================================
-// Runtime price-bearing structured data (kept out of static HTML per Rule 1)
+// Runtime structured data (kept out of static HTML per Rule 1)
 // ===========================================================================
-function injectPriceSchema(repairs) {
-  const prices = repairs.map((r) => r.price).filter((n) => typeof n === 'number');
-  if (!prices.length) return;
-  const node = {
-    '@context': 'https://schema.org',
+// One <script type="application/ld+json"> @graph injected after pricing loads:
+//  • a WebPage carrying dateModified (= the data's `generated` date) for freshness;
+//  • an aggregate repair Service; and
+//  • a per-repair-type Service (screen/battery/back glass/charge port), each with its
+//    own CAD price band. Specific, priced services read better to search + AI assistants
+//    than one catch-all node. No Review/AggregateRating here: self-hosted reviews are not
+//    eligible for review rich results on a LocalBusiness, so we display them as UI only.
+function serviceNode(name, serviceType, prices) {
+  return {
     '@type': 'Service',
-    name: 'Phone & tablet repair — Guelph',
+    name,
+    serviceType,
     provider: { '@id': 'https://nuera.talha-k.com/#business' },
     areaServed: { '@type': 'City', name: 'Guelph' },
     offers: {
@@ -1039,10 +1089,112 @@ function injectPriceSchema(repairs) {
       offerCount: prices.length,
     },
   };
+}
+
+function injectStructuredData(data) {
+  const repairs = Array.isArray(data?.repairs) ? data.repairs : [];
+  const graph = [];
+
+  if (typeof data?.generated === 'string') {
+    graph.push({
+      '@type': 'WebPage',
+      '@id': 'https://nuera.talha-k.com/#webpage',
+      url: 'https://nuera.talha-k.com/',
+      name: 'Nuera Tech — Guelph Phone Repair',
+      isPartOf: { '@id': 'https://nuera.talha-k.com/#website' },
+      about: { '@id': 'https://nuera.talha-k.com/#business' },
+      dateModified: data.generated,
+    });
+  }
+
+  const prices = repairs.map((r) => r.price).filter((n) => typeof n === 'number' && n > 0);
+  if (prices.length) {
+    graph.push(serviceNode('Phone & tablet repair — Guelph', 'Phone and tablet repair', prices));
+    for (const t of TYPES) {
+      if (t.id === 'all') continue;
+      const tp = repairs.filter((r) => r.chip === t.id).map((r) => r.price).filter((n) => typeof n === 'number' && n > 0);
+      if (tp.length) graph.push(serviceNode(`${SERVICE_NAME[t.id] || t.label} — Guelph`, SERVICE_NAME[t.id] || t.label, tp));
+    }
+  }
+
+  if (!graph.length) return;
   const s = document.createElement('script');
   s.type = 'application/ld+json';
-  s.textContent = JSON.stringify(node);
+  s.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
   document.head.appendChild(s);
+}
+
+// ===========================================================================
+// Reviews (runtime-fetched from /reviews.json, kept out of static HTML per Rule 1)
+// ===========================================================================
+// Progressive enhancement: the #reviews section + hero rating chip ship with a static
+// fallback so the page is never blank (and works with JS off / offline). On load we
+// fetch /reviews.json (synced from Google by cloud/reviews-sync) and replace the wall +
+// aggregate score with the live values. A failed fetch is non-fatal — the fallback stays.
+const initialsOf = (name) =>
+  String(name || '').trim().split(/\s+/).map((w) => w[0] || '').join('').slice(0, 2).toUpperCase() || 'G';
+
+function starFill(rating) { return Math.round((Math.max(0, Math.min(5, Number(rating) || 0)) / 5) * 100); }
+
+async function loadReviews() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 12000);
+    const res = await fetch(REVIEWS_URL, { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    renderReviews(await res.json());
+  } catch (err) {
+    // Non-fatal — leave the static fallback in #reviews as-is.
+    console.warn('[nuera] reviews unavailable, keeping static fallback:', err?.message || err);
+  }
+}
+
+function reviewCardHTML(r) {
+  const rating = Math.max(1, Math.min(5, Number(r.rating) || 5));
+  const who = esc(r.author || 'Google reviewer');
+  const initials = esc((r.initials || initialsOf(r.author)).slice(0, 2));
+  const meta = r.device || r.time || ''; // device tag (seed) or relative time (Google)
+  return `<figure class="review">
+      <div class="review-stars" role="img" aria-label="Rated ${rating} out of 5"><span class="stars-on" style="--fill:${starFill(rating)}%">★★★★★</span><span class="stars-off">★★★★★</span></div>
+      <blockquote>${esc(r.text)}</blockquote>
+      <figcaption><span class="review-avatar" aria-hidden="true">${initials}</span><span class="review-who"><b>${who}</b>${meta ? `<span class="review-device">${esc(meta)}</span>` : ''}</span></figcaption>
+    </figure>`;
+}
+
+function renderReviews(data) {
+  if (!data || typeof data !== 'object') return;
+  const rating = Number(data.rating);
+  const count = Number(data.review_count);
+
+  // Aggregate: #reviews summary + the hero rating chip (only with a sane score).
+  if (rating > 0 && rating <= 5) {
+    const score = rating.toFixed(1);
+    const fill = starFill(rating);
+    const summary = $('#reviews .rating-summary');
+    if (summary) {
+      summary.innerHTML =
+        `<span class="rating-score">${esc(score)}</span>`
+        + `<span class="rating-stars" role="img" aria-label="Average rating ${esc(score)} out of 5 stars">`
+        + `<span class="stars-on" style="--fill:${fill}%">★★★★★</span><span class="stars-off">★★★★★</span></span>`
+        + (count > 0 ? `<span class="rating-meta">from <b>${count}</b> Google reviews</span>` : '');
+    }
+    const chip = $('.hero-trust .rating-chip');
+    if (chip) {
+      chip.setAttribute('aria-label', `Rated ${score} out of 5 from Google reviews`);
+      chip.querySelector('.stars-on')?.style.setProperty('--fill', fill + '%');
+      const b = chip.querySelector('b'); if (b) b.textContent = score;
+    }
+  }
+
+  // The review wall.
+  const reviews = Array.isArray(data.reviews)
+    ? data.reviews.filter((r) => r && typeof r.text === 'string' && r.text.trim())
+    : [];
+  if (reviews.length) {
+    const wrap = $('#reviews .reviews');
+    if (wrap) wrap.innerHTML = reviews.map(reviewCardHTML).join('');
+  }
 }
 
 // ===========================================================================
@@ -1069,16 +1221,27 @@ function initScrollTop() {
 function initScrollProgress() {
   const bar = $('#scroll-progress-bar');
   if (!bar) return;
+
+  let maxScroll = 0;
+  const recalcMax = () => {
+    const doc = document.documentElement;
+    maxScroll = doc.scrollHeight - doc.clientHeight;
+  };
+  recalcMax();
+
+  // Recompute the max scroll height when the window resizes or body size changes.
+  addEventListener('resize', recalcMax, { passive: true });
+  if (window.ResizeObserver) {
+    new ResizeObserver(recalcMax).observe(document.body);
+  }
+
   let ticking = false;
   const update = () => {
-    const doc = document.documentElement;
-    const max = doc.scrollHeight - doc.clientHeight;
-    bar.style.setProperty('--p', (max > 0 ? Math.min(1, window.scrollY / max) : 0).toFixed(4));
+    bar.style.setProperty('--p', (maxScroll > 0 ? Math.min(1, window.scrollY / maxScroll) : 0).toFixed(4));
     ticking = false;
   };
   update();
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener('resize', update, { passive: true });
 }
 
 // "Open now / Closed" status + today-highlight for the Visit section. The #visit hours table is the
@@ -1234,10 +1397,12 @@ function onCVStateChange(e) { if (!e.skipped) reveal(e.currentTarget); }
 // viewport. Idempotent with the observer; `:not(.in)` keeps the normal scroll-stagger intact.
 function revealInView() {
   const vh = window.innerHeight || document.documentElement.clientHeight;
+  const toReveal = [];
   $$('.reveal:not(.in)').forEach((el) => {
     const r = el.getBoundingClientRect();
-    if (r.top < vh && r.bottom > -1) reveal(el);
+    if (r.top < vh && r.bottom > -1) toReveal.push(el);
   });
+  toReveal.forEach((el) => reveal(el));
 }
 // Belt-and-suspenders for a stalled WebKit opacity transition: an element can carry `.in` yet still
 // compute opacity:0 if the 0→1 transition never composited (seen after a scroll jump). Snap those
@@ -1245,10 +1410,12 @@ function revealInView() {
 // never per scroll frame, and never touches anything already painted.
 function settleReveal() {
   const vh = window.innerHeight || document.documentElement.clientHeight;
+  const toSettle = [];
   $$('.reveal.in:not(.reveal-shown)').forEach((el) => {
     const r = el.getBoundingClientRect();
-    if (r.top < vh && r.bottom > -1 && getComputedStyle(el).opacity === '0') el.classList.add('reveal-shown');
+    if (r.top < vh && r.bottom > -1 && getComputedStyle(el).opacity === '0') toSettle.push(el);
   });
+  toSettle.forEach((el) => el.classList.add('reveal-shown'));
 }
 function initReveal() {
   revealIO = new IntersectionObserver((ents) => {
