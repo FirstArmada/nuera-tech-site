@@ -636,7 +636,9 @@ function renderGrid({ resetPage = true } = {}) {
   if (loadMore) {
     const remaining = shown - visibleCount;
     loadMore.hidden = remaining <= 0;
-    if (remaining > 0) loadMore.setAttribute('aria-label', `Load ${Math.min(PAGE_SIZE, remaining)} more devices — ${remaining} remaining`);
+    // Lead the accessible name with the exact visible label ("Load More Devices") so it satisfies
+    // WCAG 2.5.3 (Label in Name) — axe's label-content-name-mismatch; the count is extra context.
+    if (remaining > 0) loadMore.setAttribute('aria-label', `Load More Devices — ${remaining} remaining`);
   }
 
   if (!shown) {
@@ -740,7 +742,10 @@ function cardHTML(d) {
   const save = d.maxSaving > 0
     ? `<div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs other shops</span></div>`
     : '';
-  return `<button class="card reveal" type="button" data-model="${esc(d.model)}" aria-label="View pricing for ${esc(d.model)}">
+  // No aria-label: the visible content (model, brand, per-type prices, savings, CTA) IS the
+  // accessible name. A custom label would drop that visible text and trip WCAG 2.5.3 (Label in
+  // Name) — axe's label-content-name-mismatch. Name-from-content keeps the two in sync.
+  return `<button class="card reveal" type="button" data-model="${esc(d.model)}">
     <div class="card-top">
       <span class="card-model">${esc(stripManufacturer(d.model, d.brand))}</span>
       <span class="brand-tag">${esc(manufacturer(d.brand))}</span>

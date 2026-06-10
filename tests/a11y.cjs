@@ -67,7 +67,14 @@ function startServer() {
     await page.waitForTimeout(120); // let layout settle after un-deferring content-visibility
     await page.addScriptTag({ content: axe.source });
     const results = await page.evaluate(async () =>
-      await window.axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] }));
+      await window.axe.run(document, {
+        runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'],
+        // label-content-name-mismatch maps to WCAG 2.1 A (2.5.3 Label in Name) but axe ships it
+        // tagged 'experimental', so the tag filter alone leaves it disabled. Opt in explicitly so
+        // this gate actually covers the WCAG 2.1 A/AA surface STYLEGUIDE.md promises — it's what
+        // catches a button/link whose visible text isn't part of its accessible name.
+        rules: { 'label-content-name-mismatch': { enabled: true } },
+      }));
     const v = results.violations || [];
     if (v.length) {
       console.error(`axe-core: ${v.length} WCAG 2.1 A/AA violation(s)`);
