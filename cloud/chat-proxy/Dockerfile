@@ -1,8 +1,8 @@
-# Cloud Run builds this with `gcloud run deploy --source`. Node 20, no build step.
-FROM node:20-slim
+# Cloud Run builds this with `gcloud run deploy --source`. Node 24, no build step.
+FROM node:24-slim
 WORKDIR /app
-COPY package.json ./
-RUN npm install --omit=dev
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 COPY . .
 ENV PORT=8080
 EXPOSE 8080
