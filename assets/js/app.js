@@ -3,7 +3,6 @@
  * WhatsApp number is fixed at +1 226 978 4666 (Rule 2).
  */
 const WA = '12269784666';
-const useSavingsMsg = Math.random() > 0.5;
 const DATA_URL = '/pricing-data.json';
 
 const BRANDS = [
@@ -743,15 +742,6 @@ function initDialog() {
     openDevice(card.dataset.model, card);
   });
   $('#detail-close').addEventListener('click', () => withViewTransition(() => dlg.close()));
-
-  const ctaAll = $('#detail-book-all');
-  if (ctaAll) {
-    ctaAll.addEventListener('click', () => {
-       // Check if the current href contains the word 'saving' to accurately track the variant shown
-       const variantShown = ctaAll.href.includes('saving') ? 'savings' : 'standard';
-       console.log('wa_click', { variant: variantShown });
-    });
-  }
   dlg.addEventListener('click', (e) => { if (e.target === dlg) withViewTransition(() => dlg.close()); }); // backdrop
   // Esc fires the dialog's native cancel/close (left un-wrapped → instant); the close listener below
   // still restores focus in every path.
@@ -830,36 +820,21 @@ function selLabel(g) {
 
 function bundleMsg(model, sel) {
   const { original, discount, final } = bundleTotals(sel);
-  let totalSavings = 0;
   const lines = sel.map((gi) => {
     const g = state.groups[gi]; const r = selOpt(g); const v = selLabel(g);
-    if (r.savings && r.savings > 0) {
-      totalSavings += Math.round(r.savings);
-    }
     return `• ${r.repair_type}${v ? ` (${v})` : ''} — ${moneyExact(r.price)}`;
   });
-
   if (sel.length < 2) {
-    if (useSavingsMsg && totalSavings > 0) {
-       const g = state.groups[sel[0]]; const r = selOpt(g); const v = selLabel(g);
-       return `Hi, I want to book a ${model} ${r.repair_type} repair for ${moneyExact(r.price)}, saving me ${moneyExact(totalSavings)}.`;
-    }
     return `Hi Nuera Tech! I'd like to book for my ${model}:\n${lines.join('\n')}\n• Total: ${moneyExact(final)}`;
   }
-
-  const msg = [
+  return [
     `Hi Nuera Tech! I'd like to book a bundle for my ${model}:`,
     ...lines,
     '',
     `Original total: ${moneyExact(original)}`,
     `Bundle discount: -${moneyExact(discount)}`,
     `You pay: ${moneyExact(final)}`,
-  ];
-
-  if (useSavingsMsg && totalSavings > 0) {
-      msg.push(`Total savings: ${moneyExact(totalSavings)}`);
-  }
-  return msg.join('\n');
+  ].join('\n');
 }
 
 // Add/remove a repair group from the bundle, sync its toggle button, refresh the summary.
