@@ -249,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initWhatsAppDefaults();
   initDialog();
   initShareQuote();
+  initSearchShortcut();
   loadData();
   loadReviews();
 });
@@ -408,6 +409,27 @@ function renderStats(stats) {
 }
 
 // ===========================================================================
+// Search shortcut: press "/" anywhere to jump to the finder search box.
+// ===========================================================================
+// Registered ONCE at boot (not inside buildFilters, which re-runs per data load).
+// Ignored while typing in a field, and while the device modal (<dialog open>) or the
+// chat panel is open, so it never yanks focus out of them. The visual "/" hint is
+// hidden on touch devices via CSS (@media (hover: none)).
+function initSearchShortcut() {
+  const input = $('#search');
+  if (!input) return;
+  addEventListener('keydown', (e) => {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const ae = document.activeElement;
+    if (ae === input || ae?.matches?.('input, textarea, select, [contenteditable]')) return;
+    if (document.querySelector('dialog[open], .nt-chat-panel:not([hidden])')) return; // modal/chat open
+    e.preventDefault();
+    input.focus({ preventScroll: true });
+    input.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+  });
+}
+
+// ===========================================================================
 // Filters
 // ===========================================================================
 function buildFilters() {
@@ -449,14 +471,6 @@ function buildFilters() {
   // search
   const input = $('#search');
   const clear = $('#search-clear');
-
-  addEventListener('keydown', (e) => {
-    if (e.key === '/' && document.activeElement !== input && !document.activeElement.matches('input, textarea')) {
-      e.preventDefault();
-      input.focus({ preventScroll: true });
-      input.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
-    }
-  });
 
   const onSearch = debounce(() => {
     state.q = input.value.trim().toLowerCase();
