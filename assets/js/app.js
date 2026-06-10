@@ -1060,16 +1060,27 @@ function initScrollTop() {
 function initScrollProgress() {
   const bar = $('#scroll-progress-bar');
   if (!bar) return;
+
+  let maxScroll = 0;
+  const recalcMax = () => {
+    const doc = document.documentElement;
+    maxScroll = doc.scrollHeight - doc.clientHeight;
+  };
+  recalcMax();
+
+  // Recompute the max scroll height when the window resizes or body size changes.
+  addEventListener('resize', recalcMax, { passive: true });
+  if (window.ResizeObserver) {
+    new ResizeObserver(recalcMax).observe(document.body);
+  }
+
   let ticking = false;
   const update = () => {
-    const doc = document.documentElement;
-    const max = doc.scrollHeight - doc.clientHeight;
-    bar.style.setProperty('--p', (max > 0 ? Math.min(1, window.scrollY / max) : 0).toFixed(4));
+    bar.style.setProperty('--p', (maxScroll > 0 ? Math.min(1, window.scrollY / maxScroll) : 0).toFixed(4));
     ticking = false;
   };
   update();
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener('resize', update, { passive: true });
 }
 
 // "Open now / Closed" status + today-highlight for the Visit section. The #visit hours table is the
@@ -1225,10 +1236,12 @@ function onCVStateChange(e) { if (!e.skipped) reveal(e.currentTarget); }
 // viewport. Idempotent with the observer; `:not(.in)` keeps the normal scroll-stagger intact.
 function revealInView() {
   const vh = window.innerHeight || document.documentElement.clientHeight;
+  const toReveal = [];
   $$('.reveal:not(.in)').forEach((el) => {
     const r = el.getBoundingClientRect();
-    if (r.top < vh && r.bottom > -1) reveal(el);
+    if (r.top < vh && r.bottom > -1) toReveal.push(el);
   });
+  toReveal.forEach((el) => reveal(el));
 }
 // Belt-and-suspenders for a stalled WebKit opacity transition: an element can carry `.in` yet still
 // compute opacity:0 if the 0→1 transition never composited (seen after a scroll jump). Snap those
@@ -1236,10 +1249,12 @@ function revealInView() {
 // never per scroll frame, and never touches anything already painted.
 function settleReveal() {
   const vh = window.innerHeight || document.documentElement.clientHeight;
+  const toSettle = [];
   $$('.reveal.in:not(.reveal-shown)').forEach((el) => {
     const r = el.getBoundingClientRect();
-    if (r.top < vh && r.bottom > -1 && getComputedStyle(el).opacity === '0') el.classList.add('reveal-shown');
+    if (r.top < vh && r.bottom > -1 && getComputedStyle(el).opacity === '0') toSettle.push(el);
   });
+  toSettle.forEach((el) => el.classList.add('reveal-shown'));
 }
 function initReveal() {
   revealIO = new IntersectionObserver((ents) => {
