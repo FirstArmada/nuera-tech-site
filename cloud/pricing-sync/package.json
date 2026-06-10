@@ -7,7 +7,8 @@
   "engines": { "node": ">=24" },
   "scripts": {
     "start": "node job.js",
-    "dry-run": "node job.js --dry-run"
+    "dry-run": "node job.js --dry-run",
+    "test": "node --test lib/*.test.js"
   },
   "dependencies": {
     "@google-cloud/secret-manager": "^6.1.3",
