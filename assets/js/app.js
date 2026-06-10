@@ -404,6 +404,15 @@ function buildFilters() {
   // search
   const input = $('#search');
   const clear = $('#search-clear');
+
+  addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement !== input && !document.activeElement.matches('input, textarea')) {
+      e.preventDefault();
+      input.focus({ preventScroll: true });
+      input.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+    }
+  });
+
   const onSearch = debounce(() => {
     state.q = input.value.trim().toLowerCase();
     clear.classList.toggle('show', input.value.length > 0);
