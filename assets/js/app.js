@@ -18,9 +18,17 @@ const MANUFACTURER = { iphone: 'Apple', ipad: 'Apple', samsung: 'Samsung', 'sams
 const manufacturer = (b) => MANUFACTURER[b] || brandLabel(b);
 // Strip a leading manufacturer word so the card title doesn't echo the badge
 // ("Samsung Galaxy S20" → "Galaxy S20", "Google Pixel 10" → "Pixel 10"; Apple names are untouched).
+// Optimization: Cache RegExp objects per manufacturer to avoid recompiling on every card render.
+const _stripManufacturerRegexCache = new Map();
 const stripManufacturer = (model, b) => {
   const m = MANUFACTURER[b];
-  return m ? model.replace(new RegExp(`^${m}\\s+`, 'i'), '') : model;
+  if (!m) return model;
+  let reg = _stripManufacturerRegexCache.get(m);
+  if (!reg) {
+    reg = new RegExp(`^${m}\\s+`, 'i');
+    _stripManufacturerRegexCache.set(m, reg);
+  }
+  return model.replace(reg, '');
 };
 const TYPES = [
   { id: 'all', label: 'All repairs' },
@@ -128,37 +136,70 @@ function pulseResultCount(el) {
 // Pull a paint colour out of a back-glass variant string, e.g.
 // "Back Glass (No Logo) — Titanium Natural" → { name:"Titanium Natural", hex:"#b9a894" }.
 // Returns null when no known colour is found (caller falls back to text chips).
+// Optimization: Pre-compile regexes and memoize results. Since there are many duplicate variant
+// strings across devices, caching avoids redundant parsing and substring searching during render.
+const _parseColorRegexSplit = /—|–/;
+const _parseColorRegexParen = /\(.*?\)/g;
+const _parseColorRegexNoise = /no logo|large camera hole|back glass|service pack/gi;
+const _parseColorRegexWs = /\s+/g;
+const _parseColorCache = new Map();
+
 function parseColor(variant) {
   const v = cleanVariant(variant);
   if (!v) return null;
-  const parts = v.split(/—|–/); // text after the last em/en dash carries the colour
-  const seg = parts[parts.length - 1].replace(/\(.*?\)/g, ' ').replace(/no logo|large camera hole|back glass|service pack/gi, ' ').replace(/\s+/g, ' ').trim();
-  if (!seg) return null;
+  const cached = _parseColorCache.get(v);
+  if (cached !== undefined) return cached;
+
+  const parts = v.split(_parseColorRegexSplit); // text after the last em/en dash carries the colour
+  const seg = parts[parts.length - 1].replace(_parseColorRegexParen, ' ').replace(_parseColorRegexNoise, ' ').replace(_parseColorRegexWs, ' ').trim();
+  if (!seg) {
+    _parseColorCache.set(v, null);
+    return null;
+  }
   const low = seg.toLowerCase();
-  for (const k of SWATCH_KEYS) if (low.includes(k)) return { name: seg, hex: SWATCH_COLORS[k] };
+  for (const k of SWATCH_KEYS) {
+    if (low.includes(k)) {
+      const res = { name: seg, hex: SWATCH_COLORS[k] };
+      _parseColorCache.set(v, res);
+      return res;
+    }
+  }
+  _parseColorCache.set(v, null);
   return null;
 }
 
 // Short label for a quality/grade tier chip (screen & battery options).
 // The full variant text is still shown as the group subtitle and in the booking message.
+// Optimization: Pre-compile regexes and memoize results to bypass repeated execution
+// for the same variant string.
+const _tierLabelRegexDash = /^.*?[—–]\s*(.+)$/;
+const _tierLabelRegexNoun = /^(screen assembly|screen|battery|charge port)\b\s*/i;
+const _tierLabelRegexParenFull = /^\(.*\)$/;
+const _tierLabelCache = new Map();
+
 function tierLabel(r) {
   const original = cleanVariant(r.variant);
   if (!original) return 'Standard';
-  const dash = original.match(/^.*?[—–]\s*(.+)$/); // descriptor after the first em/en dash
+  const cached = _tierLabelCache.get(original);
+  if (cached !== undefined) return cached;
+
+  const dash = original.match(_tierLabelRegexDash); // descriptor after the first em/en dash
   let v;
   if (dash) {
     v = dash[1].trim();
     if (v.includes(' / ') && !v.includes('(')) v = v.split(' / ')[0].trim(); // drop "/ SOH 99–100%" specs
   } else {
     // No dash: strip only a bare leading repair noun, keep the distinguishing remainder.
-    let s = original.replace(/^(screen assembly|screen|battery|charge port)\b\s*/i, '').trim();
-    if (!s) return 'Standard';                       // variant was just "Battery", "Screen", …
-    if (/^\(.*\)$/.test(s)) s = s.slice(1, -1).trim();           // "(AMP)" → "AMP"
+    let s = original.replace(_tierLabelRegexNoun, '').trim();
+    if (!s) { _tierLabelCache.set(original, 'Standard'); return 'Standard'; } // variant was just "Battery", "Screen", …
+    if (_tierLabelRegexParenFull.test(s)) s = s.slice(1, -1).trim();           // "(AMP)" → "AMP"
     else if (s.includes(' (')) s = s.slice(0, s.indexOf(' (')).trim(); // "Inner Display (Main)" → "Inner Display"
     v = s;
   }
-  if (!v) return 'Standard';
-  return v.length > 30 ? v.slice(0, 29).trim() + '…' : v;
+  if (!v) { _tierLabelCache.set(original, 'Standard'); return 'Standard'; }
+  const res = v.length > 30 ? v.slice(0, 29).trim() + '…' : v;
+  _tierLabelCache.set(original, res);
+  return res;
 }
 
 // Group a device's repairs by repair type, cheapest first, deciding per group
