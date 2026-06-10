@@ -446,7 +446,7 @@ function buildFilters() {
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
     .filter((t) => t.id === 'all' || state.devices.some((d) => d.types.has(t.id)))
-    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
+    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}<span class="cnt">${counts('type', t.id)}</span></button>`)
     .join('');
 
   brandWrap.addEventListener('click', (e) => {
@@ -633,10 +633,19 @@ function renderGrid({ resetPage = true } = {}) {
 
   // "Load More" is offered only while unshown matches remain.
   const loadMore = $('#load-more');
+  const remaining = shown - visibleCount;
   if (loadMore) {
-    const remaining = shown - visibleCount;
     loadMore.hidden = remaining <= 0;
-    if (remaining > 0) loadMore.setAttribute('aria-label', `Load ${Math.min(PAGE_SIZE, remaining)} more devices — ${remaining} remaining`);
+    // Accessible name leads with the visible label ("Load More Devices") so voice control and
+    // WCAG 2.5.3 (Label in Name) match; the count detail follows.
+    if (remaining > 0) loadMore.setAttribute('aria-label', `Load More Devices — ${Math.min(PAGE_SIZE, remaining)} more, ${remaining} remaining`);
+  }
+  // Visible "Showing X of Y" pager hint. aria-hidden: #result-count (live region) and the
+  // button's aria-label already convey this to assistive tech. Gated like the button.
+  const loadProgress = $('#load-progress');
+  if (loadProgress) {
+    loadProgress.hidden = remaining <= 0;
+    if (remaining > 0) loadProgress.textContent = `Showing ${Math.min(visibleCount, shown)} of ${shown} devices`;
   }
 
   if (!shown) {
