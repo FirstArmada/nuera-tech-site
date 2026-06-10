@@ -4,9 +4,6 @@
  */
 const WA = '12269784666';
 const DATA_URL = '/pricing-data.json';
-const REVIEWS_URL = '/reviews.json';
-// Schema.org Service names per repair type — used for the per-type Service structured data.
-const SERVICE_NAME = { screen: 'Screen replacement', battery: 'Battery replacement', backglass: 'Back glass replacement', chargeport: 'Charge port repair' };
 
 const BRANDS = [
   { id: 'all', label: 'All' },
@@ -249,9 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initWhatsAppDefaults();
   initDialog();
   initShareQuote();
-  initSearchShortcut();
   loadData();
-  loadReviews();
 });
 
 async function loadData() {
@@ -272,7 +267,7 @@ async function loadData() {
     buildFilters();
     buildSpotlight(stats);
     renderGrid();
-    injectStructuredData(data);
+    injectPriceSchema(repairs);
   } catch (err) {
     console.error('[nuera] failed to load pricing:', err);
     grid.setAttribute('aria-busy', 'false');
@@ -409,27 +404,6 @@ function renderStats(stats) {
 }
 
 // ===========================================================================
-// Search shortcut: press "/" anywhere to jump to the finder search box.
-// ===========================================================================
-// Registered ONCE at boot (not inside buildFilters, which re-runs per data load).
-// Ignored while typing in a field, and while the device modal (<dialog open>) or the
-// chat panel is open, so it never yanks focus out of them. The visual "/" hint is
-// hidden on touch devices via CSS (@media (hover: none)).
-function initSearchShortcut() {
-  const input = $('#search');
-  if (!input) return;
-  addEventListener('keydown', (e) => {
-    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
-    const ae = document.activeElement;
-    if (ae === input || ae?.matches?.('input, textarea, select, [contenteditable]')) return;
-    if (document.querySelector('dialog[open], .nt-chat-panel:not([hidden])')) return; // modal/chat open
-    e.preventDefault();
-    input.focus({ preventScroll: true });
-    input.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
-  });
-}
-
-// ===========================================================================
 // Filters
 // ===========================================================================
 function buildFilters() {
@@ -471,6 +445,14 @@ function buildFilters() {
   // search
   const input = $('#search');
   const clear = $('#search-clear');
+
+  addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement !== input && !document.activeElement.matches('input, textarea')) {
+      e.preventDefault();
+      input.focus({ preventScroll: true });
+      input.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+    }
+  });
 
   const onSearch = debounce(() => {
     state.q = input.value.trim().toLowerCase();
@@ -1079,20 +1061,15 @@ function buildSpotlight(stats) {
 }
 
 // ===========================================================================
-// Runtime structured data (kept out of static HTML per Rule 1)
+// Runtime price-bearing structured data (kept out of static HTML per Rule 1)
 // ===========================================================================
-// One <script type="application/ld+json"> @graph injected after pricing loads:
-//  • a WebPage carrying dateModified (= the data's `generated` date) for freshness;
-//  • an aggregate repair Service; and
-//  • a per-repair-type Service (screen/battery/back glass/charge port), each with its
-//    own CAD price band. Specific, priced services read better to search + AI assistants
-//    than one catch-all node. No Review/AggregateRating here: self-hosted reviews are not
-//    eligible for review rich results on a LocalBusiness, so we display them as UI only.
-function serviceNode(name, serviceType, prices) {
-  return {
+function injectPriceSchema(repairs) {
+  const prices = repairs.map((r) => r.price).filter((n) => typeof n === 'number');
+  if (!prices.length) return;
+  const node = {
+    '@context': 'https://schema.org',
     '@type': 'Service',
-    name,
-    serviceType,
+    name: 'Phone & tablet repair — Guelph',
     provider: { '@id': 'https://nuera.talha-k.com/#business' },
     areaServed: { '@type': 'City', name: 'Guelph' },
     offers: {
@@ -1103,112 +1080,10 @@ function serviceNode(name, serviceType, prices) {
       offerCount: prices.length,
     },
   };
-}
-
-function injectStructuredData(data) {
-  const repairs = Array.isArray(data?.repairs) ? data.repairs : [];
-  const graph = [];
-
-  if (typeof data?.generated === 'string') {
-    graph.push({
-      '@type': 'WebPage',
-      '@id': 'https://nuera.talha-k.com/#webpage',
-      url: 'https://nuera.talha-k.com/',
-      name: 'Nuera Tech — Guelph Phone Repair',
-      isPartOf: { '@id': 'https://nuera.talha-k.com/#website' },
-      about: { '@id': 'https://nuera.talha-k.com/#business' },
-      dateModified: data.generated,
-    });
-  }
-
-  const prices = repairs.map((r) => r.price).filter((n) => typeof n === 'number' && n > 0);
-  if (prices.length) {
-    graph.push(serviceNode('Phone & tablet repair — Guelph', 'Phone and tablet repair', prices));
-    for (const t of TYPES) {
-      if (t.id === 'all') continue;
-      const tp = repairs.filter((r) => r.chip === t.id).map((r) => r.price).filter((n) => typeof n === 'number' && n > 0);
-      if (tp.length) graph.push(serviceNode(`${SERVICE_NAME[t.id] || t.label} — Guelph`, SERVICE_NAME[t.id] || t.label, tp));
-    }
-  }
-
-  if (!graph.length) return;
   const s = document.createElement('script');
   s.type = 'application/ld+json';
-  s.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+  s.textContent = JSON.stringify(node);
   document.head.appendChild(s);
-}
-
-// ===========================================================================
-// Reviews (runtime-fetched from /reviews.json, kept out of static HTML per Rule 1)
-// ===========================================================================
-// Progressive enhancement: the #reviews section + hero rating chip ship with a static
-// fallback so the page is never blank (and works with JS off / offline). On load we
-// fetch /reviews.json (synced from Google by cloud/reviews-sync) and replace the wall +
-// aggregate score with the live values. A failed fetch is non-fatal — the fallback stays.
-const initialsOf = (name) =>
-  String(name || '').trim().split(/\s+/).map((w) => w[0] || '').join('').slice(0, 2).toUpperCase() || 'G';
-
-function starFill(rating) { return Math.round((Math.max(0, Math.min(5, Number(rating) || 0)) / 5) * 100); }
-
-async function loadReviews() {
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 12000);
-    const res = await fetch(REVIEWS_URL, { signal: ctrl.signal });
-    clearTimeout(t);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    renderReviews(await res.json());
-  } catch (err) {
-    // Non-fatal — leave the static fallback in #reviews as-is.
-    console.warn('[nuera] reviews unavailable, keeping static fallback:', err?.message || err);
-  }
-}
-
-function reviewCardHTML(r) {
-  const rating = Math.max(1, Math.min(5, Number(r.rating) || 5));
-  const who = esc(r.author || 'Google reviewer');
-  const initials = esc((r.initials || initialsOf(r.author)).slice(0, 2));
-  const meta = r.device || r.time || ''; // device tag (seed) or relative time (Google)
-  return `<figure class="review">
-      <div class="review-stars" role="img" aria-label="Rated ${rating} out of 5"><span class="stars-on" style="--fill:${starFill(rating)}%">★★★★★</span><span class="stars-off">★★★★★</span></div>
-      <blockquote>${esc(r.text)}</blockquote>
-      <figcaption><span class="review-avatar" aria-hidden="true">${initials}</span><span class="review-who"><b>${who}</b>${meta ? `<span class="review-device">${esc(meta)}</span>` : ''}</span></figcaption>
-    </figure>`;
-}
-
-function renderReviews(data) {
-  if (!data || typeof data !== 'object') return;
-  const rating = Number(data.rating);
-  const count = Number(data.review_count);
-
-  // Aggregate: #reviews summary + the hero rating chip (only with a sane score).
-  if (rating > 0 && rating <= 5) {
-    const score = rating.toFixed(1);
-    const fill = starFill(rating);
-    const summary = $('#reviews .rating-summary');
-    if (summary) {
-      summary.innerHTML =
-        `<span class="rating-score">${esc(score)}</span>`
-        + `<span class="rating-stars" role="img" aria-label="Average rating ${esc(score)} out of 5 stars">`
-        + `<span class="stars-on" style="--fill:${fill}%">★★★★★</span><span class="stars-off">★★★★★</span></span>`
-        + (count > 0 ? `<span class="rating-meta">from <b>${count}</b> Google reviews</span>` : '');
-    }
-    const chip = $('.hero-trust .rating-chip');
-    if (chip) {
-      chip.setAttribute('aria-label', `Rated ${score} out of 5 from Google reviews`);
-      chip.querySelector('.stars-on')?.style.setProperty('--fill', fill + '%');
-      const b = chip.querySelector('b'); if (b) b.textContent = score;
-    }
-  }
-
-  // The review wall.
-  const reviews = Array.isArray(data.reviews)
-    ? data.reviews.filter((r) => r && typeof r.text === 'string' && r.text.trim())
-    : [];
-  if (reviews.length) {
-    const wrap = $('#reviews .reviews');
-    if (wrap) wrap.innerHTML = reviews.map(reviewCardHTML).join('');
-  }
 }
 
 // ===========================================================================

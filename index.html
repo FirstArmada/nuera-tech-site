@@ -825,7 +825,7 @@
     "priceRange":"$$",
     "currenciesAccepted":"CAD",
     "address":{"@type":"PostalAddress","addressLocality":"Guelph","addressRegion":"ON","addressCountry":"CA"},
-    "areaServed":[{"@type":"City","name":"Guelph"},{"@type":"City","name":"Fergus"},{"@type":"City","name":"Elora"},{"@type":"City","name":"Rockwood"},{"@type":"AdministrativeArea","name":"Wellington County, Ontario"}],
+    "areaServed":[{"@type":"City","name":"Guelph"},{"@type":"AdministrativeArea","name":"Wellington County, Ontario"}],
     "sameAs":["https://www.instagram.com/nueratech"],
     "knowsAbout":["iPhone repair","Samsung Galaxy repair","Google Pixel repair","iPad repair","screen replacement","battery replacement","back glass replacement","charge port repair"],
     "makesOffer":{"@type":"Offer","itemOffered":{"@type":"Service","name":"Mobile device repair","serviceType":"Phone and tablet repair"},"warranty":{"@type":"WarrantyPromise","durationOfWarranty":{"@type":"QuantitativeValue","value":90,"unitCode":"DAY"}}}
@@ -833,7 +833,7 @@
   </script>
   <script type="application/ld+json">
   {
-    "@context":"https://schema.org","@type":"WebSite","@id":"https://nuera.talha-k.com/#website","name":"Nuera Tech","url":"https://nuera.talha-k.com/",
+    "@context":"https://schema.org","@type":"WebSite","name":"Nuera Tech","url":"https://nuera.talha-k.com/",
     "potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://nuera.talha-k.com/?q={query}"},"query-input":"required name=query"}
   }
   </script>
@@ -845,9 +845,7 @@
       {"@type":"Question","name":"What warranty do you offer on repairs?","acceptedAnswer":{"@type":"Answer","text":"Every repair is backed by a 90-day warranty covering both parts and labour. If something related to the repair fails within that window, we make it right."}},
       {"@type":"Question","name":"What devices do you repair?","acceptedAnswer":{"@type":"Answer","text":"We repair iPhone, Samsung Galaxy phones and tablets, Google Pixel, and iPad — screens, batteries, back glass and charge ports. Search your exact model on our site to see live pricing."}},
       {"@type":"Question","name":"How do I book a repair?","acceptedAnswer":{"@type":"Answer","text":"Find your device and repair on the site, then tap Book on WhatsApp. Your message is pre-filled with the device and repair so we can confirm price and timing in seconds."}},
-      {"@type":"Question","name":"Do you use quality parts?","acceptedAnswer":{"@type":"Answer","text":"Yes. We use premium aftermarket and OEM-grade parts appropriate to each device, and we're transparent about the part option for every repair."}},
-      {"@type":"Question","name":"Will my data be safe?","acceptedAnswer":{"@type":"Answer","text":"Screen, battery, back glass and charge-port repairs don't require wiping your device. We recommend a backup before any repair as good practice, and we never access personal data."}},
-      {"@type":"Question","name":"How much does a phone repair cost in Guelph?","acceptedAnswer":{"@type":"Answer","text":"Every screen, battery, back glass and charge-port price is listed live on our site — search your exact model to see our price and how much you save versus other shops. Most iPhone and Samsung screen and battery repairs are same-day and well below mall-shop pricing."}}
+      {"@type":"Question","name":"Do you use quality parts?","acceptedAnswer":{"@type":"Answer","text":"Yes. We use premium aftermarket and OEM-grade parts appropriate to each device, and we're transparent about the part option for every repair."}}
     ]
   }
   </script>
@@ -928,8 +926,7 @@
     <section class="hero wrap reveal">
       <div class="hero-trust">
         <span class="badge"><span class="dot" aria-hidden="true"></span> Guelph, ON · Same-day repairs · 90-day warranty</span>
-        <!-- Fallback rating — the live score + star fill come from /reviews.json at runtime
-             (renderReviews in app.js). This static value shows only if that fetch fails or JS is off. -->
+        <!-- PLACEHOLDER rating — set the score + star fill to match your real Google rating. -->
         <span class="rating-chip" role="img" aria-label="Rated 4.9 out of 5 from Google reviews">
           <span class="stars" aria-hidden="true"><span class="stars-on" style="--fill:98%">★★★★★</span><span class="stars-off">★★★★★</span></span>
           <b>4.9</b><span class="rating-src">Google reviews</span>
@@ -1068,10 +1065,9 @@
     </section>
 
     <!-- REVIEWS / SOCIAL PROOF -->
-    <!-- The aggregate score and the cards below are a static FALLBACK. At runtime renderReviews() in
-         app.js replaces them with live data from /reviews.json (synced from the Google Business
-         Profile by cloud/reviews-sync). To change what's shown, edit /reviews.json — not this markup.
-         This fallback is what renders if that fetch fails or JS is off, so keep it sensible. -->
+    <!-- PLACEHOLDER CONTENT — swap the names, devices, quotes and star fills below for your real
+         Google reviews before merging, and update the aggregate score + count to match. Keep one
+         <figure class="review"> per card; keep each star block's aria-label in sync with its rating. -->
     <section id="reviews" class="wrap reveal" aria-labelledby="reviews-h" style="padding-top:var(--space-8)">
       <span class="eyebrow">Loved in Guelph</span>
       <h2 id="reviews-h">Rated by the people we've fixed up</h2>
@@ -1148,7 +1144,6 @@
       <span class="eyebrow">Come say hi</span>
       <h2 id="visit-h">Visit us in Guelph</h2>
       <p class="lead-muted">Walk-ins welcome — most screen &amp; battery repairs are done while you wait. Here's where to find us and when we're open.</p>
-      <p class="lead-muted">Proudly based in Guelph, Ontario and serving the wider community — Wellington County, the University of Guelph and downtown, plus nearby Fergus, Elora and Rockwood. Same-day iPhone, Samsung, Pixel and iPad repair, all backed by our 90-day warranty.</p>
       <div class="visit-grid">
         <div class="visit-card visit-info">
           <span class="visit-status" id="visit-status" data-state="">Checking hours…</span>
@@ -1210,14 +1205,6 @@
         <details class="qa">
           <summary><span>Will my data be safe?</span><span class="qa-ic" aria-hidden="true"></span></summary>
           <div class="qa-wrap"><div class="body">Screen, battery, back glass and charge-port repairs don't require wiping your device. We recommend a backup before any repair as good practice, and we never access personal data.</div></div>
-        </details>
-        <details class="qa">
-          <summary><span>Do you use quality parts?</span><span class="qa-ic" aria-hidden="true"></span></summary>
-          <div class="qa-wrap"><div class="body">Yes. We use premium aftermarket and OEM-grade parts appropriate to each device, and we're transparent about the part option for every repair.</div></div>
-        </details>
-        <details class="qa">
-          <summary><span>How much does a phone repair cost in Guelph?</span><span class="qa-ic" aria-hidden="true"></span></summary>
-          <div class="qa-wrap"><div class="body">Every screen, battery, back glass and charge-port price is listed live on our site — search your exact model to see our price and how much you save versus other shops. Most iPhone and Samsung screen and battery repairs are same-day and well below mall-shop pricing.</div></div>
         </details>
       </div>
     </section>
