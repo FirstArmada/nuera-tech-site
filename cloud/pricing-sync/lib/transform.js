@@ -26,10 +26,15 @@ export const pctLess = (saved, base) => Math.round((saved / base) * 100);
 // Mirrors app.js computeSavingsStats exactly; app.js falls back to deriving when absent.
 export function computeStats(repairs) {
   const withMk = repairs.filter((r) => r.mk_price != null && r.mk_price > 0 && r.savings != null);
-  const maxSaving = withMk.length ? Math.max(...withMk.map((r) => r.savings)) : 0;
-  const avgPct = withMk.length
-    ? Math.round(withMk.reduce((a, r) => a + pctLess(r.savings, r.mk_price), 0) / withMk.length)
-    : 0;
+  // Single pass for max saving + the % sum (was three traversals: map+max, reduce).
+  let maxSaving = withMk.length ? -Infinity : 0;
+  let sumPct = 0;
+  for (let i = 0; i < withMk.length; i++) {
+    const r = withMk[i];
+    if (r.savings > maxSaving) maxSaving = r.savings;
+    sumPct += pctLess(r.savings, r.mk_price);
+  }
+  const avgPct = withMk.length ? Math.round(sumPct / withMk.length) : 0;
   const top = [...withMk]
     .sort((a, b) => b.savings - a.savings)
     .slice(0, 6)

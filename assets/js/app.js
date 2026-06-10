@@ -345,19 +345,26 @@ function buildModel(repairs) {
     d.types.add(r.chip);
   }
   for (const d of map.values()) {
-    d.minPrice = Math.min(...d.repairs.map((r) => r.price));
-    d.maxSaving = Math.max(0, ...d.repairs.map((r) => r.savings || 0));
-    // Per repair type: cheapest price, shown on the card.
-    const byType = new Map(); // Map<chip, minPrice>
+    // Single pass over the device's repairs: min price, max saving, cheapest-per-type,
+    // and the repair-type words for the search index (was several separate .map() passes).
+    let minPrice = Infinity;
+    let maxSaving = 0;
+    const byType = new Map(); // Map<chip, minPrice> — cheapest price per repair type, shown on the card.
+    const rtypeWords = [];
     for (const r of d.repairs) {
+      if (r.price < minPrice) minPrice = r.price;
+      const saving = r.savings || 0;
+      if (saving > maxSaving) maxSaving = saving;
       const cur = byType.get(r.chip);
       if (cur == null || r.price < cur) byType.set(r.chip, r.price);
+      rtypeWords.push(r.repair_type);
     }
+    d.minPrice = minPrice === Infinity ? 0 : minPrice;
+    d.maxSaving = maxSaving;
     d.priceByType = byType;
     // Search index — model + brand names + every repair type (id, chip label, full repair_type)
     // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
     const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
-    const rtypeWords = d.repairs.map((r) => r.repair_type);
     d.search = [d.model, manufacturer(d.brand), brandLabel(d.brand), ...typeWords, ...rtypeWords]
       .join(' ').toLowerCase();
   }
@@ -378,10 +385,15 @@ function usePrecomputedStats(data) {
 
 function computeSavingsStats(repairs) {
   const withMk = repairs.filter((r) => r.mk_price != null && r.mk_price > 0 && r.savings != null);
-  const maxSaving = withMk.length ? Math.max(...withMk.map((r) => r.savings)) : 0;
-  const avgPct = withMk.length
-    ? Math.round(withMk.reduce((a, r) => a + pctLess(r.savings, r.mk_price), 0) / withMk.length)
-    : 0;
+  // Single pass for max saving + the % sum (was three traversals: map+max, reduce).
+  let maxSaving = withMk.length ? -Infinity : 0;
+  let sumPct = 0;
+  for (let i = 0; i < withMk.length; i++) {
+    const r = withMk[i];
+    if (r.savings > maxSaving) maxSaving = r.savings;
+    sumPct += pctLess(r.savings, r.mk_price);
+  }
+  const avgPct = withMk.length ? Math.round(sumPct / withMk.length) : 0;
   const top = [...withMk].sort((a, b) => b.savings - a.savings);
   return { withMk, maxSaving, avgPct, top };
 }
@@ -429,19 +441,25 @@ function initSearchShortcut() {
 // Filters
 // ===========================================================================
 function buildFilters() {
-  const counts = (key, val) => state.devices.filter((d) =>
-    key === 'brand' ? (val === 'all' || d.brand === val)
-                    : (val === 'all' || d.types.has(val))).length;
+  // One pass to tally devices per brand and per repair type, instead of re-scanning
+  // state.devices for every pill (was O(brands × devices) + O(types × devices)).
+  const brandCounts = { all: state.devices.length };
+  const typeCounts = { all: state.devices.length };
+  for (let i = 0; i < state.devices.length; i++) {
+    const d = state.devices[i];
+    brandCounts[d.brand] = (brandCounts[d.brand] || 0) + 1;
+    for (const t of d.types) typeCounts[t] = (typeCounts[t] || 0) + 1;
+  }
 
   const brandWrap = $('#brand-filters');
   brandWrap.innerHTML = BRANDS
-    .filter((b) => b.id === 'all' || state.devices.some((d) => d.brand === b.id))
-    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${counts('brand', b.id)}</span></button>`)
+    .filter((b) => b.id === 'all' || brandCounts[b.id])
+    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${brandCounts[b.id] || 0}</span></button>`)
     .join('');
 
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
-    .filter((t) => t.id === 'all' || state.devices.some((d) => d.types.has(t.id)))
+    .filter((t) => t.id === 'all' || typeCounts[t.id])
     .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
     .join('');
 
