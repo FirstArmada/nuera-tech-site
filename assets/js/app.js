@@ -344,19 +344,30 @@ function buildModel(repairs) {
     d.types.add(r.chip);
   }
   for (const d of map.values()) {
-    d.minPrice = Math.min(...d.repairs.map((r) => r.price));
-    d.maxSaving = Math.max(0, ...d.repairs.map((r) => r.savings || 0));
+    let minPrice = Infinity;
+    let maxSaving = 0;
     // Per repair type: cheapest price, shown on the card.
     const byType = new Map(); // Map<chip, minPrice>
+    const rtypeWords = [];
+
     for (const r of d.repairs) {
+      if (r.price < minPrice) minPrice = r.price;
+      const saving = r.savings || 0;
+      if (saving > maxSaving) maxSaving = saving;
+
       const cur = byType.get(r.chip);
       if (cur == null || r.price < cur) byType.set(r.chip, r.price);
+
+      rtypeWords.push(r.repair_type);
     }
+
+    d.minPrice = minPrice === Infinity ? 0 : minPrice;
+    d.maxSaving = maxSaving;
     d.priceByType = byType;
+
     // Search index — model + brand names + every repair type (id, chip label, full repair_type)
     // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
     const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
-    const rtypeWords = d.repairs.map((r) => r.repair_type);
     d.search = [d.model, manufacturer(d.brand), brandLabel(d.brand), ...typeWords, ...rtypeWords]
       .join(' ').toLowerCase();
   }

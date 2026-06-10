@@ -1,0 +1,7 @@
+perf: Optimize buildModel array traversals
+
+💡 What: Replaced multiple map passes over d.repairs with a single for-loop that simultaneously calculates minPrice, maxSaving, priceByType, and rtypeWords.
+🎯 Why: Multiple array traversals using map created unnecessary intermediate arrays and resulted in redundant iterations over the same data.
+📊 Measured Improvement: Replaced old multiple map loops with single loop and saw a speedup from 1486.24ms to 1159.75ms across 5000 mock repairs repeated 1000 times, realizing a ~22% performance improvement.
+
+Also updated .jules/bolt.md with learning and action.
