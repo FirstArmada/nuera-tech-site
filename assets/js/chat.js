@@ -31,7 +31,7 @@ function waHref(text) {
 // Escape text, then upgrade any wa.me links the assistant returns into buttons.
 function renderReply(text) {
   const safe = esc(text).replace(/\n/g, '<br>');
-  return safe.replace(/https:\/\/wa\.me\/\d+[^\s<]*/g, (url) =>
+  return safe.replace(/https:\/\/wa\.me\/\d+(?:(?!&quot;|&#39;|&lt;|&gt;|<)[^\s])*/g, (url) =>
     `<a class="nt-chat-wa" href="${url}" target="_blank" rel="noopener">Book on WhatsApp</a>`);
 }
 
