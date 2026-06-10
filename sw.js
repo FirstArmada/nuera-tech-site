@@ -4,7 +4,7 @@
  * (immutable). pricing-data.json uses stale-while-revalidate: still fetched at runtime,
  * just served fast from cache then refreshed in the background (Rule 1 intact).
  */
-const VERSION = 'nuera-v7';
+const VERSION = 'nuera-v8';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
@@ -46,8 +46,9 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return; // let cross-origin (analytics, etc.) pass through
 
-  // Live pricing: stale-while-revalidate
-  if (url.pathname === '/pricing-data.json') {
+  // Runtime JSON (live pricing + reviews): stale-while-revalidate — served fast from cache,
+  // refreshed in the background (still fetched at runtime, so Rule 1 holds).
+  if (url.pathname === '/pricing-data.json' || url.pathname === '/reviews.json') {
     e.respondWith(staleWhileRevalidate(e));
     return;
   }
