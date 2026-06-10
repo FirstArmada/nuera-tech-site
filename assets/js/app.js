@@ -636,7 +636,7 @@ function renderGrid({ resetPage = true } = {}) {
   if (loadMore) {
     const remaining = shown - visibleCount;
     loadMore.hidden = remaining <= 0;
-    if (remaining > 0) loadMore.setAttribute('aria-label', `Load ${Math.min(PAGE_SIZE, remaining)} more devices — ${remaining} remaining`);
+    if (remaining > 0) loadMore.setAttribute('aria-label', `Load More Devices: ${Math.min(PAGE_SIZE, remaining)} more available, ${remaining} remaining`);
   }
 
   if (!shown) {
