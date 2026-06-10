@@ -15,25 +15,60 @@ export const CHIP_LABEL = { screen: 'Screen', battery: 'Battery', backglass: 'Ba
 // Mirrors cleanVariant() in assets/js/app.js.
 export const cleanVariant = (v) => (!v || v === '-' || v === '—' || String(v).trim() === '') ? '' : String(v).trim();
 
+// Group a device's repairs by chip, cheapest-first, de-duping identical options.
+// Lives here (not tools.js) so buildIndex can pre-compute it once per refresh: the
+// catalog is cached and reused across requests, so each device caches its grouping.
+export function groupByChip(repairs) {
+  const byChip = new Map();
+  for (const r of repairs) {
+    if (!byChip.has(r.chip)) byChip.set(r.chip, new Map());
+    const key = (r.repair_type || '').toLowerCase() + '|' + cleanVariant(r.variant).toLowerCase();
+    const cur = byChip.get(r.chip).get(key);
+    if (!cur || r.price < cur.price) byChip.get(r.chip).set(key, r);
+  }
+  const out = {};
+  for (const [chip, m] of byChip) out[chip] = [...m.values()].sort((a, b) => a.price - b.price);
+  return out;
+}
+
 let cache = { at: 0, repairs: [], byModel: new Map(), summary: null };
 let inflight = null;
 
 function buildIndex(repairs) {
   const byModel = new Map();
+  const brandsSet = new Set();
+  const chipsSet = new Set();
+  let minPrice = Infinity;
+  let maxPrice = -Infinity;
+  let hasPrice = false;
+
+  // Single pass: bucket by model and collect the summary aggregates at once.
   for (const r of repairs) {
     const key = String(r.model).toLowerCase();
     if (!byModel.has(key)) byModel.set(key, { model: r.model, brand: r.brand, repairs: [] });
     byModel.get(key).repairs.push(r);
+
+    brandsSet.add(r.brand);
+    chipsSet.add(r.chip);
+    if (typeof r.price === 'number') {
+      if (r.price < minPrice) minPrice = r.price;
+      if (r.price > maxPrice) maxPrice = r.price;
+      hasPrice = true;
+    }
   }
-  const brands = [...new Set(repairs.map((r) => r.brand))];
-  const chips = [...new Set(repairs.map((r) => r.chip))];
-  const prices = repairs.map((r) => r.price).filter((n) => typeof n === 'number');
+
+  // Pre-compute each device's chip grouping once. The catalog is cached and reused across
+  // requests, so the tools read d.groupedRepairs instead of regrouping on every call.
+  for (const d of byModel.values()) {
+    d.groupedRepairs = groupByChip(d.repairs);
+  }
+
   const summary = {
     deviceCount: byModel.size,
     repairCount: repairs.length,
-    brands: brands.map((b) => BRAND_LABEL[b] || b),
-    repairTypes: chips.map((c) => CHIP_LABEL[c] || c),
-    priceRange: prices.length ? { low: Math.min(...prices), high: Math.max(...prices) } : null,
+    brands: [...brandsSet].map((b) => BRAND_LABEL[b] || b),
+    repairTypes: [...chipsSet].map((c) => CHIP_LABEL[c] || c),
+    priceRange: hasPrice ? { low: minPrice, high: maxPrice } : null,
   };
   return { byModel, summary };
 }
