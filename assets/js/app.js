@@ -85,7 +85,6 @@ const pctLess = (saved, base) => Math.round((saved / base) * 100);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') ? '' : v.trim();
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
-const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = () => matchMedia('(hover: hover)').matches;
 // Run a DOM mutation inside a View Transition where supported; otherwise (or under reduced motion)
