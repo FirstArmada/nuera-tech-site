@@ -62,3 +62,7 @@ the savings UI must degrade gracefully where `mk_price`/`savings` are null.
 ## 2026-06-10 - [Layout Thrashing in Loops]
 **Learning:** Mixing DOM reads (like `getBoundingClientRect()`) and DOM writes (like `classList.add()`) inside the same loop forces the browser to recalculate layout synchronously on every single iteration, leading to massive layout thrashing and dropped frames, especially during high-frequency events like scrolling.
 **Action:** Always batch DOM operations. In loops, run one loop to collect all reads, and a separate subsequent loop to apply all writes. Additionally, cache expensive layout reads outside of scroll handlers (e.g., using `ResizeObserver`) to avoid recomputing them unnecessarily.
+
+## 2024-06-10 - Resolve tool calls concurrently
+**Learning:** Sequential resolution of multiple independent operations (like LLM tool calls) causes a linear increase in latency, drastically slowing down user response times. In environments where tools fetch state independently, they can be fired off at the same time.
+**Action:** When handling a batch of async requests that do not depend on each other (such as `Promise`-returning functions mapping over an array), use `await Promise.all(...)` combined with `array.map(...)` to parallelize execution and bound latency to the slowest single operation instead of the sum of all operations.
