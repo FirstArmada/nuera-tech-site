@@ -10,20 +10,6 @@ import { ensureFresh, getDevice, searchModels, cleanVariant } from './catalog.js
 const WA = process.env.WHATSAPP_NUMBER || '12269784666';
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
 
-// Group a device's repairs by chip, cheapest-first, de-duping identical options.
-function groupByChip(repairs) {
-  const byChip = new Map();
-  for (const r of repairs) {
-    if (!byChip.has(r.chip)) byChip.set(r.chip, new Map());
-    const key = r.repair_type.toLowerCase() + '|' + cleanVariant(r.variant).toLowerCase();
-    const cur = byChip.get(r.chip).get(key);
-    if (!cur || r.price < cur.price) byChip.get(r.chip).set(key, r);
-  }
-  const out = {};
-  for (const [chip, m] of byChip) out[chip] = [...m.values()].sort((a, b) => a.price - b.price);
-  return out;
-}
-
 // Mirrors bookMsg() in assets/js/app.js.
 function bookMsg(r, model) {
   const v = cleanVariant(r.variant);
@@ -92,7 +78,7 @@ function bestFuzzy(model) {
 function lookupRepairPrice({ model, repair_type }) {
   const d = getDevice(model) || bestFuzzy(model);
   if (!d) return { matched: false, model, message: 'No exact match — call find_devices to list similar models.' };
-  const grouped = groupByChip(d.repairs);
+  const grouped = d.groupedRepairs;
   const options = (repair_type ? (grouped[repair_type] || []) : Object.values(grouped).flat().sort((a, b) => a.price - b.price)).map(optionOut);
   return { matched: options.length > 0, model: d.model, brand: d.brand, options };
 }
@@ -110,7 +96,7 @@ function getBookingLink({ model, repair_type, variant }) {
   if (!d) return { matched: false, url: waLink(`Hi Nuera Tech! I'd like to book a repair for my ${model}.`) };
   let r = null;
   if (repair_type) {
-    const opts = groupByChip(d.repairs)[repair_type] || [];
+    const opts = d.groupedRepairs[repair_type] || [];
     r = variant ? (opts.find((o) => cleanVariant(o.variant).toLowerCase() === String(variant).toLowerCase()) || opts[0]) : opts[0];
   }
   const url = r ? waLink(bookMsg(r, d.model)) : waLink(`Hi Nuera Tech! I'd like to book a repair for my ${d.model}.`);

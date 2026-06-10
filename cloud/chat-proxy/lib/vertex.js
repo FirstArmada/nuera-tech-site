@@ -64,11 +64,11 @@ export async function runAssistant(messages) {
     const parts = result.response?.candidates?.[0]?.content?.parts || [];
     const calls = parts.filter((p) => p.functionCall).map((p) => p.functionCall);
     if (!calls.length) break;
-    const responses = [];
-    for (const call of calls) {
-      const out = await resolveTool(call.name, call.args || {});
-      responses.push({ functionResponse: { name: call.name, response: out } });
-    }
+    // Resolve this turn's tool calls concurrently; Promise.all preserves order, and
+    // resolveTool() awaits the (cached) ensureFresh() itself, so this is a safe drop-in.
+    const responses = await Promise.all(calls.map(async (call) => ({
+      functionResponse: { name: call.name, response: await resolveTool(call.name, call.args || {}) },
+    })));
     result = await chat.sendMessage(responses);
   }
 
