@@ -407,19 +407,26 @@ function renderStats(stats) {
 // Filters
 // ===========================================================================
 function buildFilters() {
-  const counts = (key, val) => state.devices.filter((d) =>
-    key === 'brand' ? (val === 'all' || d.brand === val)
-                    : (val === 'all' || d.types.has(val))).length;
+  const brandCounts = { all: state.devices.length };
+  const typeCounts = { all: state.devices.length };
+
+  for (let i = 0; i < state.devices.length; i++) {
+    const d = state.devices[i];
+    brandCounts[d.brand] = (brandCounts[d.brand] || 0) + 1;
+    for (const t of d.types) {
+      typeCounts[t] = (typeCounts[t] || 0) + 1;
+    }
+  }
 
   const brandWrap = $('#brand-filters');
   brandWrap.innerHTML = BRANDS
-    .filter((b) => b.id === 'all' || state.devices.some((d) => d.brand === b.id))
-    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${counts('brand', b.id)}</span></button>`)
+    .filter((b) => b.id === 'all' || brandCounts[b.id])
+    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${brandCounts[b.id] || 0}</span></button>`)
     .join('');
 
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
-    .filter((t) => t.id === 'all' || state.devices.some((d) => d.types.has(t.id)))
+    .filter((t) => t.id === 'all' || typeCounts[t.id])
     .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
     .join('');
 

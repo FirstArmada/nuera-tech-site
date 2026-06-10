@@ -62,3 +62,6 @@ the savings UI must degrade gracefully where `mk_price`/`savings` are null.
 ## 2026-06-10 - [Layout Thrashing in Loops]
 **Learning:** Mixing DOM reads (like `getBoundingClientRect()`) and DOM writes (like `classList.add()`) inside the same loop forces the browser to recalculate layout synchronously on every single iteration, leading to massive layout thrashing and dropped frames, especially during high-frequency events like scrolling.
 **Action:** Always batch DOM operations. In loops, run one loop to collect all reads, and a separate subsequent loop to apply all writes. Additionally, cache expensive layout reads outside of scroll handlers (e.g., using `ResizeObserver`) to avoid recomputing them unnecessarily.
+## 2024-06-10 - O(N*M) loop optimizations in UI rendering
+**Learning:** Nested array operations like using `.some()` and `.filter()` repeatedly inside a `.map()` on the same data set causes redundant O(N*M) passes over the data.
+**Action:** Replace nested loops by pre-computing counts and existences into a dictionary/map in a single O(N) pass, then use dictionary lookups inside the subsequent `.map()` operations. This simplifies complexity and execution time.
