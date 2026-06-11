@@ -326,8 +326,8 @@ function tierWeight(model) {
 // Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
 function chronoCompare(a, b) {
   return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
-    || deviceYear(b.model) - deviceYear(a.model)
-    || tierWeight(b.model) - tierWeight(a.model)
+    || b.year - a.year
+    || b.tier - a.tier
     || a.model.localeCompare(b.model, undefined, { numeric: true });
 }
 
@@ -367,6 +367,10 @@ function buildModel(repairs) {
     const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
     d.search = [d.model, manufacturer(d.brand), brandLabel(d.brand), ...typeWords, ...rtypeWords]
       .join(' ').toLowerCase();
+
+    // Precompute sort weights to avoid O(N log N) regex parsing during sort
+    d.year = deviceYear(d.model);
+    d.tier = tierWeight(d.model);
   }
   state.byModel = map;
   state.devices = [...map.values()].sort(chronoCompare); // newest first (default sort)
