@@ -44,9 +44,6 @@ const CHIP_LABEL = { screen: 'Screen', battery: 'Battery', backglass: 'Back Glas
 // Sort weight per repair type, derived from TYPES so the order lives in one place.
 const TYPE_ORDER = Object.fromEntries(TYPES.filter((t) => t.id !== 'all').map((t, i) => [t.id, i]));
 
-// Inline SVG glyph reused on every WhatsApp "Book" link (keeps us off icon CDNs).
-const WA_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>';
-
 // "Add to booking" / "added" glyphs for the per-repair multi-select toggle.
 const ADD_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
@@ -85,7 +82,6 @@ const pctLess = (saved, base) => Math.round((saved / base) * 100);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cleanVariant = (v) => (!v || v === '-' || v === '—' || v.trim() === '') ? '' : v.trim();
 const waLink = (text) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
-const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = () => matchMedia('(hover: hover)').matches;
 // Run a DOM mutation inside a View Transition where supported; otherwise (or under reduced motion)
@@ -349,19 +345,26 @@ function buildModel(repairs) {
     d.types.add(r.chip);
   }
   for (const d of map.values()) {
-    d.minPrice = Math.min(...d.repairs.map((r) => r.price));
-    d.maxSaving = Math.max(0, ...d.repairs.map((r) => r.savings || 0));
-    // Per repair type: cheapest price, shown on the card.
-    const byType = new Map(); // Map<chip, minPrice>
+    // Single pass over the device's repairs: min price, max saving, cheapest-per-type,
+    // and the repair-type words for the search index (was several separate .map() passes).
+    let minPrice = Infinity;
+    let maxSaving = 0;
+    const byType = new Map(); // Map<chip, minPrice> — cheapest price per repair type, shown on the card.
+    const rtypeWords = [];
     for (const r of d.repairs) {
+      if (r.price < minPrice) minPrice = r.price;
+      const saving = r.savings || 0;
+      if (saving > maxSaving) maxSaving = saving;
       const cur = byType.get(r.chip);
       if (cur == null || r.price < cur) byType.set(r.chip, r.price);
+      rtypeWords.push(r.repair_type);
     }
+    d.minPrice = minPrice === Infinity ? 0 : minPrice;
+    d.maxSaving = maxSaving;
     d.priceByType = byType;
     // Search index — model + brand names + every repair type (id, chip label, full repair_type)
     // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
     const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
-    const rtypeWords = d.repairs.map((r) => r.repair_type);
     d.search = [d.model, manufacturer(d.brand), brandLabel(d.brand), ...typeWords, ...rtypeWords]
       .join(' ').toLowerCase();
   }
@@ -382,10 +385,15 @@ function usePrecomputedStats(data) {
 
 function computeSavingsStats(repairs) {
   const withMk = repairs.filter((r) => r.mk_price != null && r.mk_price > 0 && r.savings != null);
-  const maxSaving = withMk.length ? Math.max(...withMk.map((r) => r.savings)) : 0;
-  const avgPct = withMk.length
-    ? Math.round(withMk.reduce((a, r) => a + pctLess(r.savings, r.mk_price), 0) / withMk.length)
-    : 0;
+  // Single pass for max saving + the % sum (was three traversals: map+max, reduce).
+  let maxSaving = withMk.length ? -Infinity : 0;
+  let sumPct = 0;
+  for (let i = 0; i < withMk.length; i++) {
+    const r = withMk[i];
+    if (r.savings > maxSaving) maxSaving = r.savings;
+    sumPct += pctLess(r.savings, r.mk_price);
+  }
+  const avgPct = withMk.length ? Math.round(sumPct / withMk.length) : 0;
   const top = [...withMk].sort((a, b) => b.savings - a.savings);
   return { withMk, maxSaving, avgPct, top };
 }
@@ -433,19 +441,25 @@ function initSearchShortcut() {
 // Filters
 // ===========================================================================
 function buildFilters() {
-  const counts = (key, val) => state.devices.filter((d) =>
-    key === 'brand' ? (val === 'all' || d.brand === val)
-                    : (val === 'all' || d.types.has(val))).length;
+  // One pass to tally devices per brand and per repair type, instead of re-scanning
+  // state.devices for every pill (was O(brands × devices) + O(types × devices)).
+  const brandCounts = { all: state.devices.length };
+  const typeCounts = { all: state.devices.length };
+  for (let i = 0; i < state.devices.length; i++) {
+    const d = state.devices[i];
+    brandCounts[d.brand] = (brandCounts[d.brand] || 0) + 1;
+    for (const t of d.types) typeCounts[t] = (typeCounts[t] || 0) + 1;
+  }
 
   const brandWrap = $('#brand-filters');
   brandWrap.innerHTML = BRANDS
-    .filter((b) => b.id === 'all' || state.devices.some((d) => d.brand === b.id))
-    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${counts('brand', b.id)}</span></button>`)
+    .filter((b) => b.id === 'all' || brandCounts[b.id])
+    .map((b) => `<button class="pill" type="button" role="radio" data-brand="${b.id}" aria-checked="${b.id === 'all'}" tabindex="${b.id === 'all' ? 0 : -1}">${b.label}<span class="cnt">${brandCounts[b.id] || 0}</span></button>`)
     .join('');
 
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
-    .filter((t) => t.id === 'all' || state.devices.some((d) => d.types.has(t.id)))
+    .filter((t) => t.id === 'all' || typeCounts[t.id])
     .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
     .join('');
 
@@ -590,9 +604,57 @@ function syncFromURL() {
 let cardEls = null; // Map<model, HTMLElement>, built once
 let emptyEl = null; // reused empty-state node
 
+// Filter → sort the device list and split the prebuilt cards into matching / non-matching
+// sets. A non-default sort also reorders the matching cards in the DOM so the visual +
+// keyboard order line up. Tokenised search: every whitespace token must appear in the
+// device's search index (model + repair types), so "iphone 12 battery" matches iPhone 12.
+function getMatchingEls(grid) {
+  const { brand, type, q, sort, devices } = state;
+  const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+  const matchFn = (d) => (brand === 'all' || d.brand === brand)
+    && (type === 'all' || d.types.has(type))
+    && tokens.every((t) => d.search.includes(t));
+  const matchDevices = sortDevices(devices.filter(matchFn), sort);
+  const matchingEls = matchDevices.map((d) => cardEls.get(d.model)).filter(Boolean);
+  const matchSet = new Set(matchingEls);
+  const nonMatching = [];
+  cardEls.forEach((el) => { if (!matchSet.has(el)) nonMatching.push(el); });
+  if (sort !== 'default' && matchingEls.length) grid.append(...matchingEls);
+  return { matchingEls, nonMatching };
+}
+
+// Show/refresh the empty-state node when nothing matches; remove it otherwise.
+function renderEmptyState(grid, shown) {
+  if (!shown) {
+    if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
+    emptyEl.innerHTML = `
+      <span class="empty-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+      <p class="empty-title">No devices match.</p>
+      <p>Try a different model, or message us — we repair more than we can list.</p>
+      <a class="btn btn-wa" href="${waLink('Hi Nuera Tech! Do you repair: ' + (state.q || 'my device') + '?')}" target="_blank" rel="noopener">Ask on WhatsApp</a>`;
+    if (!emptyEl.isConnected) grid.appendChild(emptyEl);
+  } else if (emptyEl && emptyEl.isConnected) {
+    emptyEl.remove();
+  }
+}
+
+// Update the live result count + hint, pulse the count on changes (never first paint),
+// and keep the shareable URL in sync.
+function updateResultCount(shown, firstBuild, resetPage) {
+  const { brand, q } = state;
+  const count = $('#result-count');
+  count.textContent = shown
+    ? `${shown} device${shown === 1 ? '' : 's'}`
+      + (brand !== 'all' ? ` · ${BRANDS.find((b) => b.id === brand)?.label}` : '')
+      + (q ? ` · “${q}”` : '')
+    : 'No matches';
+  $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
+  if (!firstBuild) pulseResultCount(count); // visual "results refreshed" cue; never on first paint
+  if (resetPage && !firstBuild) updateURL(); // keep the shareable URL in sync (replaceState)
+}
+
 function renderGrid({ resetPage = true } = {}) {
   const grid = $('#grid');
-  const { brand, type, q } = state;
   if (resetPage) state.page = 1; // a new filter/search always starts from the first page
 
   let firstBuild = false;
@@ -606,20 +668,8 @@ function renderGrid({ resetPage = true } = {}) {
     firstBuild = true;
   }
 
-  // Filter → sort → map to card elements. Sorting reorders the DOM (only when non-default) so the
-  // visual + keyboard order match; 'default' preserves the natural data order (no reorder needed).
-  // Tokenised search: split on whitespace and require EVERY token to appear in the device's
-  // search index (model + repair types), so "iphone 12 battery" matches the iPhone 12 (DoD #3).
-  const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
-  const matchFn = (d) => (brand === 'all' || d.brand === brand)
-    && (type === 'all' || d.types.has(type))
-    && tokens.every((t) => d.search.includes(t));
-  const matchDevices = sortDevices(state.devices.filter(matchFn), state.sort);
-  const matchingEls = matchDevices.map((d) => cardEls.get(d.model)).filter(Boolean);
-  const matchSet = new Set(matchingEls);
-  const nonMatching = [];
-  cardEls.forEach((el) => { if (!matchSet.has(el)) nonMatching.push(el); });
-  if (state.sort !== 'default' && matchingEls.length) grid.append(...matchingEls);
+  // Filter → sort → map to card elements (matching set reordered in the DOM for non-default sorts).
+  const { matchingEls, nonMatching } = getMatchingEls(grid);
 
   // Pagination: show only the first `visibleCount` matches; the rest stay [hidden] behind "Load
   // More". Animate the transition — never on first build (scroll-reveal handles those), and on a
@@ -636,30 +686,13 @@ function renderGrid({ resetPage = true } = {}) {
   if (loadMore) {
     const remaining = shown - visibleCount;
     loadMore.hidden = remaining <= 0;
-    if (remaining > 0) loadMore.setAttribute('aria-label', `Load ${Math.min(PAGE_SIZE, remaining)} more devices — ${remaining} remaining`);
+    // Lead the accessible name with the exact visible label ("Load More Devices") so it satisfies
+    // WCAG 2.5.3 (Label in Name) — axe's label-content-name-mismatch; the count is extra context.
+    if (remaining > 0) loadMore.setAttribute('aria-label', `Load More Devices — ${remaining} remaining`);
   }
 
-  if (!shown) {
-    if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'empty'; }
-    emptyEl.innerHTML = `
-      <span class="empty-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-      <p class="empty-title">No devices match.</p>
-      <p>Try a different model, or message us — we repair more than we can list.</p>
-      <a class="btn btn-wa" href="${waLink('Hi Nuera Tech! Do you repair: ' + (state.q || 'my device') + '?')}" target="_blank" rel="noopener">Ask on WhatsApp</a>`;
-    if (!emptyEl.isConnected) grid.appendChild(emptyEl);
-  } else if (emptyEl && emptyEl.isConnected) {
-    emptyEl.remove();
-  }
-
-  const count = $('#result-count');
-  count.textContent = shown
-    ? `${shown} device${shown === 1 ? '' : 's'}`
-      + (brand !== 'all' ? ` · ${BRANDS.find((b) => b.id === brand)?.label}` : '')
-      + (q ? ` · “${state.q}”` : '')
-    : 'No matches';
-  $('#result-hint').textContent = shown ? 'Tap a device for full pricing' : '';
-  if (!firstBuild) pulseResultCount(count); // visual "results refreshed" cue; never on first paint
-  if (resetPage && !firstBuild) updateURL(); // keep the shareable URL in sync (replaceState)
+  renderEmptyState(grid, shown);
+  updateResultCount(shown, firstBuild, resetPage);
 }
 
 // Animate the grid between filter states with a clean "results refresh" — fade + subtle scale the
@@ -740,7 +773,9 @@ function cardHTML(d) {
   const save = d.maxSaving > 0
     ? `<div class="save-tag">save up to <b>${money(Math.round(d.maxSaving))}</b><span>vs other shops</span></div>`
     : '';
-  return `<button class="card reveal" type="button" data-model="${esc(d.model)}" aria-label="View pricing for ${esc(d.model)}">
+  // No aria-label: the visible content (model, brand, per-type prices, savings, CTA) IS the accessible
+  // name. A custom label would drop that visible text and trip WCAG 2.5.3 (Label in Name).
+  return `<button class="card reveal" type="button" data-model="${esc(d.model)}">
     <div class="card-top">
       <span class="card-model">${esc(stripManufacturer(d.model, d.brand))}</span>
       <span class="brand-tag">${esc(manufacturer(d.brand))}</span>

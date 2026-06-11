@@ -11,8 +11,8 @@ import { runAssistant } from './lib/vertex.js';
 import { createRateLimiter } from './lib/ratelimit.js';
 
 const PORT = process.env.PORT || 8080;
-const ALLOWED = (process.env.ALLOWED_ORIGINS || 'https://nuera.talha-k.com')
-  .split(',').map((s) => s.trim()).filter(Boolean);
+const ALLOWED = new Set((process.env.ALLOWED_ORIGINS || 'https://nuera.talha-k.com')
+  .split(',').map((s) => s.trim()).filter(Boolean));
 const MAX_MSG_LEN = 1000;
 const MAX_TURNS = 12;
 
@@ -24,7 +24,7 @@ app.use(express.json({ limit: '8kb' }));
 app.use(cors({
   origin(origin, cb) {
     // Allow same-origin/no-origin (curl, health checks) and whitelisted sites only.
-    if (!origin || ALLOWED.includes(origin)) return cb(null, true);
+    if (!origin || ALLOWED.has(origin)) return cb(null, true);
     cb(new Error('origin not allowed'));
   },
   methods: ['POST'],
@@ -64,4 +64,4 @@ app.post('/chat', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`nuera-chat-proxy on :${PORT} — ${ALLOWED.length} allowed origin(s)`));
+app.listen(PORT, () => console.log(`nuera-chat-proxy on :${PORT} — ${ALLOWED.size} allowed origin(s)`));

@@ -1,0 +1,15 @@
+{
+  "esversion": 11,
+  "module": true,
+  "node": true,
+  "browser": true,
+  "worker": true,
+  "-W014": true,
+  "-W083": true,
+  "globals": {
+    "AbortController": false,
+    "AbortSignal": false,
+    "ResizeObserver": false,
+    "caches": false
+  }
+}

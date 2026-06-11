@@ -64,11 +64,14 @@ export async function runAssistant(messages) {
     const parts = result.response?.candidates?.[0]?.content?.parts || [];
     const calls = parts.filter((p) => p.functionCall).map((p) => p.functionCall);
     if (!calls.length) break;
-    const responses = [];
-    for (const call of calls) {
-      const out = await resolveTool(call.name, call.args || {});
-      responses.push({ functionResponse: { name: call.name, response: out } });
-    }
+    // Tool calls in a round are independent, so resolve them concurrently rather
+    // than awaiting each in series — the model often emits several per round.
+    const responses = await Promise.all(
+      calls.map(async (call) => {
+        const out = await resolveTool(call.name, call.args || {});
+        return { functionResponse: { name: call.name, response: out } };
+      }),
+    );
     result = await chat.sendMessage(responses);
   }
 
