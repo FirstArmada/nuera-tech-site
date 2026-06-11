@@ -326,8 +326,8 @@ function tierWeight(model) {
 // Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
 function chronoCompare(a, b) {
   return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
-    || deviceYear(b.model) - deviceYear(a.model)
-    || tierWeight(b.model) - tierWeight(a.model)
+    || b._year - a._year
+    || b._tier - a._tier
     || a.model.localeCompare(b.model, undefined, { numeric: true });
 }
 
@@ -362,6 +362,11 @@ function buildModel(repairs) {
     d.minPrice = minPrice === Infinity ? 0 : minPrice;
     d.maxSaving = maxSaving;
     d.priceByType = byType;
+    // Pre-compute the chronological sort keys once per device. chronoCompare runs O(N log N) times
+    // during the initial sort; reading d._year/d._tier there avoids re-running the regex-heavy
+    // deviceYear()/tierWeight() on every comparison (they're pure functions of the model name).
+    d._year = deviceYear(d.model);
+    d._tier = tierWeight(d.model);
     // Search index — model + brand names + every repair type (id, chip label, full repair_type)
     // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
     const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
