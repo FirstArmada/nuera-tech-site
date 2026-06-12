@@ -493,6 +493,14 @@ function buildFilters() {
   }, 110);
   input.addEventListener('input', onSearch);
   clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); resetFinderScroll(); input.focus(); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (input.value) { e.preventDefault(); clear.click(); }
+      else input.blur(); // allow keyboard scrolling to resume
+    } else if (e.key === 'Enter') {
+      input.blur(); // dismiss mobile keyboard since search is live
+    }
+  });
 
   // "Load More" pager. Every filter/search above calls renderGrid() (which resets to page 1); this
   // only grows the page and re-renders, keeping the current scroll position.
