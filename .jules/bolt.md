@@ -62,3 +62,6 @@ the savings UI must degrade gracefully where `mk_price`/`savings` are null.
 ## 2026-06-10 - [Layout Thrashing in Loops]
 **Learning:** Mixing DOM reads (like `getBoundingClientRect()`) and DOM writes (like `classList.add()`) inside the same loop forces the browser to recalculate layout synchronously on every single iteration, leading to massive layout thrashing and dropped frames, especially during high-frequency events like scrolling.
 **Action:** Always batch DOM operations. In loops, run one loop to collect all reads, and a separate subsequent loop to apply all writes. Additionally, cache expensive layout reads outside of scroll handlers (e.g., using `ResizeObserver`) to avoid recomputing them unnecessarily.
+## 2026-06-12 - [Expensive String Parsing in Sort Loops]
+**Learning:** Performing expensive string manipulation or regular expression evaluations inside a sort comparator (like `chronoCompare`) multiplies the computational cost by $O(N \log N)$, causing measurable performance bottlenecks when processing large lists of objects.
+**Action:** Always pre-compute and cache expensive values on the objects themselves during an $O(N)$ creation pass (e.g., in `buildModel`), then use simple $O(1)$ property lookups in the sort comparator.

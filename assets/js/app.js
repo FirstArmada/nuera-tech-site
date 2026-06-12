@@ -325,9 +325,11 @@ function tierWeight(model) {
 
 // Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
 function chronoCompare(a, b) {
+  // Optimization: b.year and b.tier are precomputed on object creation to avoid
+  // expensive string parsing + regex evaluation in an O(N log N) sort loop.
   return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
-    || deviceYear(b.model) - deviceYear(a.model)
-    || tierWeight(b.model) - tierWeight(a.model)
+    || b.year - a.year
+    || b.tier - a.tier
     || a.model.localeCompare(b.model, undefined, { numeric: true });
 }
 
@@ -338,7 +340,15 @@ function buildModel(repairs) {
   const map = new Map();
   for (const r of repairs) {
     if (!map.has(r.model)) {
-      map.set(r.model, { model: r.model, brand: r.brand, repairs: [], types: new Set() });
+      // Pre-compute year and tier for O(1) lookups during sorting (prevents layout thrashing)
+      map.set(r.model, {
+        model: r.model,
+        brand: r.brand,
+        repairs: [],
+        types: new Set(),
+        year: deviceYear(r.model),
+        tier: tierWeight(r.model)
+      });
     }
     const d = map.get(r.model);
     d.repairs.push(r);
