@@ -19,6 +19,10 @@ const MAX_TURNS = 12;
 const allow = createRateLimiter({ capacity: 20, refillPerSec: 20 / 60 });
 
 const app = express();
+// Cloud Run sits behind one Google front-end proxy. Trust exactly that hop so req.ip resolves to
+// the real client IP and not a client-controlled X-Forwarded-For prefix — otherwise an attacker
+// could spoof XFF to get a fresh rate-limit bucket per request and bypass the limiter entirely.
+app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.use(express.json({ limit: '8kb' }));
 app.use(cors({
@@ -33,7 +37,7 @@ app.use(cors({
 app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
 app.post('/chat', async (req, res) => {
-  const ip = String(req.headers['x-forwarded-for'] || req.ip || 'unknown').split(',')[0].trim();
+  const ip = req.ip || 'unknown'; // trust-proxy (above) makes this the real client IP, not spoofable XFF[0]
   if (!allow(ip)) return res.status(429).json({ error: 'Too many requests — please slow down.' });
 
   let messages = Array.isArray(req.body?.messages) ? req.body.messages : null;

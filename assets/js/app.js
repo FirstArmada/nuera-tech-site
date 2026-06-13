@@ -326,8 +326,8 @@ function tierWeight(model) {
 // Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
 function chronoCompare(a, b) {
   return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
-    || deviceYear(b.model) - deviceYear(a.model)
-    || tierWeight(b.model) - tierWeight(a.model)
+    || b._year - a._year
+    || b._tier - a._tier
     || a.model.localeCompare(b.model, undefined, { numeric: true });
 }
 
@@ -362,6 +362,11 @@ function buildModel(repairs) {
     d.minPrice = minPrice === Infinity ? 0 : minPrice;
     d.maxSaving = maxSaving;
     d.priceByType = byType;
+    // Pre-compute the chronological sort keys once per device. chronoCompare runs O(N log N) times
+    // during the initial sort; reading d._year/d._tier there avoids re-running the regex-heavy
+    // deviceYear()/tierWeight() on every comparison (they're pure functions of the model name).
+    d._year = deviceYear(d.model);
+    d._tier = tierWeight(d.model);
     // Search index — model + brand names + every repair type (id, chip label, full repair_type)
     // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
     const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
@@ -460,7 +465,7 @@ function buildFilters() {
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
     .filter((t) => t.id === 'all' || typeCounts[t.id])
-    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
+    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}<span class="cnt">${typeCounts[t.id] || 0}</span></button>`)
     .join('');
 
   brandWrap.addEventListener('click', (e) => {
@@ -493,6 +498,15 @@ function buildFilters() {
   }, 110);
   input.addEventListener('input', onSearch);
   clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); resetFinderScroll(); input.focus(); });
+  // Keyboard: Escape clears a query (or blurs an empty field so scrolling resumes); Enter blurs to
+  // dismiss the mobile keyboard since search is live (no submit). Pairs with the '/' focus shortcut.
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (input.value) { e.preventDefault(); clear.click(); } else input.blur();
+    } else if (e.key === 'Enter') {
+      input.blur();
+    }
+  });
 
   // "Load More" pager. Every filter/search above calls renderGrid() (which resets to page 1); this
   // only grows the page and re-renders, keeping the current scroll position.
