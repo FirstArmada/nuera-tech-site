@@ -1,3 +1,7 @@
 ## 2024-06-10 - Keyboard shortcuts (Search /) on heavy filter interfaces
 **Learning:** Adding a `/` global search shortcut significantly improves the desktop navigation experience for power/keyboard users on e-commerce/pricing sites. Crucially, providing a visual `<kbd>` hint that smoothly fades out via `:focus-within` and `:placeholder-shown` (and using `@media (hover: none)` to hide it on touch devices) prevents the UX from degrading for mobile users while making the shortcut discoverable for desktop users.
 **Action:** Always include an unobtrusive visual hint (`<kbd>`) when adding global shortcuts, and ensure the hint is hidden on devices that do not have physical keyboards using media queries like `(hover: none)`. Also, ensure focus + scroll uses `preventScroll: true` followed by `scrollIntoView` to avoid jarring jumps, while respecting `prefers-reduced-motion`.
+
+## 2026-10-27 - Completing global search shortcut loops
+**Learning:** Adding a global search shortcut like `/` is great for power users to focus an input, but the UX loop is incomplete without a matching `Escape` to blur when empty. Failing to handle `Escape` forces keyboard users to manually tab out or click away when they change their mind, disrupting flow.
+**Action:** Always pair focus shortcuts (`/`) with an `Escape` handler on the target input that calls `.blur()` if the field is empty, ensuring parity with native OS search boxes.

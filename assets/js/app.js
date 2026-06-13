@@ -426,6 +426,11 @@ function renderStats(stats) {
 function initSearchShortcut() {
   const input = $('#search');
   if (!input) return;
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && input.value === '') {
+      input.blur();
+    }
+  });
   addEventListener('keydown', (e) => {
     if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
     const ae = document.activeElement;
