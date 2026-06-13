@@ -19,6 +19,7 @@ const MAX_TURNS = 12;
 const allow = createRateLimiter({ capacity: 20, refillPerSec: 20 / 60 });
 
 const app = express();
+app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.use(express.json({ limit: '8kb' }));
 app.use(cors({
@@ -33,7 +34,8 @@ app.use(cors({
 app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
 app.post('/chat', async (req, res) => {
-  const ip = String(req.headers['x-forwarded-for'] || req.ip || 'unknown').split(',')[0].trim();
+  // Trust proxy allows req.ip to contain the actual client IP reliably
+  const ip = req.ip || 'unknown';
   if (!allow(ip)) return res.status(429).json({ error: 'Too many requests — please slow down.' });
 
   let messages = Array.isArray(req.body?.messages) ? req.body.messages : null;
