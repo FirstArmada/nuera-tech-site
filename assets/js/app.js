@@ -465,7 +465,7 @@ function buildFilters() {
   const typeWrap = $('#type-filters');
   typeWrap.innerHTML = TYPES
     .filter((t) => t.id === 'all' || typeCounts[t.id])
-    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}</button>`)
+    .map((t) => `<button class="pill rt" type="button" role="radio" data-type="${t.id}" aria-checked="${t.id === 'all'}" tabindex="${t.id === 'all' ? 0 : -1}">${t.label}<span class="cnt">${typeCounts[t.id] || 0}</span></button>`)
     .join('');
 
   brandWrap.addEventListener('click', (e) => {
@@ -498,6 +498,15 @@ function buildFilters() {
   }, 110);
   input.addEventListener('input', onSearch);
   clear.addEventListener('click', () => { input.value = ''; state.q = ''; clear.classList.remove('show'); renderGrid(); resetFinderScroll(); input.focus(); });
+  // Keyboard: Escape clears a query (or blurs an empty field so scrolling resumes); Enter blurs to
+  // dismiss the mobile keyboard since search is live (no submit). Pairs with the '/' focus shortcut.
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (input.value) { e.preventDefault(); clear.click(); } else input.blur();
+    } else if (e.key === 'Enter') {
+      input.blur();
+    }
+  });
 
   // "Load More" pager. Every filter/search above calls renderGrid() (which resets to page 1); this
   // only grows the page and re-renders, keeping the current scroll position.
