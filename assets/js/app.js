@@ -326,8 +326,8 @@ function tierWeight(model) {
 // Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
 function chronoCompare(a, b) {
   return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
-    || deviceYear(b.model) - deviceYear(a.model)
-    || tierWeight(b.model) - tierWeight(a.model)
+    || b.year - a.year
+    || b.tier - a.tier
     || a.model.localeCompare(b.model, undefined, { numeric: true });
 }
 
@@ -345,6 +345,10 @@ function buildModel(repairs) {
     d.types.add(r.chip);
   }
   for (const d of map.values()) {
+    // Optimization: Precompute year and tier here (O(N)) instead of inside the chronoCompare
+    // sorting loop (O(N log N)), which avoids repeatedly executing their internal Regex rules.
+    d.year = deviceYear(d.model);
+    d.tier = tierWeight(d.model);
     // Single pass over the device's repairs: min price, max saving, cheapest-per-type,
     // and the repair-type words for the search index (was several separate .map() passes).
     let minPrice = Infinity;
