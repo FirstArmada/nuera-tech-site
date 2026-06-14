@@ -7,6 +7,8 @@
   <meta name="description" content="A first-round editorial brand concept board for Nuera Tech and its sub-brand family — NueraCare, NueraExpress and NueraTrade. Logo system, typography, palette, icons, patterns, product & packaging mockups, signage and photography direction." />
   <meta name="theme-color" content="#07070c" />
   <meta name="color-scheme" content="dark" />
+  <!-- Theme bootstrap: BLOCKING + same-origin (CSP is script-src 'self'); sets <html data-theme> before first paint. -->
+  <script src="/assets/js/theme.js"></script>
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://nuera.talha-k.com/brand-concept" />
 
@@ -104,6 +106,65 @@
       --ring:0 0 0 3px rgba(139,92,246,.45);
       --grad:var(--grad-accent);
     }
+
+    /* =====================================================================
+       LIGHT THEME — premium light canvas sharing the purple→cyan DNA; re-tuned,
+       not inverted. Activated by <html data-theme="light"> (set pre-paint by theme.js).
+       Token block is identical across index.html / brand.html / brand-concept.html. */
+    :root[data-theme="light"]{
+      color-scheme:light;
+      --color-bg:#f6f7fb;--color-bg-raised:#eef0f7;
+      --color-surface-1:rgba(15,18,40,.03);--color-surface-2:rgba(15,18,40,.05);--color-surface-3:rgba(15,18,40,.09);
+      --color-border:rgba(15,18,40,.12);--color-border-strong:rgba(15,18,40,.2);
+      --color-text-primary:#0e1222;--color-text-secondary:#3f4763;--color-text-tertiary:#5b6480;
+      --color-accent:#7c3aed;--color-accent-soft:#6d28d9;--color-accent-2:#0e7490;
+      --color-on-accent:#fff;--color-on-success:#053527;--color-on-danger:#fff;--color-on-warning:#3a2a00;
+      --color-success:#0f9d6b;--color-success-text:#0a7d54;--color-danger:#dc2626;--color-warning:#b45309;
+      --color-save:#0a7d54;--color-was:#dc2626;
+      --repair-screen:#6d28d9;--repair-battery:#0a7d54;--repair-backglass:#b45309;--repair-chargeport:#0e7490;
+      --grad-accent:linear-gradient(100deg,#7c3aed 0%,#6d28d9 42%,#0e7490 100%);
+      --grad-wa:#0f9d6b;
+      --c-trust-400:hsl(220 16% 42%);
+      --shadow-1:0 6px 16px -10px rgba(20,24,48,.18);--shadow-2:0 18px 40px -18px rgba(20,24,48,.2);--shadow-3:0 34px 80px -24px rgba(20,24,48,.24);
+      --glow-accent:0 12px 30px -10px rgba(124,58,237,.3);--glow-accent-strong:0 16px 38px -10px rgba(124,58,237,.4);--glow-success:0 14px 34px -12px rgba(15,157,107,.34);
+      --focus-ring-color:#7c3aed;--ring:0 0 0 3px rgba(124,58,237,.4);
+    }
+    /* shared chrome */
+    :root[data-theme="light"] .header{background:rgba(246,247,251,.72)}
+    @media (max-width:600px){:root[data-theme="light"] .header{background:rgba(246,247,251,.85)}}
+    :root[data-theme="light"] .header.scrolled{background:rgba(246,247,251,.9);box-shadow:0 10px 30px -18px rgba(20,24,48,.25)}
+    :root[data-theme="light"] .mobile-nav{background:rgba(246,247,251,.98);box-shadow:0 18px 40px -18px rgba(20,24,48,.3)}
+    :root[data-theme="light"] .aurora{background:
+      radial-gradient(60% 50% at 18% 12%,rgba(124,58,237,.12),transparent 60%),
+      radial-gradient(55% 45% at 85% 8%,rgba(14,116,144,.1),transparent 60%),
+      radial-gradient(60% 55% at 78% 80%,rgba(124,58,237,.08),transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg2))}
+    :root[data-theme="light"] .aurora::after{background:
+      radial-gradient(35% 35% at 30% 30%,rgba(124,58,237,.1),transparent 60%),
+      radial-gradient(35% 35% at 70% 60%,rgba(14,116,144,.08),transparent 60%)}
+    :root[data-theme="light"] .grain{opacity:.02}
+    :root[data-theme="light"] :is(.hnav a,footer a){color:var(--color-text-secondary)}
+    :root[data-theme="light"] :is(.hnav a:hover,footer a:hover){color:var(--color-text-primary)}
+    :root[data-theme="light"] .hnav a:hover{background:var(--panel-2)}
+    :root[data-theme="light"] .hnav a[aria-current=page]{color:#fff}
+    /* concept-board components */
+    :root[data-theme="light"] .bc-subnav-inner{background:rgba(246,247,251,.82)}
+    :root[data-theme="light"] .bc-subnav a{color:var(--color-text-secondary)}
+    :root[data-theme="light"] .bc-subnav a:hover{background:var(--panel-2);color:var(--color-text-primary)}
+    :root[data-theme="light"] .bc-subnav a[aria-current=true]{color:#fff}
+    :root[data-theme="light"] :is(.bc-cover p,.bc-card p,.bc-chip){color:var(--color-text-secondary)}
+    :root[data-theme="light"] :is(.bc-word,.bc-quote){color:var(--color-text-primary)}
+    :root[data-theme="light"] .bc-adj.p{color:#6d28d9}
+    :root[data-theme="light"] .bc-adj.c{color:#0e7490}
+    :root[data-theme="light"] .bc-adj.g{color:#0a7d54}
+    :root[data-theme="light"] .bc-adj.a{color:#b45309}
+    :root[data-theme="light"] .bc-prompt-head .t{color:#9fa9bd}
+    :root[data-theme="light"] .bc-toast{background:rgba(246,247,251,.96);color:var(--color-text-primary)}
+    /* GUARD — leave DARK on purpose (renders/specimens, not chrome): .bc-clearspace .frame,
+       .bc-field colour swatches, .bc-pat* pattern demos, .bc-phone/.bc-mock-card/.bc-box/.bc-pouch/
+       .bc-sign/.bc-decal/.bc-photo product/packaging/signage/photography renders, and .bc-prompt/pre
+       (terminal). The light overrides above intentionally do not target any of these. */
+
     *,*::before,*::after{box-sizing:border-box}
     html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
     body{margin:0;font-family:var(--font-sans);background:var(--color-bg);color:var(--color-text-primary);min-height:100dvh;line-height:var(--lh-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;overscroll-behavior-y:contain}
@@ -160,6 +221,14 @@
     .hburger svg{width:22px;height:22px}
     .hburger:focus-visible{outline:none;box-shadow:var(--ring)}
     @media (min-width:1000px){.hburger{display:none}}
+    /* Theme toggle — mirrors .hburger; shows the icon for the theme you'd switch TO. */
+    .htheme{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-2);color:var(--text);cursor:pointer;transition:background .15s ease,border-color .15s ease}
+    .htheme svg{width:20px;height:20px}
+    .htheme:hover{border-color:rgba(139,92,246,.5)}
+    .htheme:focus-visible{outline:none;box-shadow:var(--ring)}
+    .htheme .ic-moon{display:none}
+    :root[data-theme="light"] .htheme .ic-sun{display:none}
+    :root[data-theme="light"] .htheme .ic-moon{display:inline-block}
     .mobile-nav{position:absolute;top:calc(var(--header-h) + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-2) clamp(16px,4vw,28px) var(--space-3);border-top:1px solid var(--border);background:rgba(7,7,12,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
     .mobile-nav[hidden]{display:none}
     .mobile-nav a{color:#e7ecf7;text-decoration:none;font-weight:700;padding:var(--space-3) var(--space-2);border-radius:12px;min-height:46px;display:flex;align-items:center}
@@ -191,7 +260,7 @@
     .bc-cover{position:relative;display:grid;place-items:center;text-align:center;min-height:min(82vh,720px);padding:clamp(40px,8vw,90px) 0}
     .bc-cover .mark{height:clamp(72px,12vw,120px);width:clamp(72px,12vw,120px);filter:drop-shadow(0 18px 50px rgba(139,92,246,.5));margin-bottom:var(--space-4)}
     .bc-cover h1{font-size:clamp(2.8rem,8vw,5.5rem);font-weight:var(--fw-display);letter-spacing:-.05em;line-height:1.02;margin:0 0 var(--space-3);text-wrap:balance}
-    .bc-cover .grad-text{display:inline-block;padding-bottom:.06em;filter:drop-shadow(0 3px 30px rgba(139,92,246,.4))}
+    .bc-cover .grad-text{display:inline-block;line-height:1.18;padding-bottom:.08em;filter:drop-shadow(0 3px 30px rgba(139,92,246,.4))}
     .bc-cover p{font-size:var(--fs-lead);color:#d7deee;max-width:56ch;margin:0 auto var(--space-5)}
     .bc-cover-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
     .bc-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:var(--radius-pill);background:var(--panel-2);border:1px solid var(--border-2);font-size:.86rem;font-weight:700;color:#dbe3f4}
@@ -351,6 +420,31 @@
     .bc-disclaimer p{margin:0;color:#e7ddc4;line-height:1.55;font-size:.9rem}
     .bc-disclaimer b{color:#fff}
 
+    /* Image slots (drop-in <img>; no src = no request, JS reveals on src) + Direction + theme tiles */
+    .bc-slot{position:relative;border-radius:var(--radius-16);border:1px dashed var(--border-2);background:var(--panel-2);min-height:220px;display:grid;place-items:center;overflow:hidden;margin:0}
+    .bc-slot>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s ease}
+    .bc-slot.has-img>img{opacity:1}
+    .bc-slot.has-img .bc-slot-ph{opacity:0;pointer-events:none}
+    .bc-slot-ph{display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;padding:22px;transition:opacity .3s ease}
+    .bc-slot-ph>svg{width:30px;height:30px;color:var(--purple-lt);opacity:.85}
+    .bc-slot-label{font-weight:700;color:#dbe3f4;font-size:.92rem;max-width:30ch;line-height:1.4}
+    .bc-slot-hint{font-size:.78rem;color:var(--faint);max-width:34ch;line-height:1.45}
+    .bc-slot pre{display:none}
+    .bc-slot-copy{display:inline-flex;align-items:center;gap:7px;margin-top:4px;padding:8px 14px;min-height:40px;border-radius:var(--radius-pill);background:var(--panel-2);border:1px solid var(--border-2);color:var(--color-text-secondary);font:inherit;font-weight:700;font-size:.8rem;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+    .bc-slot-copy svg{width:14px;height:14px}
+    .bc-slot-copy:hover{border-color:rgba(139,92,246,.5);color:var(--text)}
+    .bc-slot-copy:focus-visible{outline:none;box-shadow:var(--ring)}
+    .bc-dir-mark{height:clamp(96px,16vw,128px);width:clamp(96px,16vw,128px)}
+    .bc-theme-tiles{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:var(--space-3)}
+    .bc-theme-tile{border-radius:var(--radius-24);border:1px solid var(--border-2);padding:26px;display:flex;flex-direction:column;align-items:center;gap:12px;min-height:170px;justify-content:center}
+    .bc-theme-tile .brand-mark{height:52px;width:52px}
+    .bc-theme-tile .lbl{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .bc-theme-tile .tw{font-weight:800;letter-spacing:-.02em;font-size:1.2rem}
+    .bc-theme-tile.dark{background:#07070c}
+    .bc-theme-tile.dark .tw{color:#f4f6ff}.bc-theme-tile.dark .lbl{color:#8794ab}.bc-theme-tile.dark .tw .t{color:#22d3ee}
+    .bc-theme-tile.light{background:#f6f7fb}
+    .bc-theme-tile.light .tw{color:#0e1222}.bc-theme-tile.light .lbl{color:#5b6480}.bc-theme-tile.light .tw .t{color:#0e7490}
+
     .bc-toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);z-index:120;background:rgba(12,13,22,.96);border:1px solid var(--border-2);color:var(--text);padding:12px 20px;border-radius:var(--radius-pill);font-weight:700;font-size:.9rem;box-shadow:var(--shadow-2);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;backdrop-filter:blur(8px)}
     .bc-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -381,6 +475,14 @@
       <path d="M12 28V12L28 28V12" fill="none" stroke="url(#nueraMarkGrad)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
       <circle cx="28" cy="12" r="2.4" fill="#22d3ee"/>
     </symbol>
+    <!-- PROPOSED direction (concept, not final): a single-stroke "pulse N" — the monoline neon-tube
+         feel of concept 1, carrying the heartbeat/ECG motif of concept 2, in the brand gradient. -->
+    <symbol id="nuera-mark-v2" viewBox="0 0 40 40">
+      <rect width="40" height="40" rx="11" fill="#0f0d18"/>
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="none" stroke="#fff" stroke-opacity=".1"/>
+      <path d="M10 30 V12 L16 19 L18.5 12.5 L21 27 L23.5 20 L30 30 V12" fill="none" stroke="url(#nueraMarkGrad)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="30" cy="12" r="2.4" fill="#22d3ee"/>
+    </symbol>
   </svg>
   <div class="aurora" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
@@ -403,6 +505,10 @@
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
         <span class="cta-label">Book on WhatsApp</span>
       </a>
+      <button class="htheme" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to light theme" title="Switch to light theme">
+        <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="ic-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+      </button>
       <button class="hburger" id="nav-toggle" type="button" aria-label="Open menu" title="Open menu" aria-expanded="false" aria-controls="mobile-nav">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M21.166 18c.428 0 .78.383.828.883L22 19c0 .552-.373 1-.834 1H2.834C2.374 20 2 19.556 2 19c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 12c0 .552-.373 1-.834 1H2.834C2.374 13 2 12.556 2 12c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 5c0 .552-.373 1-.834 1H2.834C2.374 6 2 5.556 2 5c0-.552.373-1 .834-1h18.332Z" clip-rule="evenodd"/></svg>
       </button>
@@ -446,6 +552,7 @@
           <a href="#signage">Signage</a>
           <a href="#photography">Photography</a>
           <a href="#voice">Voice</a>
+          <a href="#direction">Direction</a>
           <a href="#appendix">Appendix</a>
         </div>
       </nav>
@@ -639,6 +746,14 @@
             <div class="meta"><span>Certified refurb</span><span>$120 credit</span></div>
           </div>
         </div>
+        <figure class="bc-slot bc-reveal" data-slot style="margin-top:18px">
+          <img alt="Product mockup render" />
+          <div class="bc-slot-ph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+            <span class="bc-slot-label">Drop a real product render</span>
+            <span class="bc-slot-hint">App screen, case or membership card — nothing loads until a source is added.</span>
+          </div>
+        </figure>
       </section>
 
       <!-- Packaging -->
@@ -659,6 +774,14 @@
             <p style="margin:0;color:var(--muted);font-size:.86rem">Tonal "N" repeat, drawstring — protects the screen on the way home.</p>
           </div>
         </div>
+        <figure class="bc-slot bc-reveal" data-slot style="margin-top:18px">
+          <img alt="Packaging mockup render" />
+          <div class="bc-slot-ph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+            <span class="bc-slot-label">Drop a real packaging render</span>
+            <span class="bc-slot-hint">Repair-return box or device pouch — nothing loads until a source is added.</span>
+          </div>
+        </figure>
       </section>
 
       <!-- Signage -->
@@ -681,6 +804,14 @@
             <div class="row"><span>Book ahead</span><span style="color:var(--green-lt);font-weight:700">WhatsApp</span></div>
           </div>
         </div>
+        <figure class="bc-slot bc-reveal" data-slot style="margin-top:18px">
+          <img alt="Storefront signage photo" />
+          <div class="bc-slot-ph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+            <span class="bc-slot-label">Drop a real storefront / signage photo</span>
+            <span class="bc-slot-hint">Illuminated exterior sign or window decal — nothing loads until a source is added.</span>
+          </div>
+        </figure>
       </section>
 
       <!-- Photography -->
@@ -701,6 +832,28 @@
             <span class="tag">Lifestyle — interior</span>
             <div class="dir"><h3>The repair bench</h3><p>Warm, clean workspace: brushed-metal tools, soft neon glow, a technician's hands mid-repair. Honest and human — never sterile or stocky.</p></div>
           </div>
+        </div>
+        <div class="bc-grid bc-g2 bc-reveal" style="margin-top:18px">
+          <figure class="bc-slot" data-slot>
+            <img alt="Hero product photo" />
+            <div class="bc-slot-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+              <span class="bc-slot-label">Drop the hero product shot</span>
+              <span class="bc-slot-hint">Rim-lit device on ink, three-quarter angle.</span>
+              <button class="bc-slot-copy" type="button" data-copy-target="#p-photo-hero" aria-label="Copy hero photo prompt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Copy image prompt</button>
+            </div>
+            <pre id="p-photo-hero">Product photograph for Nuera Tech: a single freshly-repaired smartphone, three-quarter angle, catching a purple→cyan rim light against a near-black background. Crisp, premium, minimal props, soft reflection. Portrait 4:5.</pre>
+          </figure>
+          <figure class="bc-slot" data-slot>
+            <img alt="Repair bench photo" />
+            <div class="bc-slot-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+              <span class="bc-slot-label">Drop the repair-bench shot</span>
+              <span class="bc-slot-hint">Warm, clean workspace; hands mid-repair under soft neon.</span>
+              <button class="bc-slot-copy" type="button" data-copy-target="#p-photo-bench" aria-label="Copy bench photo prompt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Copy image prompt</button>
+            </div>
+            <pre id="p-photo-bench">Lifestyle photograph for Nuera Tech: a clean, warm repair bench, brushed-metal tools, soft purple/cyan neon glow, a technician's hands mid-repair. Honest and human, not sterile or stocky. Landscape 3:2.</pre>
+          </figure>
         </div>
       </section>
 
@@ -724,10 +877,74 @@
         </div>
       </section>
 
+      <!-- Direction (current → proposed) -->
+      <section class="bc-slide" id="direction">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">12 / Direction</span>
+          <h2>Where the mark goes next</h2>
+          <p class="sub">The badge today is a clean geometric "N". The proposed direction — drawn from concepts the team liked — keeps the gradient DNA but makes the mark feel alive: a single continuous neon-tube stroke that doubles as a heartbeat / pulse line — "we bring your device back to life." A concept exploration, not final art.</p>
+        </div>
+
+        <div class="bc-dir-grid bc-grid bc-g2 bc-reveal">
+          <div class="bc-card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px">
+            <span class="bc-tag">Current</span>
+            <svg class="brand-mark bc-dir-mark" aria-hidden="true"><use href="#nuera-mark"/></svg>
+            <h3>Geometric "N"</h3>
+            <p>The mark shipping today — a confident, angular monogram in the purple→cyan gradient on an ink tile.</p>
+          </div>
+          <div class="bc-card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px">
+            <span class="bc-tag">Proposed · concept</span>
+            <svg class="brand-mark bc-dir-mark" aria-hidden="true"><use href="#nuera-mark-v2"/></svg>
+            <h3>Pulse "N"</h3>
+            <p>One unbroken neon stroke that reads as both the "N" and a heartbeat — warmer and more energetic, still unmistakably Nuera.</p>
+          </div>
+        </div>
+
+        <h3 style="margin:var(--space-6) 0 0;font-size:1.06rem;letter-spacing:-.01em">Concepts we liked</h3>
+        <p class="sub" style="margin:6px 0 0">Reference frames that inspired the direction. Drop the real renders into these slots — each carries a copy-ready image prompt, and nothing loads until a source is added.</p>
+        <div class="bc-grid bc-g2 bc-reveal" style="margin-top:var(--space-3)">
+          <figure class="bc-slot" data-slot>
+            <img alt="Neon monoline N concept" />
+            <div class="bc-slot-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+              <span class="bc-slot-label">Neon monoline "N" — app-icon tile</span>
+              <span class="bc-slot-hint">Single gradient neon-tube stroke over a phone silhouette on black.</span>
+              <button class="bc-slot-copy" type="button" data-copy-target="#p-concept-monoline" aria-label="Copy image prompt for the monoline concept"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Copy image prompt</button>
+            </div>
+            <pre id="p-concept-monoline">App-icon logo for "Nuera Tech", a premium phone-repair brand. A single continuous neon-tube stroke forming a stylised letter "N" (with a subtle hook), glowing white-to-purple, centred over a minimal phone outline. Pure black background, soft realistic neon glow and reflection, rounded-square app-icon framing, a small AI sparkle accent. Clean, modern, high-end. No text.</pre>
+          </figure>
+          <figure class="bc-slot" data-slot>
+            <img alt="Pulse-line lockup concept" />
+            <div class="bc-slot-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+              <span class="bc-slot-label">Pulse-line lockup — wordmark</span>
+              <span class="bc-slot-hint">Heartbeat/ECG line through a phone outline in the purple→cyan gradient, with the wordmark.</span>
+              <button class="bc-slot-copy" type="button" data-copy-target="#p-concept-pulse" aria-label="Copy image prompt for the pulse-line concept"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Copy image prompt</button>
+            </div>
+            <pre id="p-concept-pulse">Logo lockup for "NUERA TECH — Mobile Phone Repair &amp; Sales". A thin phone outline with a heartbeat / ECG pulse line running horizontally through it, drawn in a purple-to-cyan gradient (#8b5cf6 to #22d3ee). Bold "NUERA TECH" wordmark beneath, "TECH" in the cyan gradient, a small uppercase descriptor line, a subtle AI sparkle. Near-black background, premium, modern, crisp. Accurate spelling.</pre>
+          </figure>
+        </div>
+
+        <h3 style="margin:var(--space-6) 0 0;font-size:1.06rem;letter-spacing:-.01em">The identity in light &amp; dark</h3>
+        <p class="sub" style="margin:6px 0 0">The product now ships both themes — it follows the OS, with a persistent toggle. The mark and wordmark hold up on either canvas; the accents darken on light to stay legible.</p>
+        <div class="bc-theme-tiles bc-reveal">
+          <div class="bc-theme-tile dark">
+            <span class="lbl">Dark · Ink #07070c</span>
+            <svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg>
+            <span class="tw">Nuera <span class="t">Tech</span></span>
+          </div>
+          <div class="bc-theme-tile light">
+            <span class="lbl">Light · Off-white #f6f7fb</span>
+            <svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg>
+            <span class="tw">Nuera <span class="t">Tech</span></span>
+          </div>
+        </div>
+      </section>
+
       <!-- Appendix -->
       <section class="bc-slide" id="appendix">
         <div class="bc-slide-head bc-reveal">
-          <span class="bc-num">12 / Appendix</span>
+          <span class="bc-num">13 / Appendix</span>
           <h2>Generate the hero board</h2>
           <p class="sub">This page renders the system in code. To produce a polished 16:9 hero image of the board, paste the prompt below into your image generator of choice.</p>
         </div>
@@ -776,7 +993,7 @@ Avoid: clutter, tiny unreadable text, misspelled brand names, too many random wo
 
         <div class="bc-disclaimer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-          <p><b>First-round concept — not final artwork.</b> The mockups, signage and lifestyle frames here are directional concepts rendered in CSS/SVG, not production photography or final logos. <b>NueraCare, NueraExpress and NueraTrade</b> are concept sub-brand names for exploration. Production-ready, trademarkable assets are to be created by the designer; colours, logo DNA and Inter type reflect the live Nuera Tech identity. Clear any names for trademark availability before use.</p>
+          <p><b>First-round concept — not final artwork.</b> The mockups, signage and lifestyle frames here are directional concepts rendered in CSS/SVG, not production photography or final logos. The <b>Direction</b> slide's "pulse N" is a concept exploration of the mark, not final art; the image slots accept real renders — drop in a source and the frame reveals it (nothing loads until you do). <b>NueraCare, NueraExpress and NueraTrade</b> are concept sub-brand names for exploration. Production-ready, trademarkable assets are to be created by the designer; colours, logo DNA and Inter type reflect the live Nuera Tech identity. Clear any names for trademark availability before use.</p>
         </div>
       </section>
 
