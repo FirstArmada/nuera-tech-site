@@ -323,12 +323,16 @@ function tierWeight(model) {
   return 2;
 }
 
+// Optimization: Pre-instantiate Intl.Collator since it is significantly faster
+// than calling String.prototype.localeCompare repeatedly inside a sort loop.
+const numericCollator = new Intl.Collator(undefined, { numeric: true });
+
 // Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
 function chronoCompare(a, b) {
   return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
     || b._year - a._year
     || b._tier - a._tier
-    || a.model.localeCompare(b.model, undefined, { numeric: true });
+    || numericCollator.compare(a.model, b.model);
 }
 
 // ===========================================================================
