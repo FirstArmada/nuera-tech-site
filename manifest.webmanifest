@@ -19,6 +19,8 @@
   ],
   "shortcuts": [
     { "name": "Find your repair price", "url": "/#finder", "description": "Search live device pricing" },
-    { "name": "Book on WhatsApp", "url": "https://wa.me/12269784666", "description": "Message Nuera Tech to book" }
+    { "name": "Book on WhatsApp", "url": "https://wa.me/12269784666", "description": "Message Nuera Tech to book" },
+    { "name": "Brand Book", "url": "/brand", "description": "Palette, usage rules & logo brief" },
+    { "name": "Brand Concept", "url": "/brand-concept", "description": "Editorial brand concept board" }
   ]
 }
