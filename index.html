@@ -595,6 +595,39 @@
     .btn-cta{margin-inline:auto;font-size:1.02rem;padding:15px 28px;min-height:52px}
     .cta .cta-fine{color:var(--muted);font-size:.84rem;margin:14px auto 0;opacity:.9}
 
+    /* NueraExpress sub-brand wordmark (Nuera + purple "Express") */
+    .nx{font-weight:700}
+    .nx>span{color:var(--color-accent)}
+
+    /* Service levels — two-tier comparison (Standard + NueraExpress) */
+    .tiers{display:grid;gap:18px;margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .tier{position:relative;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);border-radius:var(--radius);padding:26px;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+    .tier-express{border-color:rgba(139,92,246,.45);box-shadow:0 24px 60px -30px rgba(139,92,246,.5)}
+    @media (hover:hover){.tier:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.5);box-shadow:0 24px 56px -26px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.22)}}
+    .tier-head h3{margin:8px 0 4px;font-size:1.25rem;letter-spacing:-.02em}
+    .tier-sub{margin:0;color:var(--muted)}
+    .tier-flag{display:inline-flex;align-items:center;font-size:.64rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border-2);color:var(--muted)}
+    .tier-flag-x{background:rgba(139,92,246,.16);border-color:rgba(139,92,246,.4);color:var(--color-accent)}
+    .tier-list{list-style:none;margin:18px 0;padding:0;display:flex;flex-direction:column;gap:11px;flex:1}
+    .tier-list li{display:flex;gap:10px;align-items:flex-start;color:var(--text);font-size:.92rem;line-height:1.45}
+    .tier-list .tl-ic{flex:none;width:18px;height:18px;margin-top:1px;color:var(--green-lt)}
+    .tier-express .tier-list .tl-ic{color:var(--color-accent)}
+    .tier-price{margin:0 0 16px;color:var(--muted);font-size:.92rem}
+    .tier-price b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+    .tier-cta{width:100%;justify-content:center}
+    .tiers-foot{margin:18px auto 0;color:var(--muted);font-size:.92rem;text-align:center;max-width:72ch;line-height:1.55}
+
+    /* Service-level selector in the device sheet foot */
+    .svc{margin-bottom:14px}
+    .svc .opts{margin-top:0}
+    .svc-note{margin:8px 0 0;color:var(--muted);font-size:.8rem;text-align:center;line-height:1.4}
+    .bundle-row.bundle-express span:last-child{color:var(--color-accent)}
+
+    /* Hero two-tier cue */
+    .hero-tiers-cue{margin:14px 0 0;color:var(--muted);font-size:.92rem;line-height:1.5}
+    .hero-tiers-cue a{color:var(--cyan);font-weight:600;white-space:nowrap}
+    .hero-tiers-cue strong{color:var(--text)}
+
     /* FAQ */
     .faq{display:grid;gap:10px;margin-top:22px} /* full content width, matching the other sections */
     .qa{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:border-color .2s ease,background .2s ease}
@@ -956,6 +989,7 @@
   {
     "@context":"https://schema.org","@type":"FAQPage","mainEntity":[
       {"@type":"Question","name":"How long does a phone repair take at Nuera Tech?","acceptedAnswer":{"@type":"Answer","text":"Most common repairs — like iPhone and Samsung screen or battery replacements — are completed the same day, usually within about two hours. Bring your device in to Guelph and we will give you an exact turnaround time up front."}},
+      {"@type":"Question","name":"What's the difference between a standard repair and NueraExpress?","acceptedAnswer":{"@type":"Answer","text":"A standard repair is our everyday service — walk in or drop off at the Guelph shop and most repairs are done the same day. NueraExpress is our priority tier: a technician comes to you for an urgent, guaranteed same-day fix, for a flat priority fee on top of the standard price. Both include the same 90-day warranty and the same quality parts — the only difference is how fast, and where we fix it."}},
       {"@type":"Question","name":"Is Nuera Tech really cheaper than other shops?","acceptedAnswer":{"@type":"Answer","text":"Yes. On comparable repairs we publish both our price and the typical price side by side. We are consistently cheaper — up to $115 less on popular iPhone screen replacements — because we don't carry mall-rent overhead."}},
       {"@type":"Question","name":"What warranty do you offer on repairs?","acceptedAnswer":{"@type":"Answer","text":"Every repair is backed by a 90-day warranty covering both parts and labour. If something related to the repair fails within that window, we make it right."}},
       {"@type":"Question","name":"What devices do you repair?","acceptedAnswer":{"@type":"Answer","text":"We repair iPhone, Samsung Galaxy phones and tablets, Google Pixel, and iPad — screens, batteries, back glass and charge ports. Search your exact model on our site to see live pricing."}},
@@ -1016,6 +1050,7 @@
       <nav class="hnav" aria-label="Primary">
         <a href="#finder">Pricing</a>
         <a href="#why">Why Nuera</a>
+        <a href="#tiers">Service levels</a>
         <a href="#reviews">Reviews</a>
         <a href="#visit">Visit</a>
         <a href="#faq">FAQ</a>
@@ -1037,6 +1072,7 @@
     <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile" hidden>
       <a href="#finder">Pricing</a>
       <a href="#why">Why Nuera</a>
+      <a href="#tiers">Service levels</a>
       <a href="#how">How it works</a>
       <a href="#reviews">Reviews</a>
       <a href="#visit">Visit us</a>
@@ -1071,6 +1107,7 @@
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
         <span><b>No account, no forms.</b> Booking opens WhatsApp with your device pre-filled.</span>
       </p>
+      <p class="hero-tiers-cue" data-express-only>Two ways to get fixed: <strong>Standard</strong> in-shop, or same-day on-site <span class="nx">Nuera<span>Express</span></span>. <a href="#tiers">Compare service levels →</a></p>
       <div class="stats" aria-label="Nuera Tech at a glance">
         <div class="stat" style="--i:0"><div class="num"><span class="grad-text" data-stat="devices">—</span></div><div class="lbl">devices priced live</div></div>
         <div class="stat" style="--i:1"><div class="num">up to <span class="grad-text" data-stat="maxSaving">—</span></div><div class="lbl">cheaper than other shops</div></div>
@@ -1162,6 +1199,51 @@
           <p>Premium aftermarket and OEM-grade parts matched to your device — clearly labelled per repair.</p>
         </div>
       </div>
+    </section>
+
+    <!-- SERVICE LEVELS — two-tier structure (Standard + NueraExpress). The +$XX fee and the service
+         area are filled at runtime by applyExpress() from pricing-data.json (data.express), never
+         baked into this HTML (Rule 1). The whole section hides if Express is disabled in config. -->
+    <section id="tiers" class="wrap reveal" aria-labelledby="tiers-h" style="padding-top:var(--space-8)" data-express-only>
+      <span class="eyebrow">Two ways to get fixed</span>
+      <h2 id="tiers-h">Choose your service level</h2>
+      <p class="lead-muted">Same parts, same 90-day warranty — pick the speed and convenience that fit your day.</p>
+      <div class="tiers">
+        <div class="tier reveal">
+          <div class="tier-head">
+            <span class="tier-flag">Most popular</span>
+            <h3>Standard repair</h3>
+            <p class="tier-sub">Walk in or drop off — ready the same day.</p>
+          </div>
+          <ul class="tier-list">
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Same-day — most screen &amp; battery jobs done in under 2 hours</span></li>
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Transparent published pricing — what you see is what you pay</span></li>
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Walk-ins welcome at our Guelph shop</span></li>
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>90-day warranty &amp; quality parts</span></li>
+          </ul>
+          <div class="tier-price">Our published price — <b>no extra fee</b></div>
+          <a class="btn btn-primary tier-cta" href="#finder">Find your price</a>
+        </div>
+        <div class="tier tier-express reveal">
+          <div class="tier-head">
+            <span class="tier-flag tier-flag-x">Priority</span>
+            <h3 class="nx">Nuera<span>Express</span></h3>
+            <p class="tier-sub">We come to you — same-day, urgent.</p>
+          </div>
+          <ul class="tier-list">
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg><span><strong>On-site</strong> — a technician comes to your home or office</span></li>
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg><span>Guaranteed same-day, front-of-queue priority</span></li>
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Serving <span data-express-area>Guelph &amp; nearby</span></span></li>
+            <li><svg class="tl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Same 90-day warranty &amp; quality parts</span></li>
+          </ul>
+          <div class="tier-price">Standard price <b><span data-express-fee>+$—</span> per visit</b></div>
+          <a class="btn btn-wa tier-cta" data-wa="express" href="https://wa.me/12269784666" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
+            Book NueraExpress on WhatsApp
+          </a>
+        </div>
+      </div>
+      <p class="tiers-foot">Every repair — Standard or <span class="nx">Nuera<span>Express</span></span> — includes our <strong>90-day warranty</strong> and the same quality parts. The only difference is how fast, and where we fix it.</p>
     </section>
 
     <!-- HOW IT WORKS -->
@@ -1314,6 +1396,10 @@
           <summary><span>How long does a repair take?</span><span class="qa-ic" aria-hidden="true"></span></summary>
           <div class="qa-wrap"><div class="body">Most common repairs — iPhone and Samsung screens or batteries — are done the same day, usually within about two hours. We'll give you an exact turnaround when you book.</div></div>
         </details>
+        <details class="qa" data-express-only>
+          <summary><span>What's the difference between a standard repair and NueraExpress?</span><span class="qa-ic" aria-hidden="true"></span></summary>
+          <div class="qa-wrap"><div class="body">A <strong>standard repair</strong> is our everyday service — walk in or drop off at the Guelph shop and most repairs are done the same day. <strong class="nx">Nuera<span>Express</span></strong> is our priority tier: a technician <strong>comes to you</strong> for an urgent, guaranteed same-day fix, for a flat priority fee on top of the standard price. Both include the same 90-day warranty and the same quality parts — the only difference is how fast, and where we fix it.</div></div>
+        </details>
         <details class="qa">
           <summary><span>Are you really cheaper than other shops?</span><span class="qa-ic" aria-hidden="true"></span></summary>
           <div class="qa-wrap"><div class="body">Yes. On comparable repairs we show both prices side by side, and we're consistently cheaper — up to $115 less on popular iPhone screen replacements. No mall-rent overhead means a lower price for you.</div></div>
@@ -1405,9 +1491,17 @@
       </div>
       <div class="sheet-body" id="detail-body"></div>
       <div class="sheet-foot">
+        <!-- Service-level toggle. Reveals + its +$XX label are set by applyExpress() (data-driven). -->
+        <div class="svc" id="detail-svc" data-express-only hidden>
+          <div class="opts opts-seg" role="radiogroup" aria-label="Service level">
+            <button class="opt" type="button" role="radio" data-svc="standard" aria-checked="true" tabindex="0"><span class="opt-label">Standard</span><span class="opt-price">In-shop</span></button>
+            <button class="opt" type="button" role="radio" data-svc="express" aria-checked="false" tabindex="-1"><span class="opt-label">NueraExpress</span><span class="opt-price" data-express-fee>+$—</span></button>
+          </div>
+          <p class="svc-note" id="detail-svc-note">Drop in or walk in at our Guelph shop — ready the same day.</p>
+        </div>
         <div class="trust-strip">
           <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>90-day warranty</span>
-          <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Same-day repair</span>
+          <span class="ti" id="detail-trust-speed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="ti-tx">Same-day repair</span></span>
           <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>OEM-grade parts</span>
         </div>
         <div class="bundle" id="detail-bundle" aria-live="polite" hidden></div>

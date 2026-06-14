@@ -47,6 +47,11 @@ assets/
   153 devices; accessible card grid; bottom-sheet detail modal on mobile.
 - **WhatsApp booking** — every repair row deep-links to WhatsApp with a pre-filled
   message (device, repair, price, and the dollar saving).
+- **Two service tiers** — a `#tiers` comparison and an in-modal **Standard / NueraExpress**
+  toggle. NueraExpress is the premium *same-day, on-site (we come to you), urgent* tier: a flat
+  per-visit priority surcharge over the standard price. The surcharge + copy live in
+  `pricing-data.json` (`data.express`, from the sync; see `cloud/infra/README.md`) so they're
+  never baked into HTML (Rule 1); `app.js` adds the fee to the booking total and message.
 - **Social proof** — a `#reviews` section (aggregate rating + review cards) and a hero rating
   chip. *Content is placeholder — swap in real Google reviews before relying on it (see below).*
 - **Visit us** — a `#visit` section with the shop address, a "Get directions" link, and an

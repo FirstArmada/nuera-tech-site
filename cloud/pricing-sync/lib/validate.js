@@ -32,6 +32,16 @@ export function validate(data, prev) {
     if (!Array.isArray(s.top)) throw new Error('stats.top must be an array');
   }
 
+  // Optional NueraExpress tier config (see transform.expressConfig).
+  if (data.express !== undefined) {
+    const x = data.express;
+    if (!x || typeof x !== 'object') throw new Error('express must be an object');
+    if (typeof x.enabled !== 'boolean') throw new Error('express.enabled must be a boolean');
+    if (typeof x.surcharge !== 'number' || !(x.surcharge > 0)) throw new Error('express.surcharge must be a positive number');
+    if (typeof x.label !== 'string') throw new Error('express.label must be a string');
+    if (typeof x.tagline !== 'string') throw new Error('express.tagline must be a string');
+  }
+
   if (prev && Array.isArray(prev.repairs) && prev.repairs.length) {
     const ratio = data.repairs.length / prev.repairs.length;
     if (ratio < 0.8 || ratio > 1.2) {

@@ -49,6 +49,22 @@ function num(v) {
   return Number.isFinite(n) ? n : null;
 }
 
+// NueraExpress — the premium "same-day, on-site (we come to you), urgent" tier.
+// It is a flat per-visit priority surcharge over the standard price, configured here
+// (env-driven, mirroring COLUMN_MAP) and consumed at runtime by app.js. Kept in the
+// data file — not hardcoded in HTML — so the surcharge/copy stays editable via the
+// sheet/job config without a code change (Rule 1). app.js carries a fallback.
+export function expressConfig() {
+  return {
+    enabled: (process.env.EXPRESS_ENABLED ?? 'true') !== 'false',
+    surcharge: num(process.env.EXPRESS_SURCHARGE) ?? 49, // flat per-visit priority fee (CAD)
+    label: 'NueraExpress',
+    tagline: 'Same-day · on-site · urgent',
+    eta: 'Same-day — we come to you',
+    area: process.env.EXPRESS_AREA || 'Guelph & nearby (Wellington County)',
+  };
+}
+
 // Fallbacks only used when the sheet has no explicit brand/chip column.
 function deriveBrand(model, given) {
   const g = String(given || '').toLowerCase().trim();
@@ -92,5 +108,5 @@ export function transform(rows, { date = new Date().toISOString().slice(0, 10) }
       sku: String(row[COLUMN_MAP.sku] || '').trim(),
     });
   }
-  return { generated: date, source: 'Google Sheets — Master Price List', repairs, stats: computeStats(repairs) };
+  return { generated: date, source: 'Google Sheets — Master Price List', repairs, stats: computeStats(repairs), express: expressConfig() };
 }
