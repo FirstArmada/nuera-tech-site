@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Concept render: pulse-line NUERA TECH lockup">
+  <defs>
+    <linearGradient id="p-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c4b5fd"/>
+      <stop offset=".5" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <radialGradient id="p-bg" cx="50%" cy="38%" r="82%">
+      <stop offset="0" stop-color="#121019"/>
+      <stop offset="1" stop-color="#070709"/>
+    </radialGradient>
+    <filter id="p-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="900" rx="40" fill="url(#p-bg)"/>
+  <rect x="516" y="118" width="168" height="338" rx="32" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="6"/>
+  <rect x="566" y="150" width="68" height="9" rx="4.5" fill="#ffffff" fill-opacity=".4"/>
+  <path d="M110 300 H452 l34 0 28 -128 44 244 36 -168 30 96 40 -44 H1090"
+        fill="none" stroke="url(#p-grad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" filter="url(#p-glow)"/>
+  <text x="600" y="610" text-anchor="middle" font-family="Inter,Helvetica,Arial,sans-serif" font-weight="800" font-size="150" letter-spacing="-4"><tspan fill="#f4f6ff">NUERA </tspan><tspan fill="url(#p-grad)">TECH</tspan></text>
+  <text x="600" y="688" text-anchor="middle" font-family="Inter,Helvetica,Arial,sans-serif" font-weight="700" font-size="38" letter-spacing="13" fill="#9fa9bd">MOBILE PHONE REPAIR &amp; SALES</text>
+  <path d="M980 545 l12 31 31 12 -31 12 -12 31 -12-31 -31-12 31-12z" fill="#c4b5fd"/>
+</svg>

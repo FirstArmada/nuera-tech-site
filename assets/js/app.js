@@ -323,12 +323,17 @@ function tierWeight(model) {
   return 2;
 }
 
+// Pre-instantiated numeric collator. localeCompare() re-parses its locale options on every call,
+// so using it inside a comparator that sort() invokes O(N log N) times pays that cost repeatedly;
+// a single shared Intl.Collator is built once and reused for the model-name tiebreak.
+const _modelCollator = new Intl.Collator(undefined, { numeric: true });
+
 // Newest first, grouped by brand (catalog order), then year desc, tier desc, numeric name.
 function chronoCompare(a, b) {
   return (BRAND_RANK[a.brand] ?? 99) - (BRAND_RANK[b.brand] ?? 99)
     || b._year - a._year
     || b._tier - a._tier
-    || a.model.localeCompare(b.model, undefined, { numeric: true });
+    || _modelCollator.compare(a.model, b.model);
 }
 
 // ===========================================================================

@@ -35,33 +35,36 @@ function renderReply(text) {
     `<a class="nt-chat-wa" href="${url}" target="_blank" rel="noopener">Book on WhatsApp</a>`);
 }
 
+// Styled with the site's design tokens (defined on :root in every page) so the widget follows the
+// active light/dark theme automatically — no hardcoded canvas/ink colours of its own.
 const STYLE = `
-.nt-chat-launch{display:grid;place-items:center;width:54px;height:54px;border-radius:50%;border:1px solid rgba(255,255,255,.14);
-  background:linear-gradient(135deg,#8b5cf6,#22d3ee);color:#0b0b12;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.45)}
+.nt-chat-launch{display:grid;place-items:center;width:54px;height:54px;border-radius:50%;border:1px solid var(--color-border-strong);
+  background:var(--grad-accent);color:var(--color-on-accent);cursor:pointer;box-shadow:var(--shadow-2)}
 .nt-chat-launch svg{width:26px;height:26px}
-.nt-chat-launch:focus-visible{outline:2px solid #c4b5fd;outline-offset:3px}
+.nt-chat-launch:focus-visible{outline:2px solid var(--focus-ring-color);outline-offset:3px}
 .nt-chat-panel{position:fixed;z-index:80;right:18px;bottom:18px;width:min(380px,calc(100dvw - 28px));height:min(560px,calc(100dvh - 36px));
-  display:flex;flex-direction:column;background:#0f0d18;color:#f4f4f8;border:1px solid rgba(255,255,255,.12);
-  border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+  display:flex;flex-direction:column;background:var(--color-bg-raised);color:var(--color-text-primary);border:1px solid var(--color-border-strong);
+  border-radius:18px;overflow:hidden;box-shadow:var(--shadow-3)}
 .nt-chat-panel[hidden]{display:none}
-.nt-chat-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.1);
-  background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(34,211,238,.14))}
+.nt-chat-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-border);
+  background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(34,211,238,.12))}
 .nt-chat-head b{font-size:.98rem}
-.nt-chat-head .nt-chat-sub{font-size:.74rem;color:#b9b9c6}
-.nt-chat-x{margin-left:auto;background:none;border:0;color:#f4f4f8;font-size:1.4rem;line-height:1;cursor:pointer;padding:4px 8px;border-radius:8px}
-.nt-chat-x:hover{background:rgba(255,255,255,.08)}
+.nt-chat-head .nt-chat-sub{font-size:.74rem;color:var(--color-text-secondary)}
+.nt-chat-x{margin-left:auto;background:none;border:0;color:var(--color-text-primary);font-size:1.4rem;line-height:1;cursor:pointer;padding:4px 8px;border-radius:8px}
+.nt-chat-x:hover{background:var(--color-surface-3)}
 .nt-chat-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
 .nt-chat-msg{max-width:85%;padding:9px 12px;border-radius:14px;font-size:.9rem;line-height:1.45;white-space:normal;word-wrap:break-word}
-.nt-chat-msg.user{align-self:flex-end;background:#2a2440;border:1px solid rgba(196,181,253,.3)}
-.nt-chat-msg.bot{align-self:flex-start;background:#16151f;border:1px solid rgba(255,255,255,.08)}
-.nt-chat-wa{display:inline-block;margin-top:8px;padding:7px 12px;border-radius:10px;background:#34d399;color:#000;
+.nt-chat-msg.user{align-self:flex-end;background:var(--color-surface-3);border:1px solid var(--color-border-strong)}
+.nt-chat-msg.bot{align-self:flex-start;background:var(--color-surface-2);border:1px solid var(--color-border)}
+.nt-chat-wa{display:inline-block;margin-top:8px;padding:7px 12px;border-radius:10px;background:var(--grad-wa);color:var(--color-on-success);
   font-weight:700;text-decoration:none;font-size:.82rem}
-.nt-chat-form{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.1)}
-.nt-chat-form input{flex:1;min-width:0;padding:10px 12px;border-radius:11px;border:1px solid rgba(255,255,255,.14);
-  background:#16151f;color:#f4f4f8;font:inherit;font-size:.9rem}
-.nt-chat-form input:focus-visible{outline:2px solid #8b5cf6;outline-offset:1px}
+.nt-chat-form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--color-border)}
+.nt-chat-form input{flex:1;min-width:0;padding:10px 12px;border-radius:11px;border:1px solid var(--color-border-strong);
+  background:var(--color-surface-2);color:var(--color-text-primary);font:inherit;font-size:.9rem}
+.nt-chat-form input::placeholder{color:var(--color-text-tertiary)}
+.nt-chat-form input:focus-visible{outline:2px solid var(--focus-ring-color);outline-offset:1px}
 .nt-chat-form button{display:grid;place-items:center;width:42px;height:42px;border-radius:11px;border:0;cursor:pointer;
-  background:linear-gradient(135deg,#8b5cf6,#22d3ee);color:#0b0b12}
+  background:var(--grad-accent);color:var(--color-on-accent)}
 .nt-chat-form button:disabled{opacity:.5;cursor:not-allowed}
 .nt-chat-form button svg{width:20px;height:20px}
 @media (prefers-reduced-motion: no-preference){.nt-chat-dots span{animation:nt-blink 1.2s infinite}}
