@@ -2,6 +2,7 @@
   "generated": "2026-06-05",
   "source": "Google Sheets \u2014 Master Price List",
   "stats": {"maxSaving":115.01,"avgPct":31,"top":[{"model":"iPhone 14 Plus","repair_type":"Screen Replacement","chip":"screen","price":103.99,"mk_price":219,"savings":115.01},{"model":"iPhone 15 Pro Max","repair_type":"Screen Replacement","chip":"screen","price":138.99,"mk_price":249,"savings":110.01},{"model":"iPhone 15 Pro","repair_type":"Screen Replacement","chip":"screen","price":139.99,"mk_price":249,"savings":109.01},{"model":"iPhone 14 Pro Max","repair_type":"Screen Replacement","chip":"screen","price":143.99,"mk_price":249,"savings":105.01},{"model":"iPhone 13 Pro","repair_type":"Screen Replacement","chip":"screen","price":144.99,"mk_price":249,"savings":104.01},{"model":"iPhone 17 Pro","repair_type":"Screen Replacement","chip":"screen","price":228.99,"mk_price":329,"savings":100.01}]},
+  "express": {"enabled":true,"surcharge":49,"label":"NueraExpress","tagline":"Same-day · on-site · urgent","eta":"Same-day — we come to you","area":"Guelph & nearby (Wellington County)"},
   "repairs": [
     {
       "model": "Google Pixel 10",

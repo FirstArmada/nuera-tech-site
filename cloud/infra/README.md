@@ -124,6 +124,21 @@ Brand, Chip, Price, MK Price, SKU`. If your headers differ, set `COL_MODEL`,
 name if omitted). `brand` must resolve to one of `iphone|samsung|pixel|ipad|samsung-tab`
 and `chip` to `screen|battery|backglass|chargeport`.
 
+## NueraExpress tier (pricing-sync)
+
+`transform.js` also emits a `data.express` config block for the premium **NueraExpress**
+"same-day, on-site (we come to you), urgent" tier — a flat per-visit priority surcharge over
+the standard price. Tune it with env vars (defaults shown):
+
+| Env | Default | Purpose |
+| --- | --- | --- |
+| `EXPRESS_ENABLED` | `true` | Set to `false` to hide every Express surface site-wide. |
+| `EXPRESS_SURCHARGE` | `49` | Flat per-visit priority fee (CAD), added once per booking. |
+| `EXPRESS_AREA` | `Guelph & nearby (Wellington County)` | Service area shown on the Express card. |
+
+The fee lives in the data (never the static HTML), so `app.js` renders it at runtime (Rule 1);
+`app.js` also carries a fallback (`EXPRESS_FALLBACK`) so the tier UI works if the block is absent.
+
 ## Mobile Klinik overlay (authorized source only)
 
 MK prices must come from a **sanctioned** source — never a scraper. Point the job at

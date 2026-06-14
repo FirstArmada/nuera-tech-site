@@ -8,6 +8,15 @@ const REVIEWS_URL = '/reviews.json';
 // Schema.org Service names per repair type — used for the per-type Service structured data.
 const SERVICE_NAME = { screen: 'Screen replacement', battery: 'Battery replacement', backglass: 'Back glass replacement', chargeport: 'Charge port repair' };
 
+// NueraExpress — premium "same-day, on-site (we come to you), urgent" tier. The real config
+// (surcharge, copy) ships in pricing-data.json (data.express, from the sync); this is the fallback
+// used when that block is absent so the two-tier UI still works (mirrors usePrecomputedStats).
+const EXPRESS_FALLBACK = { enabled: true, surcharge: 49, label: 'NueraExpress', tagline: 'Same-day · on-site · urgent', eta: 'Same-day — we come to you', area: 'Guelph & nearby (Wellington County)' };
+// General (device-less) NueraExpress booking message for the marketing CTA.
+const EXPRESS_GENERAL_MSG = "Hi Nuera Tech! I'd like to book a NueraExpress same-day on-site (urgent) repair — please come to me. I'll share my device and what's wrong.";
+const expressEnabled = () => !!(state.express && state.express.enabled);
+const expressFee = () => expressEnabled() ? Number(state.express.surcharge) || 0 : 0;
+
 const BRANDS = [
   { id: 'all', label: 'All' },
   { id: 'iphone', label: 'iPhone' },
@@ -228,7 +237,7 @@ function groupRepairs(repairs) {
 }
 
 // ---- state ----
-const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], selected: new Set(), openModel: null, page: 1, sort: 'default' };
+const state = { devices: [], byModel: new Map(), brand: 'all', type: 'all', q: '', groups: [], selected: new Set(), openModel: null, page: 1, sort: 'default', express: null, serviceLevel: 'standard' };
 const PAGE_SIZE = 12; // device cards revealed per page; "Load More" adds one page at a time
 
 // ===========================================================================
@@ -263,11 +272,13 @@ async function loadData() {
     if (!repairs.length) throw new Error('No repairs in data');
 
     buildModel(repairs);
+    state.express = (data.express && typeof data.express === 'object') ? data.express : EXPRESS_FALLBACK;
     const stats = usePrecomputedStats(data) || computeSavingsStats(repairs);
     renderStats(stats);
     buildFilters();
     buildSpotlight(stats);
     renderGrid();
+    applyExpress();
     injectStructuredData(data);
   } catch (err) {
     console.error('[nuera] failed to load pricing:', err);
@@ -846,6 +857,63 @@ function initDialog() {
     selectOption(g, next);
     const el = body.querySelector(`[data-g="${g}"][data-o="${next}"]`); if (el) el.focus();
   });
+
+  // Service-level segmented toggle (Standard / NueraExpress) lives in the sheet foot.
+  const svc = $('#detail-svc');
+  if (svc) {
+    svc.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-svc]'); if (!b) return;
+      setServiceLevel(b.dataset.svc);
+    });
+    svc.addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+      e.preventDefault();
+      setServiceLevel(state.serviceLevel === 'express' ? 'standard' : 'express');
+      const cur = $(`#detail-svc [data-svc="${state.serviceLevel}"]`); if (cur) cur.focus();
+    });
+  }
+}
+
+// ---- NueraExpress service tier ----
+// Fill the data-driven placeholders (the +$XX fee and the service area) and reveal/hide the
+// Express surfaces per config. Prices live in the data, never the static HTML (Rule 1), so the
+// markup ships a "—" placeholder that this fills after the fetch.
+function applyExpress() {
+  const on = expressEnabled();
+  const feeStr = on && expressFee() ? '+' + money(expressFee()) : '—';
+  $$('[data-express-fee]').forEach((el) => { el.textContent = feeStr; });
+  $$('[data-express-area]').forEach((el) => { el.textContent = (state.express && state.express.area) || ''; });
+  // Hide every Express-only surface (the #tiers section, the in-sheet selector) when disabled.
+  $$('[data-express-only]').forEach((el) => { el.hidden = !on; });
+}
+
+// Per-visit priority fee is the same for any device; the booking just flags urgency + on-site.
+function expressGeneralMsg(model) {
+  const fee = expressFee();
+  return `Hi Nuera Tech! I need a NueraExpress same-day ON-SITE (urgent) repair for my ${model} — please come to me.`
+    + (fee ? `\nNueraExpress priority: +${moneyExact(fee)} (added to the repair price).` : '');
+}
+
+// Swap the sheet's middle trust chip copy for the Express promise; warranty + parts chips stay
+// (shared signals — Standard is never "lesser", only slower/less convenient).
+function syncTrustStrip(express) {
+  const tx = $('#detail-trust-speed .ti-tx');
+  if (tx) tx.textContent = express ? 'Same-day · we come to you' : 'Same-day repair';
+}
+
+// Apply a service-level choice from the in-sheet segmented toggle.
+function setServiceLevel(level) {
+  state.serviceLevel = (level === 'express' && expressEnabled()) ? 'express' : 'standard';
+  $$('#detail-svc [data-svc]').forEach((b) => {
+    const sel = b.dataset.svc === state.serviceLevel;
+    b.setAttribute('aria-checked', String(sel));
+    b.tabIndex = sel ? 0 : -1;
+  });
+  const note = $('#detail-svc-note');
+  if (note) note.textContent = state.serviceLevel === 'express'
+    ? 'We come to you — same-day, urgent. Priority fee added once per visit.'
+    : 'Drop in or walk in at our Guelph shop — ready the same day.';
+  updateBundle();
 }
 
 function openDevice(model, trigger) {
@@ -854,6 +922,7 @@ function openDevice(model, trigger) {
   state.openModel = model;
   const groups = state.groups = groupRepairs(d.repairs);
   state.selected = new Set(); // fresh multi-select bundle per device
+  setServiceLevel('standard'); // every device opens on the Standard tier
 
   $('#detail-title').textContent = d.model;
   const gc = groups.length;
@@ -891,7 +960,8 @@ const BUNDLE_DISCOUNT = 20;
 function bundleTotals(sel) {
   const original = sel.reduce((s, gi) => s + selOpt(state.groups[gi]).price, 0);
   const discount = sel.length >= 2 ? BUNDLE_DISCOUNT : 0;
-  return { original, discount, final: original - discount };
+  const fee = state.serviceLevel === 'express' ? expressFee() : 0; // per-visit priority fee
+  return { original, discount, fee, final: original - discount + fee };
 }
 
 // Variant / colour label for a selected group (mirrors quoteText()).
@@ -900,22 +970,29 @@ function selLabel(g) {
 }
 
 function bundleMsg(model, sel) {
-  const { original, discount, final } = bundleTotals(sel);
+  const { original, discount, fee, final } = bundleTotals(sel);
+  const express = state.serviceLevel === 'express';
   const lines = sel.map((gi) => {
     const g = state.groups[gi]; const r = selOpt(g); const v = selLabel(g);
     return `• ${r.repair_type}${v ? ` (${v})` : ''} — ${moneyExact(r.price)}`;
   });
-  if (sel.length < 2) {
+  // Single repair, standard tier → keep the compact one-liner total.
+  if (sel.length < 2 && !express) {
     return `Hi Nuera Tech! I'd like to book for my ${model}:\n${lines.join('\n')}\n• Total: ${moneyExact(final)}`;
   }
-  return [
-    `Hi Nuera Tech! I'd like to book a bundle for my ${model}:`,
+  // Itemised breakdown for bundles and/or NueraExpress (so the surcharge is explicit).
+  const out = [
+    express
+      ? `Hi Nuera Tech! I need a NueraExpress same-day ON-SITE (urgent) repair for my ${model}:`
+      : `Hi Nuera Tech! I'd like to book a bundle for my ${model}:`,
     ...lines,
     '',
     `Original total: ${moneyExact(original)}`,
-    `Bundle discount: -${moneyExact(discount)}`,
-    `You pay: ${moneyExact(final)}`,
-  ].join('\n');
+  ];
+  if (discount) out.push(`Bundle discount: -${moneyExact(discount)}`);
+  if (fee) out.push(`NueraExpress priority (we come to you): +${moneyExact(fee)}`);
+  out.push(`You pay: ${moneyExact(final)}`);
+  return out.join('\n');
 }
 
 // Add/remove a repair group from the bundle, sync its toggle button, refresh the summary.
@@ -941,15 +1018,23 @@ function updateBundle() {
   const cta = $('#detail-book-all');
   const label = $('#detail-book-label');
   if (!model || !cta) return;
+  const express = state.serviceLevel === 'express';
+  syncTrustStrip(express);
   const sel = [...state.selected].sort((a, b) => a - b);
   if (!sel.length) {
     if (box) { box.hidden = true; box.innerHTML = ''; }
-    if (label) label.textContent = 'Book this device on WhatsApp';
-    cta.href = waLink(`Hi Nuera Tech! I'd like to book a repair for my ${model}.`);
-    cta.setAttribute('aria-label', `Book ${model} on WhatsApp`);
+    if (express) {
+      if (label) label.textContent = 'Book NueraExpress — we come to you';
+      cta.href = waLink(expressGeneralMsg(model));
+      cta.setAttribute('aria-label', `Book NueraExpress same-day on-site repair for ${model} on WhatsApp`);
+    } else {
+      if (label) label.textContent = 'Book this device on WhatsApp';
+      cta.href = waLink(`Hi Nuera Tech! I'd like to book a repair for my ${model}.`);
+      cta.setAttribute('aria-label', `Book ${model} on WhatsApp`);
+    }
     return;
   }
-  const { original, discount, final } = bundleTotals(sel);
+  const { original, discount, fee, final } = bundleTotals(sel);
   if (box) {
     const items = sel.map((gi) => {
       const g = state.groups[gi]; const v = selLabel(g);
@@ -960,15 +1045,16 @@ function updateBundle() {
       <div class="bundle-tot">
         <div class="bundle-row"><span>Original total</span><span>${moneyExact(original)}</span></div>
         ${discount ? `<div class="bundle-row bundle-save"><span>Bundle discount (2+ repairs)</span><span>-${moneyExact(discount)}</span></div>` : ''}
-        <div class="bundle-row bundle-final"><span>${discount ? 'You pay' : 'Total'}</span><b>${moneyExact(final)}</b></div>
+        ${fee ? `<div class="bundle-row bundle-express"><span>NueraExpress priority · we come to you</span><span>+${moneyExact(fee)}</span></div>` : ''}
+        <div class="bundle-row bundle-final"><span>${(discount || fee) ? 'You pay' : 'Total'}</span><b>${moneyExact(final)}</b></div>
       </div>
-      ${sel.length === 1 ? `<p class="bundle-hint">Add one more repair to save ${money(BUNDLE_DISCOUNT)}.</p>` : ''}`;
+      ${(sel.length === 1 && !express) ? `<p class="bundle-hint">Add one more repair to save ${money(BUNDLE_DISCOUNT)}.</p>` : ''}`;
   }
   if (label) label.textContent = sel.length === 1
-    ? `Book this repair — ${moneyExact(final)}`
-    : `Book ${sel.length} repairs — ${moneyExact(final)}`;
+    ? `Book ${express ? 'NueraExpress' : 'this repair'} — ${moneyExact(final)}`
+    : `Book ${sel.length} repairs${express ? ' · Express' : ''} — ${moneyExact(final)}`;
   cta.href = waLink(bundleMsg(model, sel));
-  cta.setAttribute('aria-label', `Book ${sel.length} selected repair${sel.length === 1 ? '' : 's'} for ${model} on WhatsApp`);
+  cta.setAttribute('aria-label', `Book ${sel.length} selected repair${sel.length === 1 ? '' : 's'}${express ? ' (NueraExpress)' : ''} for ${model} on WhatsApp`);
 }
 
 function optionsHTML(g, gi) {
@@ -1045,7 +1131,13 @@ function quoteText() {
     lines.push(`• ${g.rtype}${tier ? ` (${tier})` : ''}: ${moneyExact(r.price)}`
       + (hasSave ? ` — save ${money(Math.round(r.savings))} vs other shops` : ''));
   }
-  lines.push('', 'Book on WhatsApp: ' + waLink(`Hi Nuera Tech! I'd like to book a repair for my ${model}.`), 'https://nuera.talha-k.com/');
+  const express = state.serviceLevel === 'express';
+  if (express) {
+    const fee = expressFee();
+    lines.push('', `Service level: NueraExpress — same-day, on-site (we come to you)${fee ? ` · priority +${moneyExact(fee)} per visit` : ''}`);
+  }
+  const bookMsg = express ? expressGeneralMsg(model) : `Hi Nuera Tech! I'd like to book a repair for my ${model}.`;
+  lines.push('', 'Book on WhatsApp: ' + waLink(bookMsg), 'https://nuera.talha-k.com/');
   return lines.join('\n');
 }
 
@@ -1271,6 +1363,7 @@ function renderReviews(data) {
 function initWhatsAppDefaults() {
   const msg = "Hi Nuera Tech! I'd like to book a repair.";
   $$('[data-wa="general"]').forEach((a) => { a.href = waLink(msg); });
+  $$('[data-wa="express"]').forEach((a) => { a.href = waLink(EXPRESS_GENERAL_MSG); });
 }
 
 // ===========================================================================

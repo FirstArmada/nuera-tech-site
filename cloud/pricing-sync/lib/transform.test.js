@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { transform, computeStats } from './transform.js';
+import { transform, computeStats, expressConfig } from './transform.js';
 
 test('transform', async (t) => {
   await t.test('maps valid rows correctly', () => {
@@ -99,5 +99,38 @@ test('computeStats', async (t) => {
     assert.strictEqual(stats.maxSaving, 0);
     assert.strictEqual(stats.avgPct, 0);
     assert.deepStrictEqual(stats.top, []);
+  });
+});
+
+test('expressConfig', async (t) => {
+  const ENV_KEYS = ['EXPRESS_ENABLED', 'EXPRESS_SURCHARGE', 'EXPRESS_AREA'];
+  const clearEnv = () => ENV_KEYS.forEach((k) => { delete process.env[k]; });
+
+  await t.test('emits a sensible default block', () => {
+    clearEnv();
+    const x = expressConfig();
+    assert.strictEqual(x.enabled, true);
+    assert.strictEqual(x.surcharge, 49);
+    assert.strictEqual(x.label, 'NueraExpress');
+    assert.strictEqual(typeof x.tagline, 'string');
+    assert.strictEqual(typeof x.area, 'string');
+  });
+
+  await t.test('honors EXPRESS_* env overrides', () => {
+    process.env.EXPRESS_SURCHARGE = '69';
+    process.env.EXPRESS_ENABLED = 'false';
+    process.env.EXPRESS_AREA = 'Guelph downtown';
+    const x = expressConfig();
+    assert.strictEqual(x.surcharge, 69);
+    assert.strictEqual(x.enabled, false);
+    assert.strictEqual(x.area, 'Guelph downtown');
+    clearEnv();
+  });
+
+  await t.test('transform() includes the express block', () => {
+    clearEnv();
+    const result = transform([{ Model: 'iPhone 13', 'Repair Type': 'Screen', Price: '100' }]);
+    assert.strictEqual(result.express.enabled, true);
+    assert.strictEqual(result.express.surcharge, 49);
   });
 });

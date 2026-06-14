@@ -95,6 +95,22 @@ test('validates stats object if present', () => {
   assert.throws(() => validate({ ...validData, stats: { maxSaving: 10, avgPct: 10, top: null } }), /stats.top must be an array/);
 });
 
+test('validates express block if present', () => {
+  const base = {
+    generated: '2023',
+    source: 'test',
+    repairs: [{ model: '', repair_type: '', variant: '', sku: '', brand: BRANDS[0], chip: CHIPS[0], price: 100, mk_price: null, savings: null }],
+  };
+  const good = { enabled: true, surcharge: 49, label: 'NueraExpress', tagline: 'Same-day · on-site · urgent' };
+
+  assert.strictEqual(validate({ ...base, express: good }), true);
+  assert.throws(() => validate({ ...base, express: null }), /express must be an object/);
+  assert.throws(() => validate({ ...base, express: { ...good, enabled: 'yes' } }), /express.enabled must be a boolean/);
+  assert.throws(() => validate({ ...base, express: { ...good, surcharge: 0 } }), /express.surcharge must be a positive number/);
+  assert.throws(() => validate({ ...base, express: { ...good, surcharge: '49' } }), /express.surcharge must be a positive number/);
+  assert.throws(() => validate({ ...base, express: { ...good, label: 5 } }), /express.label must be a string/);
+});
+
 test('throws on >20% repair count difference', () => {
   const data = {
     generated: '2023',
