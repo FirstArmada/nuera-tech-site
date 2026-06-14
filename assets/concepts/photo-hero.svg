@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" role="img" aria-label="Concept render: premium smartphone hero product shot with purple to cyan rim light">
+  <defs>
+    <radialGradient id="h-bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#15131f"/>
+      <stop offset=".55" stop-color="#0b0b12"/>
+      <stop offset="1" stop-color="#050509"/>
+    </radialGradient>
+    <linearGradient id="h-rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c4b5fd"/>
+      <stop offset=".5" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="h-screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1830"/>
+      <stop offset=".5" stop-color="#0d0e1a"/>
+      <stop offset="1" stop-color="#101524"/>
+    </linearGradient>
+    <linearGradient id="h-refl" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c4b5fd" stop-opacity=".5"/>
+      <stop offset=".35" stop-color="#8b5cf6" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="h-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="34"/>
+    </filter>
+    <filter id="h-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="1000" height="800" fill="url(#h-bg)"/>
+  <ellipse cx="500" cy="360" rx="300" ry="320" fill="#8b5cf6" opacity=".22" filter="url(#h-glow)"/>
+  <ellipse cx="500" cy="690" rx="220" ry="42" fill="#000" opacity=".55" filter="url(#h-soft)"/>
+  <g transform="rotate(-8 500 400)">
+    <rect x="372" y="138" width="256" height="512" rx="52" fill="url(#h-rim)" filter="url(#h-soft)" opacity=".9"/>
+    <rect x="378" y="144" width="244" height="500" rx="48" fill="#0a0a12"/>
+    <rect x="392" y="158" width="216" height="472" rx="36" fill="url(#h-screen)"/>
+    <path d="M392 194 q108 -52 216 0 v-36 h-216z" fill="url(#h-refl)"/>
+    <rect x="392" y="158" width="120" height="472" rx="36" fill="url(#h-refl)" opacity=".5"/>
+    <rect x="462" y="170" width="76" height="20" rx="10" fill="#07070c"/>
+    <circle cx="524" cy="180" r="5" fill="#1a1830"/>
+    <circle cx="524" cy="180" r="2" fill="#22d3ee" opacity=".7"/>
+  </g>
+  <ellipse cx="500" cy="688" rx="120" ry="30" fill="url(#h-rim)" opacity=".12" filter="url(#h-soft)"/>
+</svg>

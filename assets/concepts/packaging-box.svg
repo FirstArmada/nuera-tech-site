@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" role="img" aria-label="Concept render: branded Nuera Tech repair return box in three-quarter view">
+  <defs>
+    <radialGradient id="p-bg" cx="50%" cy="36%" r="80%">
+      <stop offset="0" stop-color="#14121d"/>
+      <stop offset="1" stop-color="#060509"/>
+    </radialGradient>
+    <linearGradient id="p-band" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c4b5fd"/>
+      <stop offset=".5" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="p-top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1824"/>
+      <stop offset="1" stop-color="#101019"/>
+    </linearGradient>
+    <linearGradient id="p-front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#15141d"/>
+      <stop offset="1" stop-color="#0c0b12"/>
+    </linearGradient>
+    <linearGradient id="p-side" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0a0910"/>
+      <stop offset="1" stop-color="#070609"/>
+    </linearGradient>
+    <filter id="p-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+    <filter id="p-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+  </defs>
+  <rect width="1000" height="800" fill="url(#p-bg)"/>
+  <ellipse cx="500" cy="640" rx="340" ry="70" fill="#000" opacity=".55" filter="url(#p-soft)"/>
+  <ellipse cx="500" cy="230" rx="320" ry="180" fill="url(#p-band)" opacity=".1" filter="url(#p-soft)"/>
+  <!-- box: side, front, top -->
+  <polygon points="690,260 830,330 830,590 690,640" fill="url(#p-side)"/>
+  <polygon points="220,300 690,260 690,640 220,610" fill="url(#p-front)"/>
+  <polygon points="220,300 360,230 830,200 690,260" fill="url(#p-top)"/>
+  <!-- lid gradient band on the top face -->
+  <polygon points="220,300 360,230 830,200 690,260" fill="url(#p-band)" opacity=".9"/>
+  <g filter="url(#p-glow)" opacity=".25">
+    <polygon points="220,300 360,230 830,200 690,260" fill="url(#p-band)"/>
+  </g>
+  <!-- N mark + wordmark on lid band -->
+  <g transform="translate(300 248) skewY(-8)">
+    <rect width="54" height="54" rx="13" fill="#0f0d18"/>
+    <g transform="translate(7 7)">
+      <path d="M12 28V12L28 28V12" fill="none" stroke="#f4f6ff" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="12" r="2.4" fill="#22d3ee"/>
+    </g>
+    <text x="70" y="40" font-family="Inter,Helvetica,Arial,sans-serif" font-size="40" font-weight="800" fill="#07070c">Nuera<tspan fill="#0e4f5c">Tech</tspan></text>
+  </g>
+  <!-- front face seam + subtle highlight -->
+  <line x1="455" y1="285" x2="455" y2="625" stroke="#000" stroke-opacity=".3" stroke-width="2"/>
+  <polygon points="220,300 690,260 690,300 220,340" fill="#fff" opacity=".03"/>
+</svg>

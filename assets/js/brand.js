@@ -98,6 +98,14 @@ stageBtns.forEach((btn) => {
     if (stage) stage.style.background = btn.getAttribute('data-stage-bg');
   });
 });
+/* Initialise the previewer to suit the active theme (light → White, dark → Ink 800) so the
+   big stage integrates with the page instead of defaulting dark on the light theme. */
+if (stage && stageBtns.length) {
+  const want = document.documentElement.dataset.theme === 'light' ? '#f4f6ff' : '#0c0d16';
+  const initBtn = stageBtns.find((b) => b.getAttribute('data-stage-bg') === want) || stageBtns[0];
+  stageBtns.forEach((b) => b.setAttribute('aria-checked', String(b === initBtn)));
+  stage.style.background = initBtn.getAttribute('data-stage-bg');
+}
 
 /* ---- WCAG contrast checker ---- */
 function relLuminance(hex) {

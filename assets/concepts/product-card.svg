@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" role="img" aria-label="Concept render: NueraCare membership card close-up with green sheen">
+  <defs>
+    <radialGradient id="c-bg" cx="50%" cy="40%" r="80%">
+      <stop offset="0" stop-color="#13121c"/>
+      <stop offset="1" stop-color="#06060b"/>
+    </radialGradient>
+    <linearGradient id="c-card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#15151f"/>
+      <stop offset=".5" stop-color="#0e0e16"/>
+      <stop offset="1" stop-color="#121620"/>
+    </linearGradient>
+    <radialGradient id="c-sheen" cx="88%" cy="14%" r="60%">
+      <stop offset="0" stop-color="#34d399" stop-opacity=".42"/>
+      <stop offset=".5" stop-color="#34d399" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#34d399" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="c-n" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c4b5fd"/>
+      <stop offset=".5" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <filter id="c-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+  </defs>
+  <rect width="1000" height="640" fill="url(#c-bg)"/>
+  <ellipse cx="500" cy="540" rx="360" ry="60" fill="#000" opacity=".55" filter="url(#c-shadow)"/>
+  <rect x="130" y="90" width="740" height="460" rx="40" fill="url(#c-card)" stroke="#23232f" stroke-width="1.5"/>
+  <rect x="130" y="90" width="740" height="460" rx="40" fill="url(#c-sheen)"/>
+  <g transform="translate(186 150)">
+    <rect width="64" height="64" rx="16" fill="#0f0d18"/>
+    <g transform="translate(12 12) scale(1)">
+      <path d="M12 28V12L28 28V12" fill="none" stroke="url(#c-n)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="12" r="2.4" fill="#22d3ee"/>
+    </g>
+  </g>
+  <text x="270" y="192" font-family="Inter,Helvetica,Arial,sans-serif" font-size="24" font-weight="700" letter-spacing="6" fill="#34d399">MEMBERSHIP</text>
+  <text x="184" y="378" font-family="Inter,Helvetica,Arial,sans-serif" font-size="108" font-weight="800" fill="#f4f6ff">Nuera<tspan fill="#34d399">Care</tspan></text>
+  <text x="186" y="494" font-family="Inter,Helvetica,Arial,sans-serif" font-size="28" font-weight="500" letter-spacing="1" fill="#9fa9bd">Protection plan</text>
+  <text x="814" y="494" text-anchor="end" font-family="Inter,Helvetica,Arial,sans-serif" font-size="30" font-weight="600" letter-spacing="3" fill="#9fa9bd">•••• 4666</text>
+</svg>
