@@ -24,6 +24,17 @@ const app = express();
 // could spoof XFF to get a fresh rate-limit bucket per request and bypass the limiter entirely.
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
+
+// Defense-in-depth response headers (the proxy only returns JSON / SSE, never HTML, so a strict
+// default-src 'none' CSP + nosniff + frame DENY + HSTS cost nothing and harden the public API).
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Content-Security-Policy', "default-src 'none'");
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
+
 app.use(express.json({ limit: '8kb' }));
 app.use(cors({
   origin(origin, cb) {
