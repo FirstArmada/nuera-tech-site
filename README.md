@@ -1,6 +1,7 @@
 # Nuera Tech — Guelph Phone Repair
 
-Premium, dark/neon marketing + pricing site for **Nuera Tech**, a phone & tablet
+Premium dark/neon marketing + pricing site — with a light theme alongside the signature dark
+(OS-followed, with a persistent toggle) — for **Nuera Tech**, a phone & tablet
 repair shop in Guelph, Ontario. The site's job: make the savings-vs-other-shops
 story obvious and turn visitors into booked repairs over WhatsApp.
 

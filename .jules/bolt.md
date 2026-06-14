@@ -45,7 +45,8 @@ the savings UI must degrade gracefully where `mk_price`/`savings` are null.
 - The inline token block in `index.html` now follows the TELUS/UDS (Allium) system in its
   BONES while keeping the OG dark-neon palette: Inter four-weight scale (300/400/500/700;
   hero **display 300** + gradient), 4px spacing scale, Allium radii (`--radius-card` 24),
-  TELUS motion (`--dur-250/300`, `--ease-default`). Dark-only. **Do not adopt the proprietary
+  TELUS motion (`--dur-250/300`, `--ease-default`). Dark by default; a light theme was added later
+  via `:root[data-theme="light"]` tokens + a persistent toggle. **Do not adopt the proprietary
   HelveticaNowTELUS font** — Inter (SIL OFL) is the deliberate, commercially-safe choice.
 - One solid action green `#34d399` (savings + WhatsApp + FAB); danger `#ef4444`. Heavy text is
   700, never 800. Legacy token names (`--radius-sm/md/lg`, `--dur-fast/base/slow`, `--space-16`,

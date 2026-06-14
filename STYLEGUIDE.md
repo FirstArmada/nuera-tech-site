@@ -10,8 +10,9 @@ code instead of hard-coding values.
 > (300/400/500/700), the 4px spacing + Allium radius scale, TELUS 250/300ms motion, the
 > semantic-token architecture, and Allium iconography. The display weight is **300** with
 > the brand gradient; there is **one unified action green** (`#34d399`, solid — savings +
-> WhatsApp) and a **sharper danger red** (`#ef4444`). **Dark-only — there is no light
-> theme.** Source: Claude Design handoff (`nuera-tech-design-system`).
+> WhatsApp) and a **sharper danger red** (`#ef4444`). The site ships **both a dark and a light
+> theme** from one token set — see *Light & dark themes* below. Source: Claude Design handoff
+> (`nuera-tech-design-system`).
 
 ## Scope & architecture
 
@@ -41,6 +42,33 @@ New code should use the **semantic** and **scale** tokens. The **legacy aliases*
 (`--bg`, `--text`, `--purple`, `--panel`, `--radius`, `--grad`, …) are retained
 because existing rules and runtime-generated markup reference them — they now
 simply point at the semantic tokens.
+
+---
+
+## Light & dark themes
+
+The site ships **both themes from one token set**. Dark is the default (`:root`); light is a single
+override block, **`:root[data-theme="light"]`**, that re-points the semantic colour tokens to a re-tuned
+light palette — a soft off-white canvas (`--color-bg:#f6f7fb`), slate (dark-alpha) surfaces, and
+**darkened** accent/gradient ramps so text clears WCAG AA on light (accent `#7c3aed`, cyan-as-text
+`#0e7490`, gradient `#7c3aed → #6d28d9 → #0e7490`). Because components consume the semantic tokens most of
+the UI flips for free; only genuinely hardcoded surfaces get scoped `:root[data-theme="light"] …` overrides.
+
+- **Activation / no-flash.** A blocking, same-origin `assets/js/theme.js` runs in `<head>` before first
+  paint and sets `<html data-theme="light|dark">` (the CSP is `script-src 'self'`, so it can't be inline).
+  It follows the OS (`prefers-color-scheme`) on first visit; the header sun/moon toggle (`#theme-toggle`)
+  overrides and **persists** the choice in `localStorage('nuera-theme')`, and keeps following the OS until
+  the user chooses explicitly. It also syncs `<meta name="theme-color">` / `<meta name="color-scheme">`.
+  No-JS → no `data-theme` → the dark `:root` applies.
+- **Triplication.** The `:root` and `:root[data-theme="light"]` blocks are mirrored across `index.html`,
+  `brand.html` and `brand-concept.html` (each page is self-contained, build-less). **Edit all three.**
+- **Injected UI** (e.g. the `chat.js` assistant widget) must style itself from the tokens so it follows the
+  theme — no hardcoded ink/white colours.
+- **Intentionally fixed (NOT themed):** physical device-colour swatches, the Brand Book logo-on-ink/white
+  specimens + contrast-checker preview, the concept-board SVG renders, and the logo's dark app-icon badge
+  tile — these are deliberate constants, not theme bugs.
+- **Known limitation:** `manifest.webmanifest` `theme_color`/`background_color` stay dark (`#07070c`) — a
+  webmanifest can't be media-queried, so the brief PWA splash is dark on both themes (on-brand).
 
 ---
 

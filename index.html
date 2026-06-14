@@ -6,7 +6,7 @@
   <title>Nuera Tech — Guelph Phone Repair | Beat Other Shops' Pricing</title>
   <meta name="description" content="Guelph's transparent phone repair shop. iPhone, Samsung, Pixel & iPad screen and battery repair — up to $115 cheaper than other shops. Same-day service, 90-day warranty, book on WhatsApp." />
   <meta name="theme-color" content="#07070c" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="color-scheme" content="dark light" />
   <!-- Theme bootstrap: BLOCKING + same-origin (CSP is script-src 'self'); sets <html data-theme> before first paint so there's no dark↔light flash. -->
   <script src="/assets/js/theme.js"></script>
   <link rel="canonical" href="https://nuera.talha-k.com/" />
@@ -48,12 +48,15 @@
        the TELUS alignment lives in the BONES: Inter on the four-weight Allium scale, 4px
        spacing + Allium radii, TELUS 250/300ms motion, and the semantic-token architecture.
        Layered: primitives (raw palette) -> semantic tokens -> scales -> legacy aliases.
-       Dark-only — there is no light theme. New code references the semantic/scale tokens
+       Ships light + dark from ONE token set: dark is the default :root below; the light theme is the
+       :root[data-theme="light"] override block further down (set pre-paint by theme.js, OS-followed
+       with a persistent toggle). New code references the semantic/scale tokens
        (--color-*, --fs-*, --space-*, --radius-*); legacy names are kept as aliases so existing
        rules + runtime markup keep working. See STYLEGUIDE.md. */
     :root{
-      /* Dark-only UI: render native form controls, scrollbars and <dialog> dark to match
-         (the <meta name="color-scheme"> only hints UA chrome; this is the canonical declaration). */
+      /* Default (dark) UI: native form controls, scrollbars and <dialog> render dark to match;
+         :root[data-theme="light"] flips this to light, and theme.js syncs the
+         <meta name="color-scheme"> hint to the active theme. */
       color-scheme: dark;
       /* -- HSL foundation: rotate a whole colour family from one --hue knob; --sat-brand is the
          master vividness dial. The brand --c-* primitives below derive from these (original hex
