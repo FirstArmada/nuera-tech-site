@@ -41,6 +41,22 @@ const TYPES = [
   { id: 'chargeport', label: 'Charge Port' },
 ];
 const CHIP_LABEL = { screen: 'Screen', battery: 'Battery', backglass: 'Back Glass', chargeport: 'Charge Port' };
+// Search-only synonyms per repair type, so customers' words match the data's labels
+// (e.g. "display"/"lcd"/"glass" → screen). Index-only — never displayed. The data's own
+// repair_type strings ("Screen Replacement", "Charge Port"…) already cover the verbatim
+// terms, so these lists add only what's missing.
+const SEARCH_ALIASES = {
+  screen: ['display', 'lcd', 'led', 'oled', 'glass', 'digitizer', 'touch', 'cracked', 'crack'],
+  battery: ['power', 'drain', 'dead'],
+  backglass: ['rear', 'cover', 'glass'],
+  chargeport: ['charging', 'usb', 'usbc', 'port', 'dock', 'lightning'],
+};
+// Brand synonyms folded into the same index (manufacturer()/brandLabel() already cover
+// "apple"/"samsung"/"google"/"pixel"; this adds the rest, e.g. "android"/"ios"/"tablet").
+const BRAND_ALIASES = {
+  iphone: ['apple', 'ios'], ipad: ['apple', 'ios', 'tablet'],
+  samsung: ['android'], 'samsung-tab': ['android', 'tablet'], pixel: ['android'],
+};
 // Sort weight per repair type, derived from TYPES so the order lives in one place.
 const TYPE_ORDER = Object.fromEntries(TYPES.filter((t) => t.id !== 'all').map((t, i) => [t.id, i]));
 
@@ -373,9 +389,12 @@ function buildModel(repairs) {
     d._year = deviceYear(d.model);
     d._tier = tierWeight(d.model);
     // Search index — model + brand names + every repair type (id, chip label, full repair_type)
-    // so tokenised queries match a device by model AND by the repairs it offers (DoD #3).
-    const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t]);
-    d.search = [d.model, manufacturer(d.brand), brandLabel(d.brand), ...typeWords, ...rtypeWords]
+    // plus per-type and per-brand synonyms (SEARCH_ALIASES/BRAND_ALIASES) so tokenised queries
+    // match a device by model, by the repairs it offers, and by the words customers actually use
+    // ("display"/"lcd" → screen, "usb"/"port" → charge port, "android" → Samsung/Pixel) (DoD #3).
+    const typeWords = [...d.types].flatMap((t) => [t, CHIP_LABEL[t] || t, ...(SEARCH_ALIASES[t] || [])]);
+    const aliasWords = [...new Set([...typeWords, ...(BRAND_ALIASES[d.brand] || [])])];
+    d.search = [d.model, manufacturer(d.brand), brandLabel(d.brand), ...aliasWords, ...rtypeWords]
       .join(' ').toLowerCase();
   }
   state.byModel = map;
