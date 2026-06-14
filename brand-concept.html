@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+  <title>Nuera Tech — Brand Concept Board</title>
+  <meta name="description" content="A first-round editorial brand concept board for Nuera Tech and its sub-brand family — NueraCare, NueraExpress and NueraTrade. Logo system, typography, palette, icons, patterns, product & packaging mockups, signage and photography direction." />
+  <meta name="theme-color" content="#07070c" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://nuera.talha-k.com/brand-concept" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Nuera Tech" />
+  <meta property="og:title" content="Nuera Tech — Brand Concept Board" />
+  <meta property="og:description" content="First-round identity concept board: logo system, sub-brand family, palette, mockups, signage & photography direction." />
+  <meta property="og:url" content="https://nuera.talha-k.com/brand-concept" />
+  <meta property="og:image" content="https://nuera.talha-k.com/assets/icons/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Nuera Tech — Brand Concept Board" />
+  <meta name="twitter:description" content="First-round identity concept board for Nuera Tech." />
+
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Nuera Tech" />
+
+  <link rel="preload" href="/assets/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="modulepreload" href="/assets/js/brand-concept.js" />
+
+  <style>
+    /* ===== Fonts ===== */
+    @font-face{font-family:Inter;font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/inter-var-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+    /* ===== Design tokens — copied verbatim from index.html (canonical Nuera palette/scale). ===== */
+    :root{
+      color-scheme: dark;
+      --hue-purple:258;--hue-cyan:188;--hue-green:158;--hue-danger:0;
+      --sat-brand:90%;--sat-success:64%;--sat-danger:84%;
+      --c-trust-500:hsl(220 16% 46%);--c-trust-400:hsl(220 14% 60%);
+      --c-ink-900:#07070c;--c-ink-800:#0c0d16;
+      --c-slate-50:#f4f6ff;--c-slate-400:#9fa9bd;--c-slate-500:#8794ab;
+      --c-purple-500:hsl(var(--hue-purple) var(--sat-brand) 66%);
+      --c-purple-300:hsl(252 var(--sat-brand) 85%);
+      --c-cyan-400:hsl(var(--hue-cyan) 86% 53%);
+      --c-green-400:hsl(var(--hue-green) var(--sat-success) 52%);
+      --c-green-300:hsl(156 72% 67%);
+      --c-rose-400:hsl(var(--hue-danger) var(--sat-danger) 60%);--c-amber-400:#fbbf24;
+      --alpha-1:rgba(255,255,255,.03);--alpha-2:rgba(255,255,255,.05);--alpha-3:rgba(255,255,255,.10);--alpha-4:rgba(255,255,255,.16);
+      --color-bg:var(--c-ink-900);--color-bg-raised:var(--c-ink-800);
+      --color-surface-1:var(--alpha-1);--color-surface-2:var(--alpha-2);--color-surface-3:var(--alpha-3);
+      --color-border:var(--alpha-3);--color-border-strong:var(--alpha-4);
+      --color-text-primary:var(--c-slate-50);--color-text-secondary:var(--c-slate-400);--color-text-tertiary:var(--c-slate-500);
+      --color-accent:var(--c-purple-500);--color-accent-soft:var(--c-purple-300);--color-accent-2:var(--c-cyan-400);
+      --color-on-accent:#0a0a12;--color-success:var(--c-green-400);--color-success-text:var(--c-green-400);
+      --color-on-success:#000;--color-on-danger:#fff;--color-on-warning:#000;
+      --color-danger:var(--c-rose-400);--color-warning:var(--c-amber-400);
+      --grad-accent:linear-gradient(100deg,var(--c-purple-300) 0%,var(--c-purple-500) 42%,var(--c-cyan-400) 100%);
+      --grad-wa:#34d399;
+      --space-0:0;--space-1:4px;--space-2:8px;--space-3:16px;--space-4:24px;--space-5:32px;
+      --space-6:40px;--space-7:48px;--space-8:56px;--space-9:64px;--space-10:72px;--space-11:88px;
+      --space-12:128px;--space-13:160px;--space-16:64px;
+      --space-section:clamp(48px,9vw,128px);
+      --radius-4:4px;--radius-6:6px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-24:24px;--radius-32:32px;
+      --radius-pill:99px;--radius-circle:50%;--radius-card:var(--radius-24);
+      --radius-xs:var(--radius-12);--radius-sm:var(--radius-16);--radius-md:var(--radius-24);--radius-lg:var(--radius-32);
+      --shadow-1:0 8px 24px -12px rgba(0,0,0,.45);
+      --shadow-2:0 24px 60px -20px rgba(0,0,0,.55);
+      --shadow-3:0 40px 100px -20px rgba(0,0,0,.7);
+      --glow-accent:0 12px 34px -8px rgba(139,92,246,.6);
+      --glow-accent-strong:0 18px 44px -8px rgba(139,92,246,.7);
+      --glow-success:0 16px 40px -10px rgba(52,211,153,.6);
+      --font-sans:Inter,"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+      --font-display:var(--font-sans);--font-mono:ui-monospace,"SF Mono",Menlo,Monaco,Consolas,monospace;
+      --fw-display:300;--fw-regular:400;--fw-medium:500;--fw-bold:700;
+      --fs-12:12px;--fs-14:14px;--fs-16:16px;--fs-20:20px;--fs-24:24px;--fs-28:28px;--fs-32:32px;--fs-36:36px;--fs-40:40px;--fs-48:48px;--fs-56:56px;--fs-64:64px;
+      --fs-base:var(--fs-16);--fs-sm:var(--fs-14);--fs-xs:var(--fs-12);--fs-2xs:11px;
+      --fs-lead:clamp(1.0625rem,2.6vw,1.25rem);--fs-h3:var(--fs-28);--fs-h2:var(--fs-32);
+      --fs-display:clamp(2.5rem,6vw,4rem);
+      --lh-tight:1.125;--lh-headings:1.2;--lh-snug:1.33;--lh-normal:1.5;--lh-relaxed:1.6;
+      --lh-body:var(--lh-relaxed);--lh-display:var(--lh-tight);--lh-heading:var(--lh-headings);
+      --ls-condensed:-.039em;--ls-medium:-.035em;--ls-loose:-.017em;
+      --track-display:var(--ls-condensed);--track-h2:var(--ls-medium);--track-tight:var(--ls-loose);--track-eyebrow:.08em;
+      --dur-250:250ms;--dur-300:300ms;--ease-default:cubic-bezier(.4,0,.2,1);
+      --dur-fast:var(--dur-250);--dur-base:var(--dur-250);--dur-slow:var(--dur-300);
+      --ease-out:var(--ease-default);--ease-standard:var(--ease-default);
+      --ease-emphasized:cubic-bezier(.2,0,0,1);
+      --ease-entrance:cubic-bezier(.22,1,.36,1);
+      --ease-exit:cubic-bezier(.4,0,1,1);
+      --ease-spring:cubic-bezier(.34,1.56,.64,1);
+      --focus-ring-color:var(--c-purple-300);--focus-ring-width:2px;--focus-ring-offset:2px;
+      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(20px,4vw,24px);
+      --touch-min:48px;
+      --bg:var(--color-bg);--bg2:var(--color-bg-raised);
+      --text:var(--color-text-primary);--muted:var(--color-text-secondary);--faint:var(--color-text-tertiary);
+      --purple:var(--color-accent);--purple-lt:var(--color-accent-soft);--cyan:var(--color-accent-2);
+      --green:var(--color-success);--green-lt:var(--color-success-text);--red:var(--color-danger);--amber:var(--color-warning);
+      --panel:var(--color-surface-1);--panel-2:var(--color-surface-2);
+      --border:var(--color-border);--border-2:var(--color-border-strong);
+      --radius:var(--radius-md);--shadow:var(--shadow-2);
+      --ring:0 0 0 3px rgba(139,92,246,.45);
+      --grad:var(--grad-accent);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{margin:0;font-family:var(--font-sans);background:var(--color-bg);color:var(--color-text-primary);min-height:100dvh;line-height:var(--lh-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;overscroll-behavior-y:contain}
+
+    .aurora{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+      radial-gradient(60% 50% at 18% 12%,rgba(139,92,246,.26),transparent 60%),
+      radial-gradient(55% 45% at 85% 8%,rgba(34,211,238,.20),transparent 60%),
+      radial-gradient(60% 55% at 78% 80%,rgba(139,92,246,.16),transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg2))}
+    .aurora::after{content:"";position:absolute;inset:-25%;background:
+      radial-gradient(35% 35% at 30% 30%,rgba(139,92,246,.16),transparent 60%),
+      radial-gradient(35% 35% at 70% 60%,rgba(34,211,238,.12),transparent 60%);
+      filter:blur(50px);animation:drift 22s ease-in-out infinite alternate}
+    @keyframes drift{from{transform:translate3d(-2%,-1%,0) scale(1)}to{transform:translate3d(2%,2%,0) scale(1.07)}}
+    .grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.045;
+      background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+    .scroll-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:100;pointer-events:none}
+    .scroll-progress>span{display:block;height:100%;width:100%;transform:scaleX(var(--p,0));transform-origin:0 50%;background:var(--grad-accent);box-shadow:0 0 10px rgba(139,92,246,.55)}
+
+    .wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--wrap-pad)}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:var(--fs-xs);font-weight:700;letter-spacing:var(--track-eyebrow);text-transform:uppercase;color:var(--cyan)}
+    .grad-text{background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lead-muted{color:var(--color-text-secondary);max-width:60ch;margin:0}
+
+    .skip{position:absolute;left:-9999px;top:0;z-index:200;background:var(--purple);color:#fff;padding:12px 18px;border-radius:0 0 12px 0;font-weight:700}
+    .skip:focus{left:0}
+    :focus-visible{outline:var(--focus-ring-width) solid var(--focus-ring-color);outline-offset:var(--focus-ring-offset)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--radius-pill);padding:0 24px;font:inherit;font-size:var(--fs-16);font-weight:700;line-height:1;letter-spacing:var(--ls-loose);cursor:pointer;text-decoration:none;white-space:nowrap;color:var(--color-text-primary);transition:transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out);min-height:48px}
+    .btn svg{width:20px;height:20px;flex:none}
+    .btn:active{transform:scale(.97)}
+    .btn-wa{color:var(--color-on-success);background:var(--grad-wa)}
+    .btn-wa:hover{transform:translateY(-2px);box-shadow:var(--glow-success)}
+
+    .header{position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);background:rgba(7,7,12,.72);border-bottom:1px solid var(--border);transition:background .25s ease,box-shadow .25s ease,border-color .25s ease}
+    @media (max-width:600px){.header{backdrop-filter:blur(8px) saturate(130%);-webkit-backdrop-filter:blur(8px) saturate(130%);background:rgba(7,7,12,.82)}}
+    .header.scrolled{background:rgba(7,7,12,.86);border-bottom-color:var(--border-2);box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
+    .header-in{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);min-height:var(--header-h)}
+    .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1;flex:none}
+    .brand-sprite{position:absolute;width:0;height:0;overflow:hidden}
+    .brand-mark{height:1.6em;width:1.6em;flex:none;display:block}
+    .brand-name{font-weight:700;letter-spacing:var(--track-tight);white-space:nowrap}
+    .brand-name .t{color:var(--cyan)}
+    .header .btn{padding:var(--space-2) var(--space-3);min-height:44px;font-size:.92rem}
+    @media (max-width:999.98px){.header .btn{margin-left:auto}}
+    @media (max-width:599.98px){.header .btn-wa .cta-label{display:none}.header .btn-wa{padding:10px 13px}}
+    .hnav{display:none;gap:var(--space-2);margin-left:auto}
+    .hnav a{color:#cdd6e8;text-decoration:none;font-weight:600;font-size:.92rem;padding:var(--space-2) var(--space-2);border-radius:999px;transition:background .15s,color .15s}
+    .hnav a:hover{background:var(--panel-2);color:#fff}
+    .hnav a[aria-current=page]{color:#fff;background:rgba(139,92,246,.2)}
+    @media (min-width:1000px){.hnav{display:flex}}
+    .hburger{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-2);color:var(--text);cursor:pointer}
+    .hburger svg{width:22px;height:22px}
+    .hburger:focus-visible{outline:none;box-shadow:var(--ring)}
+    @media (min-width:1000px){.hburger{display:none}}
+    .mobile-nav{position:absolute;top:calc(var(--header-h) + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-2) clamp(16px,4vw,28px) var(--space-3);border-top:1px solid var(--border);background:rgba(7,7,12,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+    .mobile-nav[hidden]{display:none}
+    .mobile-nav a{color:#e7ecf7;text-decoration:none;font-weight:700;padding:var(--space-3) var(--space-2);border-radius:12px;min-height:46px;display:flex;align-items:center}
+    .mobile-nav a:hover{background:var(--panel-2)}
+
+    footer{border-top:1px solid var(--border);margin-top:40px;padding:48px 0 80px;color:var(--muted)}
+    .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1.3fr;gap:32px;align-items:start}
+    .foot-col{min-width:0}
+    .foot-brand .brand{font-size:1.08rem;margin-bottom:10px}
+    .foot-h{margin:0 0 12px;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+    footer a{color:#cdd6e8;text-decoration:none}
+    footer a:hover{color:#fff;text-decoration:underline}
+    .foot-links{display:flex;flex-direction:column;gap:9px;font-size:.92rem}
+    .foot-loc{display:inline-flex;align-items:center;gap:7px}
+    .foot-loc svg{width:15px;height:15px;color:var(--cyan);flex:none}
+    .foot-bottom{margin-top:32px;font-size:.84rem;opacity:.75}
+    @media (max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:520px){.foot-grid{grid-template-columns:1fr}}
+
+    /* ===================== Concept board (editorial deck) ===================== */
+    .bc-subnav{position:sticky;top:calc(var(--header-h) + env(safe-area-inset-top));z-index:40;padding:10px 0}
+    .bc-subnav-inner{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:8px;border-radius:var(--radius-pill);background:rgba(10,11,20,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border)}
+    .bc-subnav-inner::-webkit-scrollbar{display:none}
+    .bc-subnav a{flex:none;white-space:nowrap;text-decoration:none;color:#cdd6e8;font-weight:700;font-size:.82rem;padding:8px 13px;border-radius:var(--radius-pill);transition:background .15s,color .15s}
+    .bc-subnav a:hover{background:var(--panel-2);color:#fff}
+    .bc-subnav a[aria-current=true]{background:linear-gradient(90deg,rgba(139,92,246,.32),rgba(34,211,238,.2));color:#fff}
+
+    /* Cover */
+    .bc-cover{position:relative;display:grid;place-items:center;text-align:center;min-height:min(82vh,720px);padding:clamp(40px,8vw,90px) 0}
+    .bc-cover .mark{height:clamp(72px,12vw,120px);width:clamp(72px,12vw,120px);filter:drop-shadow(0 18px 50px rgba(139,92,246,.5));margin-bottom:var(--space-4)}
+    .bc-cover h1{font-size:clamp(2.8rem,8vw,5.5rem);font-weight:var(--fw-display);letter-spacing:-.05em;line-height:1.02;margin:0 0 var(--space-3);text-wrap:balance}
+    .bc-cover .grad-text{display:inline-block;padding-bottom:.06em;filter:drop-shadow(0 3px 30px rgba(139,92,246,.4))}
+    .bc-cover p{font-size:var(--fs-lead);color:#d7deee;max-width:56ch;margin:0 auto var(--space-5)}
+    .bc-cover-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+    .bc-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:var(--radius-pill);background:var(--panel-2);border:1px solid var(--border-2);font-size:.86rem;font-weight:700;color:#dbe3f4}
+    .bc-chip .dot{width:10px;height:10px;border-radius:50%;background:var(--accent,#8b5cf6);flex:none;box-shadow:0 0 12px -1px var(--accent,#8b5cf6)}
+
+    /* Slides */
+    .bc-slide{padding-block:clamp(48px,8vw,104px);border-top:1px solid var(--border)}
+    .bc-slide-head{display:flex;flex-direction:column;gap:8px;max-width:74ch;margin-bottom:var(--space-6)}
+    .bc-num{font-family:var(--font-mono);font-size:.8rem;color:var(--purple-lt);font-weight:700;letter-spacing:.1em}
+    .bc-slide h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:var(--fw-display);letter-spacing:-.035em;line-height:1.05;margin:0}
+    .bc-slide .sub{color:var(--muted);font-size:var(--fs-lead);margin:0;max-width:68ch;line-height:1.6}
+
+    .bc-reveal{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease-entrance),transform .6s var(--ease-entrance)}
+    .bc-reveal.in{opacity:1;transform:none}
+
+    .bc-grid{display:grid;gap:18px}
+    .bc-g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .bc-g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+    .bc-g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .bc-card{border:1px solid var(--border);border-radius:var(--radius-32);background:linear-gradient(180deg,var(--panel-2),var(--panel));padding:clamp(22px,3vw,34px);box-shadow:var(--shadow-1)}
+    .bc-card h3{margin:0 0 8px;font-size:1.18rem;letter-spacing:-.02em}
+    .bc-card p{margin:0;color:#cdd6e8;line-height:1.6}
+    .bc-tag{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--panel-2);border:1px solid var(--border-2);color:var(--muted)}
+
+    /* Positioning */
+    .bc-adjs{display:flex;flex-wrap:wrap;gap:10px;margin-top:var(--space-2)}
+    .bc-adj{padding:10px 16px;border-radius:var(--radius-pill);border:1px solid var(--border-2);background:var(--panel-2);font-weight:700;font-size:.92rem}
+    .bc-adj.p{color:#d6c6ff}.bc-adj.c{color:#aef0ff}.bc-adj.g{color:#a9f3d4}.bc-adj.a{color:#ffe2a3}
+
+    /* Lockups + architecture */
+    .bc-lockup{display:inline-flex;align-items:center;gap:12px}
+    .bc-lockup .brand-mark{height:40px;width:40px}
+    .bc-word{font-weight:800;letter-spacing:-.03em;font-size:1.5rem;color:#f4f6ff;white-space:nowrap}
+    .bc-arch{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:var(--space-5)}
+    .bc-arch-master{position:relative;z-index:1}
+    .bc-arch-stem{width:2px;height:30px;background:linear-gradient(var(--border-2),transparent);margin:6px 0}
+    .bc-arch-children{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;position:relative}
+    .bc-arch-children::before{content:"";position:absolute;top:-16px;left:16.66%;right:16.66%;height:2px;background:var(--border-2)}
+    .bc-arch-node{border:1px solid var(--border-2);border-radius:var(--radius-16);padding:18px;background:var(--panel-2);position:relative;text-align:center}
+    .bc-arch-node::before{content:"";position:absolute;top:-16px;left:50%;width:2px;height:16px;background:var(--border-2)}
+    .bc-arch-node .role{display:block;margin-top:8px;font-size:.82rem;color:var(--muted)}
+    .bc-arch-node .bar{height:3px;border-radius:3px;margin-top:14px;background:var(--accent,#8b5cf6)}
+    @media (max-width:600px){.bc-arch-children{grid-template-columns:1fr}.bc-arch-children::before{display:none}.bc-arch-node::before{display:none}}
+
+    .bc-clearspace{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-top:var(--space-4)}
+    .bc-clearspace .frame{position:relative;padding:36px;border-radius:var(--radius-16);background:#0c0d16;border:1px dashed var(--border-2)}
+    .bc-clearspace .frame .brand-mark{height:70px;width:70px}
+
+    /* Color (editorial fields) */
+    .bc-colorfields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border-radius:var(--radius-24);overflow:hidden;border:1px solid var(--border)}
+    .bc-field{min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;cursor:pointer;color:#fff;border:0;font:inherit;text-align:left;transition:transform .15s ease}
+    .bc-field:hover{transform:translateY(-2px)}
+    .bc-field:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #fff}
+    .bc-field b{font-weight:700;font-size:.95rem}
+    .bc-field code{font-family:var(--font-mono);font-size:.78rem;opacity:.85}
+    .bc-field.dark b,.bc-field.dark code{color:#f4f6ff}
+    .bc-field.light b,.bc-field.light code{color:#07070c}
+
+    /* Icons + doodles */
+    .bc-icons{display:flex;flex-wrap:wrap;gap:14px}
+    .bc-ico{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;background:var(--panel-2);border:1px solid var(--border)}
+    .bc-ico svg{width:26px;height:26px;color:var(--cyan)}
+    .bc-ico.p svg{color:var(--purple-lt)}.bc-ico.g svg{color:var(--green-lt)}.bc-ico.a svg{color:var(--amber)}
+    .bc-doodles{display:flex;flex-wrap:wrap;gap:16px;margin-top:var(--space-4)}
+    .bc-doodle{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 40% 30%,rgba(139,92,246,.22),transparent 70%);border:1px solid var(--border)}
+    .bc-doodle svg{width:34px;height:34px}
+
+    /* Patterns */
+    .bc-pats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px}
+    .bc-pat{height:140px;border-radius:var(--radius-16);border:1px solid var(--border);position:relative;overflow:hidden}
+    .bc-pat .pl{position:absolute;left:12px;bottom:10px;font-size:.76rem;font-weight:700;color:#dbe3f4;background:rgba(7,7,12,.6);padding:3px 9px;border-radius:999px;backdrop-filter:blur(4px)}
+    .bc-pat.dots{background:#0c0d16 radial-gradient(rgba(196,181,253,.5) 1.4px,transparent 1.4px);background-size:16px 16px}
+    .bc-pat.grid{background:#0c0d16;background-image:linear-gradient(rgba(139,92,246,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.28) 1px,transparent 1px);background-size:24px 24px}
+    .bc-pat.aurora{background:
+      radial-gradient(60% 60% at 25% 20%,rgba(139,92,246,.5),transparent 60%),
+      radial-gradient(60% 60% at 80% 70%,rgba(34,211,238,.4),transparent 60%),#0a0b12}
+    .bc-pat.marks{background:#0c0d16;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M10 27V13l10 14V13' fill='none' stroke='%238b5cf6' stroke-opacity='.5' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-size:40px 40px}
+
+    /* Phone mockup */
+    .bc-stage{display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:center}
+    .bc-phone{width:200px;aspect-ratio:9/19.5;border-radius:32px;background:linear-gradient(160deg,#23242f,#0a0b12);padding:7px;box-shadow:var(--shadow-2),inset 0 0 0 1px rgba(255,255,255,.1);position:relative;flex:none}
+    .bc-phone-screen{height:100%;border-radius:26px;background:radial-gradient(120% 70% at 50% 0,rgba(139,92,246,.4),transparent 55%),linear-gradient(180deg,#0c0d16,#07070c);overflow:hidden;position:relative;padding:30px 13px 14px;display:flex;flex-direction:column;gap:9px}
+    .bc-phone-screen::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:64px;height:18px;border-radius:12px;background:#04050a}
+    .bc-ph-line{height:9px;border-radius:5px;background:rgba(255,255,255,.1)}
+    .bc-ph-line.w1{width:64%}.bc-ph-line.w2{width:88%;background:linear-gradient(90deg,var(--c-purple-300),var(--c-cyan-400));height:14px}
+    .bc-ph-card{margin-top:4px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);padding:10px;display:flex;flex-direction:column;gap:7px}
+    .bc-ph-pill{align-self:flex-start;font-size:.6rem;font-weight:700;color:#06120c;background:linear-gradient(100deg,var(--c-cyan-400),var(--c-green-400));padding:3px 8px;border-radius:999px}
+    .bc-ph-btn{margin-top:auto;height:34px;border-radius:999px;background:var(--grad-accent);box-shadow:var(--glow-accent)}
+    .bc-case{width:150px;aspect-ratio:9/19.5;border-radius:34px;border:2px solid var(--border-2);background:linear-gradient(160deg,rgba(139,92,246,.12),rgba(34,211,238,.06));position:relative;flex:none;box-shadow:var(--shadow-1)}
+    .bc-case::before{content:"";position:absolute;top:20px;left:18px;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.05);box-shadow:0 0 0 1px var(--border) inset}
+    .bc-case .lbl{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:.7rem;font-weight:700;color:var(--muted)}
+
+    /* Sub-brand product cards */
+    .bc-mock-card{aspect-ratio:1.58/1;border-radius:18px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:var(--shadow-2);color:#fff;background:linear-gradient(150deg,#13141f,#0a0b12);border:1px solid var(--border-2)}
+    .bc-mock-card::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 120% at 100% 0,color-mix(in srgb,var(--accent) 32%,transparent),transparent 60%);pointer-events:none}
+    .bc-mock-card .top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
+    .bc-mock-card .brand-mark{height:30px;width:30px}
+    .bc-mock-card .kind{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+    .bc-mock-card .name{position:relative;z-index:1;font-weight:800;font-size:1.15rem;letter-spacing:-.02em}
+    .bc-mock-card .name span{color:var(--accent)}
+    .bc-mock-card .meta{position:relative;z-index:1;display:flex;justify-content:space-between;font-size:.72rem;color:#aeb6c8;font-variant-numeric:tabular-nums}
+
+    /* Packaging */
+    .bc-box{position:relative;border-radius:0 0 14px 14px;background:linear-gradient(180deg,#12131d,#0c0d15);border:1px solid var(--border-2);border-top:0;padding:26px 22px 22px;box-shadow:var(--shadow-2);overflow:hidden}
+    .bc-box::before{content:"";position:absolute;inset:0 0 auto 0;height:46px;background:var(--grad-accent);opacity:.9}
+    .bc-box .lid{position:relative;z-index:1;display:flex;align-items:center;gap:10px;color:#0a0a12;font-weight:800;height:28px;margin:-4px 0 22px}
+    .bc-box .lid .brand-mark{height:26px;width:26px}
+    .bc-box .lid-word{font-size:1rem;letter-spacing:-.02em}
+    .bc-box .lid-word .t{color:#07232b}
+    .bc-box .b-body{color:#cdd6e8}
+    .bc-box .b-body b{color:#fff}
+    .bc-pouch{border-radius:var(--radius-16);border:1px dashed var(--border-2);background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 10px,transparent 10px 20px),#0c0d16;padding:24px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;text-align:center}
+    .bc-pouch .brand-mark{height:40px;width:40px}
+
+    /* Storefront / signage */
+    .bc-sign{border-radius:var(--radius-24);background:linear-gradient(180deg,#0a0b13,#070709);border:1px solid var(--border-2);padding:clamp(36px,6vw,72px) 24px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden}
+    .bc-sign::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% 120%,rgba(139,92,246,.3),transparent 70%);pointer-events:none}
+    .bc-sign .brand-mark{height:60px;width:60px;filter:drop-shadow(0 0 26px rgba(139,92,246,.7))}
+    .bc-sign .sign-word{font-weight:800;font-size:clamp(1.6rem,4vw,2.6rem);letter-spacing:-.03em;margin-top:14px;text-shadow:0 0 30px rgba(34,211,238,.45)}
+    .bc-sign .sign-word .t{color:var(--cyan)}
+    .bc-sign .sign-sub{margin-top:8px;color:var(--muted);font-weight:600;letter-spacing:.3em;text-transform:uppercase;font-size:.74rem}
+    .bc-decal{border-radius:var(--radius-16);border:1px solid var(--border-2);background:linear-gradient(180deg,rgba(34,211,238,.06),transparent),#0c0d16;padding:22px;display:flex;flex-direction:column;gap:10px}
+    .bc-decal .row{display:flex;justify-content:space-between;font-size:.86rem;color:#cdd6e8;border-bottom:1px solid var(--border);padding-bottom:8px}
+    .bc-decal .row:last-child{border-bottom:0;padding-bottom:0}
+
+    /* Photography / lifestyle direction tiles */
+    .bc-photo{border-radius:var(--radius-24);min-height:260px;position:relative;overflow:hidden;border:1px solid var(--border-2)}
+    .bc-photo .art{position:absolute;inset:0}
+    .bc-photo.hero .art{background:
+      radial-gradient(80% 60% at 70% 30%,rgba(34,211,238,.5),transparent 60%),
+      radial-gradient(70% 70% at 25% 80%,rgba(139,92,246,.55),transparent 60%),
+      linear-gradient(150deg,#101019,#07070c)}
+    .bc-photo.bench .art{background:
+      radial-gradient(90% 60% at 50% 0,rgba(139,92,246,.32),transparent 55%),
+      linear-gradient(180deg,#14110c,#0a0a0c)}
+    .bc-photo .tag{position:absolute;top:14px;left:14px;z-index:2;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#dbe3f4;background:rgba(7,7,12,.66);border:1px solid var(--border-2);padding:5px 11px;border-radius:999px;backdrop-filter:blur(4px)}
+    .bc-photo .dir{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px;background:linear-gradient(0deg,rgba(7,7,12,.94),rgba(7,7,12,.5) 60%,transparent)}
+    .bc-photo .dir h3{margin:0 0 5px;font-size:1.05rem;letter-spacing:-.01em}
+    .bc-photo .dir p{margin:0;color:#cdd6e8;font-size:.86rem;line-height:1.5}
+
+    /* Voice / taglines */
+    .bc-voice{display:grid;gap:16px}
+    .bc-quote{border-left:3px solid;border-image:var(--grad-accent) 1;padding:6px 0 6px 22px;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:var(--fw-display);letter-spacing:-.03em;line-height:1.15;color:#f4f6ff}
+    .bc-voice-principles{display:flex;flex-wrap:wrap;gap:10px;margin-top:var(--space-3)}
+
+    /* Appendix prompt + disclaimer */
+    .bc-prompt{position:relative;border:1px solid var(--border-2);border-radius:var(--radius-24);background:#0a0b12;overflow:hidden;margin-top:var(--space-4)}
+    .bc-prompt-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--panel-2)}
+    .bc-prompt-head .t{font-family:var(--font-mono);font-size:.8rem;color:var(--muted)}
+    .bc-prompt pre{margin:0;padding:20px;overflow-x:auto;font-family:var(--font-mono);font-size:.82rem;line-height:1.6;color:#cdd6e8;white-space:pre-wrap;word-break:break-word}
+    .bc-copybtn{display:inline-flex;align-items:center;gap:7px;flex:none;padding:8px 14px;min-height:40px;border-radius:var(--radius-pill);background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.4);color:#d6c6ff;font:inherit;font-weight:700;font-size:.82rem;cursor:pointer;transition:background .15s,border-color .15s}
+    .bc-copybtn svg{width:15px;height:15px}
+    .bc-copybtn:hover{background:rgba(139,92,246,.26)}
+    .bc-copybtn:focus-visible{outline:none;box-shadow:var(--ring)}
+    .bc-disclaimer{display:flex;gap:14px;padding:18px 20px;border-radius:var(--radius-16);background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.3);margin-top:var(--space-4)}
+    .bc-disclaimer svg{width:22px;height:22px;color:var(--amber);flex:none;margin-top:2px}
+    .bc-disclaimer p{margin:0;color:#e7ddc4;line-height:1.55;font-size:.9rem}
+    .bc-disclaimer b{color:#fff}
+
+    .bc-toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);z-index:120;background:rgba(12,13,22,.96);border:1px solid var(--border-2);color:var(--text);padding:12px 20px;border-radius:var(--radius-pill);font-weight:700;font-size:.9rem;box-shadow:var(--shadow-2);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;backdrop-filter:blur(8px)}
+    .bc-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    .btn,.bc-field,.bc-copybtn,.hnav a,.mobile-nav a,.hburger,.bc-subnav a{touch-action:manipulation}
+
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .aurora::after{animation:none}
+      .bc-reveal{opacity:1;transform:none;transition:none}
+      *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+    }
+  </style>
+
+  <script type="module" src="/assets/js/brand-concept.js"></script>
+</head>
+<body>
+  <svg class="brand-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="nueraMarkGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#c4b5fd"/>
+        <stop offset=".45" stop-color="#8b5cf6"/>
+        <stop offset="1" stop-color="#22d3ee"/>
+      </linearGradient>
+    </defs>
+    <symbol id="nuera-mark" viewBox="0 0 40 40">
+      <rect width="40" height="40" rx="11" fill="#0f0d18"/>
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="none" stroke="#fff" stroke-opacity=".1"/>
+      <path d="M12 28V12L28 28V12" fill="none" stroke="url(#nueraMarkGrad)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="12" r="2.4" fill="#22d3ee"/>
+    </symbol>
+  </svg>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+  <a class="skip" href="#logo-system">Skip to the logo system</a>
+
+  <header class="header">
+    <div class="wrap header-in">
+      <a class="brand" href="/" aria-label="Nuera Tech home">
+        <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
+        <span class="brand-name">Nuera <span class="t">Tech</span></span>
+      </a>
+      <nav class="hnav" aria-label="Primary">
+        <a href="/#finder">Pricing</a>
+        <a href="/#why">Why Nuera</a>
+        <a href="/brand">Brand Book</a>
+        <a href="/brand-concept" aria-current="page">Brand Concept</a>
+      </nav>
+      <a class="btn btn-wa" href="https://wa.me/12269784666" target="_blank" rel="noopener" aria-label="Book on WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
+        <span class="cta-label">Book on WhatsApp</span>
+      </a>
+      <button class="hburger" id="nav-toggle" type="button" aria-label="Open menu" title="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M21.166 18c.428 0 .78.383.828.883L22 19c0 .552-.373 1-.834 1H2.834C2.374 20 2 19.556 2 19c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 12c0 .552-.373 1-.834 1H2.834C2.374 13 2 12.556 2 12c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 5c0 .552-.373 1-.834 1H2.834C2.374 6 2 5.556 2 5c0-.552.373-1 .834-1h18.332Z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile" hidden>
+      <a href="/">Home</a>
+      <a href="/#finder">Pricing</a>
+      <a href="/brand">Brand Book</a>
+      <a href="/brand-concept" aria-current="page">Brand Concept</a>
+      <a href="https://wa.me/12269784666" target="_blank" rel="noopener">Book on WhatsApp</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+
+      <!-- Cover -->
+      <section class="bc-cover" aria-label="Cover">
+        <svg class="brand-mark mark" aria-hidden="true"><use href="#nuera-mark"/></svg>
+        <span class="eyebrow">Nuera Tech · Brand concept board · v1</span>
+        <h1>Phone repair, <span class="grad-text">leveled up.</span></h1>
+        <p>A first-round identity concept board — the full Nuera Tech visual system and its sub-brand family, presented like a founding brand deck.</p>
+        <div class="bc-cover-chips">
+          <span class="bc-chip"><span class="dot" style="--accent:#22d3ee"></span> Nuera Tech</span>
+          <span class="bc-chip"><span class="dot" style="--accent:#34d399"></span> NueraCare</span>
+          <span class="bc-chip"><span class="dot" style="--accent:#8b5cf6"></span> NueraExpress</span>
+          <span class="bc-chip"><span class="dot" style="--accent:#fbbf24"></span> NueraTrade</span>
+        </div>
+      </section>
+
+      <nav class="bc-subnav" aria-label="Concept board sections">
+        <div class="bc-subnav-inner">
+          <a href="#positioning">Positioning</a>
+          <a href="#logo-system">Logo system</a>
+          <a href="#type">Type</a>
+          <a href="#color">Colour</a>
+          <a href="#icons">Icons</a>
+          <a href="#patterns">Patterns</a>
+          <a href="#products">Products</a>
+          <a href="#packaging">Packaging</a>
+          <a href="#signage">Signage</a>
+          <a href="#photography">Photography</a>
+          <a href="#voice">Voice</a>
+          <a href="#appendix">Appendix</a>
+        </div>
+      </nav>
+
+      <!-- Positioning -->
+      <section class="bc-slide" id="positioning">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">01 / Positioning</span>
+          <h2>The honest, fast repair brand for Guelph</h2>
+          <p class="sub">Nuera Tech fixes iPhone, Samsung, Pixel &amp; iPad at transparent prices that beat other shops — same-day, 90-day warranty, booked over WhatsApp. The identity should feel like a well-funded consumer startup: confident, premium and approachable.</p>
+        </div>
+        <div class="bc-grid bc-g2">
+          <div class="bc-card bc-reveal">
+            <span class="bc-tag">Audience</span>
+            <h3 style="margin-top:12px">Who it's for</h3>
+            <p>University of Guelph students, busy professionals and local residents who need their device back today — without the mall-chain runaround or surprise pricing.</p>
+          </div>
+          <div class="bc-card bc-reveal">
+            <span class="bc-tag">Brand feel</span>
+            <h3 style="margin-top:12px">How it should feel</h3>
+            <div class="bc-adjs">
+              <span class="bc-adj p">Premium</span>
+              <span class="bc-adj c">Trustworthy</span>
+              <span class="bc-adj g">Fast</span>
+              <span class="bc-adj a">Honest</span>
+              <span class="bc-adj">Local</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Logo system & architecture -->
+      <section class="bc-slide" id="logo-system">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">02 / Logo system &amp; architecture</span>
+          <h2>One mark, a family of services</h2>
+          <p class="sub">The gradient "N" badge anchors a master brand and three endorsed sub-brands. Each sub-brand keeps the mark and the wordmark structure, differentiated only by a colour-coded suffix.</p>
+        </div>
+
+        <div class="bc-grid bc-g2">
+          <div class="bc-card bc-reveal">
+            <h3>Master lockup</h3>
+            <p style="margin-bottom:20px">Wordmark in Inter 800, "Tech" in brand cyan.</p>
+            <span class="bc-lockup"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="bc-word">Nuera <span style="color:#22d3ee">Tech</span></span></span>
+            <div class="bc-clearspace">
+              <div class="frame"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg></div>
+              <p style="margin:0;color:var(--muted);font-size:.86rem;max-width:24ch">Minimum clear-space = the height of the "N" on all sides.</p>
+            </div>
+          </div>
+          <div class="bc-card bc-reveal">
+            <h3>Sub-brand suffixes</h3>
+            <p style="margin-bottom:18px">Same mark, colour-coded suffix.</p>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <span class="bc-lockup"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="bc-word">Nuera<span style="color:#34d399">Care</span></span></span>
+              <span class="bc-lockup"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="bc-word">Nuera<span style="color:#8b5cf6">Express</span></span></span>
+              <span class="bc-lockup"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="bc-word">Nuera<span style="color:#fbbf24">Trade</span></span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bc-arch bc-reveal" aria-label="Brand architecture diagram">
+          <div class="bc-arch-master"><span class="bc-lockup"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="bc-word">Nuera <span style="color:#22d3ee">Tech</span></span></span></div>
+          <div class="bc-arch-stem" aria-hidden="true"></div>
+          <div class="bc-arch-children">
+            <div class="bc-arch-node" style="--accent:#34d399"><b class="bc-word" style="font-size:1.05rem">Nuera<span style="color:#34d399">Care</span></b><span class="role">Protection &amp; 90-day warranty membership</span><div class="bar"></div></div>
+            <div class="bc-arch-node" style="--accent:#8b5cf6"><b class="bc-word" style="font-size:1.05rem">Nuera<span style="color:#8b5cf6">Express</span></b><span class="role">Same-day premium fast-lane repair</span><div class="bar"></div></div>
+            <div class="bc-arch-node" style="--accent:#fbbf24"><b class="bc-word" style="font-size:1.05rem">Nuera<span style="color:#fbbf24">Trade</span></b><span class="role">Trade-in &amp; certified refurbished</span><div class="bar"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Typography -->
+      <section class="bc-slide" id="type">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">03 / Typography</span>
+          <h2>Inter does everything</h2>
+          <p class="sub">A single self-hosted variable family — light for display, bold for the wordmark and CTAs. Confident negative tracking on headlines; tabular numerals for prices.</p>
+        </div>
+        <div class="bc-grid bc-g2">
+          <div class="bc-card bc-reveal">
+            <div style="font-weight:800;font-size:clamp(3rem,9vw,5rem);letter-spacing:-.05em;line-height:1">Aa</div>
+            <p style="margin-top:10px">Inter — variable, weights 300 / 400 / 500 / 700 / 800.</p>
+          </div>
+          <div class="bc-card bc-reveal">
+            <div style="font-weight:300;font-size:1.9rem;letter-spacing:-.04em;line-height:1.1">Always cheaper.</div>
+            <div style="font-weight:500;margin-top:14px;color:#cdd6e8">Screen · Battery · Back glass · Charge port</div>
+            <div style="font-weight:800;margin-top:14px;font-variant-numeric:tabular-nums;font-size:1.7rem;letter-spacing:-.02em">$129 · $189 · $249</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Colour -->
+      <section class="bc-slide" id="color">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">04 / Colour</span>
+          <h2>Neon on ink</h2>
+          <p class="sub">A disciplined dark palette: a near-black canvas, two brand accents and an action green. Tap a field to copy its hex. Full HEX / RGB / CMYK lives in the <a href="/brand#palette" style="color:var(--cyan)">Brand Book</a>.</p>
+        </div>
+        <div class="bc-colorfields bc-reveal">
+          <button class="bc-field dark" type="button" data-copy="#07070c" style="background:#07070c" aria-label="Copy Ink hex #07070c"><b>Ink</b><code>#07070c</code></button>
+          <button class="bc-field" type="button" data-copy="#8b5cf6" style="background:#8b5cf6" aria-label="Copy Purple hex #8b5cf6"><b>Purple</b><code>#8b5cf6</code></button>
+          <button class="bc-field" type="button" data-copy="#22d3ee" style="background:#22d3ee" aria-label="Copy Cyan hex #22d3ee"><b style="color:#06222a">Cyan</b><code style="color:#06222a">#22d3ee</code></button>
+          <button class="bc-field" type="button" data-copy="#34d399" style="background:#34d399" aria-label="Copy Green hex #34d399"><b style="color:#06120c">Green</b><code style="color:#06120c">#34d399</code></button>
+          <button class="bc-field" type="button" data-copy="#fbbf24" style="background:#fbbf24" aria-label="Copy Amber hex #fbbf24"><b style="color:#241a00">Amber</b><code style="color:#241a00">#fbbf24</code></button>
+          <button class="bc-field light" type="button" data-copy="#f4f6ff" style="background:#f4f6ff" aria-label="Copy Paper hex #f4f6ff"><b>Paper</b><code>#f4f6ff</code></button>
+        </div>
+      </section>
+
+      <!-- Icons & doodles -->
+      <section class="bc-slide" id="icons">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">05 / Icons &amp; doodles</span>
+          <h2>A clean, repair-native icon set</h2>
+          <p class="sub">Feather-style 2px line icons for the system, plus a few playful doodles that give marketing surfaces personality without going cartoonish.</p>
+        </div>
+        <div class="bc-card bc-reveal">
+          <div class="bc-icons">
+            <span class="bc-ico p" title="Screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2.4"/><path d="M11 18h2"/></svg></span>
+            <span class="bc-ico" title="Battery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="16" height="9" rx="2"/><path d="M22 11v3"/><path d="M6 12.5h3"/></svg></span>
+            <span class="bc-ico a" title="Back glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2.4"/><circle cx="9.5" cy="7" r="1.5"/><circle cx="9.5" cy="11" r="1.5"/></svg></span>
+            <span class="bc-ico g" title="Charge port"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v5M15 2v5"/><path d="M7 7h10v3.5a5 5 0 0 1-10 0z"/><path d="M12 15.5V22"/></svg></span>
+            <span class="bc-ico g" title="Warranty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <span class="bc-ico" title="Same-day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="bc-ico p" title="Speed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
+            <span class="bc-ico" title="Location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          </div>
+          <div class="bc-doodles">
+            <span class="bc-doodle" title="Spark"><svg viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg></span>
+            <span class="bc-doodle" title="Fixed"><svg viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="bc-doodle" title="Heart"><svg viewBox="0 0 24 24" fill="#22d3ee" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/></svg></span>
+            <span class="bc-doodle" title="Crack squiggle"><svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h6l-3 5h5l-3 7"/></svg></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Patterns -->
+      <section class="bc-slide" id="patterns">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">06 / Patterns &amp; texture</span>
+          <h2>Atmosphere, not noise</h2>
+          <p class="sub">The aurora glow and a fine film-grain carry depth; a subtle "N" repeat and dot/grid fields give packaging and backgrounds rhythm.</p>
+        </div>
+        <div class="bc-pats bc-reveal">
+          <div class="bc-pat aurora"><span class="pl">Aurora glow</span></div>
+          <div class="bc-pat marks"><span class="pl">"N" repeat</span></div>
+          <div class="bc-pat dots"><span class="pl">Dot field</span></div>
+          <div class="bc-pat grid"><span class="pl">Gradient grid</span></div>
+        </div>
+      </section>
+
+      <!-- Products -->
+      <section class="bc-slide" id="products">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">07 / Product mockups</span>
+          <h2>The system in the wild</h2>
+          <p class="sub">How the identity lands on real touchpoints — the app on a freshly-repaired device, a protective case, and a membership card / ticket / tag for each sub-brand.</p>
+        </div>
+
+        <div class="bc-card bc-reveal" style="margin-bottom:18px">
+          <div class="bc-stage">
+            <div class="bc-phone" role="img" aria-label="Nuera Tech app on a repaired phone">
+              <div class="bc-phone-screen">
+                <div class="bc-ph-line w1"></div>
+                <div class="bc-ph-line w2"></div>
+                <div class="bc-ph-card">
+                  <span class="bc-ph-pill">Save $115</span>
+                  <div class="bc-ph-line" style="width:80%"></div>
+                  <div class="bc-ph-line" style="width:55%"></div>
+                  <div class="bc-ph-btn"></div>
+                </div>
+              </div>
+            </div>
+            <div class="bc-case" role="img" aria-label="Branded protective case concept"><span class="lbl">Protective case</span></div>
+          </div>
+        </div>
+
+        <div class="bc-grid bc-g3">
+          <div class="bc-mock-card bc-reveal" style="--accent:#34d399" role="img" aria-label="NueraCare membership card concept">
+            <div class="top"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="kind">Membership</span></div>
+            <div class="name">Nuera<span>Care</span></div>
+            <div class="meta"><span>Protection plan</span><span>•••• 4666</span></div>
+          </div>
+          <div class="bc-mock-card bc-reveal" style="--accent:#8b5cf6" role="img" aria-label="NueraExpress fast-lane ticket concept">
+            <div class="top"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="kind">Fast lane</span></div>
+            <div class="name">Nuera<span>Express</span></div>
+            <div class="meta"><span>Same-day priority</span><span>EXP-208</span></div>
+          </div>
+          <div class="bc-mock-card bc-reveal" style="--accent:#fbbf24" role="img" aria-label="NueraTrade trade-in tag concept">
+            <div class="top"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="kind">Trade-in</span></div>
+            <div class="name">Nuera<span>Trade</span></div>
+            <div class="meta"><span>Certified refurb</span><span>$120 credit</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Packaging -->
+      <section class="bc-slide" id="packaging">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">08 / Packaging</span>
+          <h2>The hand-back moment</h2>
+          <p class="sub">Repaired devices leave in branded packaging — a small premium that reinforces trust and makes the fix feel like an unboxing.</p>
+        </div>
+        <div class="bc-grid bc-g2">
+          <div class="bc-box bc-reveal" role="img" aria-label="Repair-return box concept">
+            <div class="lid"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg><span class="lid-word">Nuera <span class="t">Tech</span></span></div>
+            <p class="b-body"><b>Repair-return box.</b> Soft-touch matte ink with a gradient lid band. Inside: a thank-you card, the 90-day warranty, and a NueraCare invite.</p>
+          </div>
+          <div class="bc-pouch bc-reveal" role="img" aria-label="Device pouch concept">
+            <svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg>
+            <p style="margin:0;font-weight:700">Microfibre device pouch</p>
+            <p style="margin:0;color:var(--muted);font-size:.86rem">Tonal "N" repeat, drawstring — protects the screen on the way home.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Signage -->
+      <section class="bc-slide" id="signage">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">09 / Storefront &amp; signage</span>
+          <h2>Findable after dark</h2>
+          <p class="sub">A glowing exterior sign and a simple window decal — the mark and wordmark do the work; the gradient becomes light.</p>
+        </div>
+        <div class="bc-grid bc-g2">
+          <div class="bc-sign bc-reveal" role="img" aria-label="Illuminated storefront sign concept">
+            <svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg>
+            <div class="sign-word">Nuera <span class="t">Tech</span></div>
+            <div class="sign-sub">Phone Repair · Guelph</div>
+          </div>
+          <div class="bc-decal bc-reveal" role="img" aria-label="Window decal concept">
+            <div class="row"><span style="font-weight:700;color:#fff">Walk-ins welcome</span><span>Same-day</span></div>
+            <div class="row"><span>Mon–Fri</span><span>10–7</span></div>
+            <div class="row"><span>Sat</span><span>11–5</span></div>
+            <div class="row"><span>Book ahead</span><span style="color:var(--green-lt);font-weight:700">WhatsApp</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Photography -->
+      <section class="bc-slide" id="photography">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">10 / Photography direction</span>
+          <h2>How it should be shot</h2>
+          <p class="sub">Art direction for real photography to come — rendered here as colour/lighting treatments, not final images.</p>
+        </div>
+        <div class="bc-grid bc-g2">
+          <div class="bc-photo hero bc-reveal">
+            <div class="art" aria-hidden="true"></div>
+            <span class="tag">Hero — product</span>
+            <div class="dir"><h3>Rim-lit device on ink</h3><p>A single repaired phone, three-quarter angle, catching a purple→cyan rim light against a near-black background. Crisp, premium, minimal props.</p></div>
+          </div>
+          <div class="bc-photo bench bc-reveal">
+            <div class="art" aria-hidden="true"></div>
+            <span class="tag">Lifestyle — interior</span>
+            <div class="dir"><h3>The repair bench</h3><p>Warm, clean workspace: brushed-metal tools, soft neon glow, a technician's hands mid-repair. Honest and human — never sterile or stocky.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Voice -->
+      <section class="bc-slide" id="voice">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">11 / Voice &amp; taglines</span>
+          <h2>Say it straight</h2>
+          <p class="sub">Direct, confident, no jargon. Lead with the benefit; prove it with transparency.</p>
+        </div>
+        <div class="bc-voice bc-reveal">
+          <p class="bc-quote">"Phone repair that's always cheaper."</p>
+          <p class="bc-quote">"Speed, trust &amp; honest pricing."</p>
+          <p class="bc-quote">"Walk in, get fixed, save."</p>
+          <div class="bc-voice-principles">
+            <span class="bc-adj p">Plain-spoken</span>
+            <span class="bc-adj c">Transparent</span>
+            <span class="bc-adj g">Reassuring</span>
+            <span class="bc-adj">Local &amp; warm</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Appendix -->
+      <section class="bc-slide" id="appendix">
+        <div class="bc-slide-head bc-reveal">
+          <span class="bc-num">12 / Appendix</span>
+          <h2>Generate the hero board</h2>
+          <p class="sub">This page renders the system in code. To produce a polished 16:9 hero image of the board, paste the prompt below into your image generator of choice.</p>
+        </div>
+
+        <div class="bc-prompt bc-reveal">
+          <div class="bc-prompt-head">
+            <span class="t">image-prompt · nuera-tech.txt</span>
+            <button class="bc-copybtn" type="button" id="copy-prompt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              Copy prompt
+            </button>
+          </div>
+          <pre id="prompt-text">Create a single premium editorial brand guideline and concept board for a real consumer tech-repair brand named Nuera Tech and its sub-brand family NueraCare, NueraExpress and NueraTrade.
+
+Format: 16:9 landscape brand presentation board.
+
+Brand feel: premium, trustworthy, modern, fast, approachable — a well-funded consumer startup. Dark, neon-on-ink aesthetic; vibrant but not gaming.
+
+Audience: University of Guelph students, busy professionals and local Guelph residents who need fast, honest, affordable phone & tablet repair.
+
+Visual identity: refined dark palette of ink black #07070c, brand purple #8b5cf6, brand cyan #22d3ee, action green #34d399, near-white #f4f6ff text and an amber #fbbf24 accent. Signature purple→cyan gradient. Include labeled colour swatches; keep all text minimal, clean and readable.
+
+Design system to show:
+- Main logo for Nuera Tech (gradient "N" mark + wordmark, "Tech" in cyan)
+- Secondary lockups for NueraCare (green), NueraExpress (purple), NueraTrade (amber)
+- Typography pairing: Inter (variable) for both the logo and supporting text
+- Colour palette
+- Simple line icons + playful doodles inspired by phone repair (screen, battery, charge port, spark, shield)
+- Subtle aurora + film-grain patterns
+- Product mockups: a repaired phone showing the app, a protective case, a NueraCare membership card, a NueraExpress same-day fast-lane ticket
+- Packaging mockup: a branded repair-return box / device pouch
+- Storefront signage: a glowing "Nuera Tech — Guelph" exterior sign + a window decal
+- Interior / lifestyle mood: a clean, warm repair bench under soft neon glow
+- Product photography-style hero: a device catching purple→cyan rim light on ink
+
+Layout: clean modular sections, generous whitespace, rounded cards, premium editorial styling, consistent hierarchy, polished grid — not a messy collage.
+
+Text to include:
+Nuera Tech
+NueraCare · NueraExpress · NueraTrade
+Phone repair that's always cheaper.
+Speed, trust & honest pricing.
+
+Avoid: clutter, tiny unreadable text, misspelled brand names, too many random words, cheap Canva styling, overly cartoonish design, generic visuals, messy mockups, distorted packaging, or extra fake logos.</pre>
+        </div>
+
+        <div class="bc-disclaimer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+          <p><b>First-round concept — not final artwork.</b> The mockups, signage and lifestyle frames here are directional concepts rendered in CSS/SVG, not production photography or final logos. <b>NueraCare, NueraExpress and NueraTrade</b> are concept sub-brand names for exploration. Production-ready, trademarkable assets are to be created by the designer; colours, logo DNA and Inter type reflect the live Nuera Tech identity. Clear any names for trademark availability before use.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot-grid">
+      <div class="foot-col foot-brand">
+        <span class="brand">
+          <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
+          <span class="brand-name">Nuera <span class="t">Tech</span></span>
+        </span>
+        <p class="lead-muted">Brand concept board — a first-round identity presentation for Nuera Tech.</p>
+      </div>
+      <nav class="foot-col foot-links" aria-label="Footer">
+        <h3 class="foot-h">Brand</h3>
+        <a href="/brand-concept">Brand Concept board</a>
+        <a href="/brand">Brand Book</a>
+        <a href="#logo-system">Logo system</a>
+        <a href="#appendix">Appendix</a>
+      </nav>
+      <div class="foot-col foot-links">
+        <h3 class="foot-h">Nuera Tech</h3>
+        <a href="/">Main site</a>
+        <a data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener">WhatsApp: +1 226 978 4666</a>
+        <span class="foot-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Guelph, Ontario, Canada</span>
+      </div>
+    </div>
+    <div class="wrap foot-bottom">© <span id="year">2026</span> Nuera Tech · Brand concept board · Concept presentation, not final artwork.</div>
+  </footer>
+
+  <div class="bc-toast" id="bc-toast" role="status" aria-live="polite"></div>
+</body>
+</html>

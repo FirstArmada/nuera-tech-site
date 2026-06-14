@@ -4,7 +4,7 @@
  * (immutable). pricing-data.json uses stale-while-revalidate: still fetched at runtime,
  * just served fast from cache then refreshed in the background (Rule 1 intact).
  */
-const VERSION = 'nuera-v8';
+const VERSION = 'nuera-v9';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
@@ -15,8 +15,12 @@ const RUNTIME = `${VERSION}-runtime`;
 const PRECACHE = [
   '/',
   '/index.html',
+  '/brand.html',
+  '/brand-concept.html',
   '/assets/js/app.js',
   '/assets/js/chat.js',
+  '/assets/js/brand.js',
+  '/assets/js/brand-concept.js',
   '/assets/fonts/inter-var-latin.woff2',
   '/assets/icons/favicon.svg',
   '/assets/icons/favicon-32.png',

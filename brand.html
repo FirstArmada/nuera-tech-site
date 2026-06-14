@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+  <title>Nuera Tech — Brand Book</title>
+  <meta name="description" content="The Nuera Tech brand book: the live colour palette (HEX / RGB / CMYK), usage rules, an interactive contrast checker and a logo-designer colour brief — extracted straight from the product's design tokens." />
+  <meta name="theme-color" content="#07070c" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://nuera.talha-k.com/brand" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Nuera Tech" />
+  <meta property="og:title" content="Nuera Tech — Brand Book" />
+  <meta property="og:description" content="Live colour palette (HEX / RGB / CMYK), usage rules, contrast checker and a logo-designer colour brief." />
+  <meta property="og:url" content="https://nuera.talha-k.com/brand" />
+  <meta property="og:image" content="https://nuera.talha-k.com/assets/icons/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Nuera Tech — Brand Book" />
+  <meta name="twitter:description" content="Live colour palette, usage rules and a logo-designer colour brief." />
+
+  <!-- Icons / PWA -->
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Nuera Tech" />
+
+  <!-- Performance: self-hosted font + module preload -->
+  <link rel="preload" href="/assets/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="modulepreload" href="/assets/js/brand.js" />
+
+  <style>
+    /* ===== Fonts ===== */
+    @font-face{font-family:Inter;font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/inter-var-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+    /* ===== Design tokens — copied verbatim from index.html (the canonical Nuera palette/scale). ===== */
+    :root{
+      color-scheme: dark;
+      --hue-purple:258;--hue-cyan:188;--hue-green:158;--hue-danger:0;
+      --sat-brand:90%;--sat-success:64%;--sat-danger:84%;
+      --c-trust-500:hsl(220 16% 46%);--c-trust-400:hsl(220 14% 60%);
+      --c-ink-900:#07070c;--c-ink-800:#0c0d16;
+      --c-slate-50:#f4f6ff;--c-slate-400:#9fa9bd;--c-slate-500:#8794ab;
+      --c-purple-500:hsl(var(--hue-purple) var(--sat-brand) 66%); /* #8b5cf6 */
+      --c-purple-300:hsl(252 var(--sat-brand) 85%);               /* #c4b5fd */
+      --c-cyan-400:hsl(var(--hue-cyan) 86% 53%);                  /* #22d3ee */
+      --c-green-400:hsl(var(--hue-green) var(--sat-success) 52%); /* #34d399 */
+      --c-green-300:hsl(156 72% 67%);                             /* #6ee7b7 */
+      --c-rose-400:hsl(var(--hue-danger) var(--sat-danger) 60%);--c-amber-400:#fbbf24; /* #ef4444 */
+      --alpha-1:rgba(255,255,255,.03);--alpha-2:rgba(255,255,255,.05);--alpha-3:rgba(255,255,255,.10);--alpha-4:rgba(255,255,255,.16);
+      --color-bg:var(--c-ink-900);--color-bg-raised:var(--c-ink-800);
+      --color-surface-1:var(--alpha-1);--color-surface-2:var(--alpha-2);--color-surface-3:var(--alpha-3);
+      --color-border:var(--alpha-3);--color-border-strong:var(--alpha-4);
+      --color-text-primary:var(--c-slate-50);--color-text-secondary:var(--c-slate-400);--color-text-tertiary:var(--c-slate-500);
+      --color-accent:var(--c-purple-500);--color-accent-soft:var(--c-purple-300);--color-accent-2:var(--c-cyan-400);
+      --color-on-accent:#0a0a12;--color-success:var(--c-green-400);--color-success-text:var(--c-green-400);
+      --color-on-success:#000;--color-on-danger:#fff;--color-on-warning:#000;
+      --color-danger:var(--c-rose-400);--color-warning:var(--c-amber-400);
+      --color-save:var(--c-green-400);--color-was:var(--c-rose-400);
+      --grad-accent:linear-gradient(100deg,var(--c-purple-300) 0%,var(--c-purple-500) 42%,var(--c-cyan-400) 100%);
+      --grad-wa:#34d399;
+      --space-0:0;--space-1:4px;--space-2:8px;--space-3:16px;--space-4:24px;--space-5:32px;
+      --space-6:40px;--space-7:48px;--space-8:56px;--space-9:64px;--space-10:72px;--space-11:88px;
+      --space-12:128px;--space-13:160px;--space-16:64px;
+      --space-section:clamp(48px,9vw,128px);
+      --radius-4:4px;--radius-6:6px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-24:24px;--radius-32:32px;
+      --radius-pill:99px;--radius-circle:50%;--radius-card:var(--radius-24);
+      --radius-xs:var(--radius-12);--radius-sm:var(--radius-16);--radius-md:var(--radius-24);--radius-lg:var(--radius-32);
+      --shadow-1:0 8px 24px -12px rgba(0,0,0,.45);
+      --shadow-2:0 24px 60px -20px rgba(0,0,0,.55);
+      --shadow-3:0 40px 100px -20px rgba(0,0,0,.7);
+      --glow-accent:0 12px 34px -8px rgba(139,92,246,.6);
+      --glow-accent-strong:0 18px 44px -8px rgba(139,92,246,.7);
+      --glow-success:0 16px 40px -10px rgba(52,211,153,.6);
+      --font-sans:Inter,"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+      --font-display:var(--font-sans);--font-mono:ui-monospace,"SF Mono",Menlo,Monaco,Consolas,monospace;
+      --fw-display:300;--fw-regular:400;--fw-medium:500;--fw-bold:700;
+      --fs-12:12px;--fs-14:14px;--fs-16:16px;--fs-20:20px;--fs-24:24px;--fs-28:28px;--fs-32:32px;--fs-36:36px;--fs-40:40px;--fs-48:48px;--fs-56:56px;--fs-64:64px;
+      --fs-base:var(--fs-16);--fs-sm:var(--fs-14);--fs-xs:var(--fs-12);--fs-2xs:11px;
+      --fs-lead:clamp(1.0625rem,2.6vw,1.25rem);--fs-h3:var(--fs-28);--fs-h2:var(--fs-32);
+      --fs-display:clamp(2.5rem,6vw,4rem);
+      --lh-tight:1.125;--lh-headings:1.2;--lh-snug:1.33;--lh-normal:1.5;--lh-relaxed:1.6;
+      --lh-body:var(--lh-relaxed);--lh-display:var(--lh-tight);--lh-heading:var(--lh-headings);
+      --ls-condensed:-.039em;--ls-medium:-.035em;--ls-loose:-.017em;
+      --track-display:var(--ls-condensed);--track-h2:var(--ls-medium);--track-tight:var(--ls-loose);--track-eyebrow:.08em;
+      --dur-250:250ms;--dur-300:300ms;--ease-default:cubic-bezier(.4,0,.2,1);
+      --dur-fast:var(--dur-250);--dur-base:var(--dur-250);--dur-slow:var(--dur-300);
+      --ease-out:var(--ease-default);--ease-standard:var(--ease-default);
+      --ease-emphasized:cubic-bezier(.2,0,0,1);
+      --ease-entrance:cubic-bezier(.22,1,.36,1);
+      --ease-exit:cubic-bezier(.4,0,1,1);
+      --ease-spring:cubic-bezier(.34,1.56,.64,1);
+      --focus-ring-color:var(--c-purple-300);--focus-ring-width:2px;--focus-ring-offset:2px;
+      --maxw:1200px;--header-h:72px;--wrap-pad:clamp(20px,4vw,24px);
+      --touch-min:48px;
+      --bg:var(--color-bg);--bg2:var(--color-bg-raised);
+      --text:var(--color-text-primary);--muted:var(--color-text-secondary);--faint:var(--color-text-tertiary);
+      --purple:var(--color-accent);--purple-lt:var(--color-accent-soft);--cyan:var(--color-accent-2);
+      --green:var(--color-success);--green-lt:var(--color-success-text);--red:var(--color-danger);--amber:var(--color-warning);
+      --panel:var(--color-surface-1);--panel-2:var(--color-surface-2);
+      --border:var(--color-border);--border-2:var(--color-border-strong);
+      --radius:var(--radius-md);--shadow:var(--shadow-2);
+      --ring:0 0 0 3px rgba(139,92,246,.45);
+      --grad:var(--grad-accent);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    @property --angle{syntax:"<angle>";initial-value:120deg;inherits:false}
+    @keyframes border-spin{to{--angle:480deg}}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{margin:0;font-family:var(--font-sans);background:var(--color-bg);color:var(--color-text-primary);min-height:100dvh;line-height:var(--lh-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;overscroll-behavior-y:contain}
+
+    /* Aurora + grain + progress (verbatim from index.html) */
+    .aurora{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+      radial-gradient(60% 50% at 18% 12%,rgba(139,92,246,.26),transparent 60%),
+      radial-gradient(55% 45% at 85% 8%,rgba(34,211,238,.20),transparent 60%),
+      radial-gradient(60% 55% at 78% 80%,rgba(139,92,246,.16),transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg2))}
+    .aurora::after{content:"";position:absolute;inset:-25%;background:
+      radial-gradient(35% 35% at 30% 30%,rgba(139,92,246,.16),transparent 60%),
+      radial-gradient(35% 35% at 70% 60%,rgba(34,211,238,.12),transparent 60%);
+      filter:blur(50px);animation:drift 22s ease-in-out infinite alternate}
+    @keyframes drift{from{transform:translate3d(-2%,-1%,0) scale(1)}to{transform:translate3d(2%,2%,0) scale(1.07)}}
+    .grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.045;
+      background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+    .scroll-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:100;pointer-events:none}
+    .scroll-progress>span{display:block;height:100%;width:100%;transform:scaleX(var(--p,0));transform-origin:0 50%;background:var(--grad-accent);box-shadow:0 0 10px rgba(139,92,246,.55)}
+
+    /* Layout + type helpers */
+    .wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--wrap-pad)}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:var(--fs-xs);font-weight:700;letter-spacing:var(--track-eyebrow);text-transform:uppercase;color:var(--cyan)}
+    h2{font-size:var(--fs-h2);letter-spacing:var(--track-h2);line-height:var(--lh-display);margin:var(--space-3) 0 var(--space-2)}
+    .lead-muted{color:var(--color-text-secondary);max-width:60ch;margin:0}
+    .grad-text{background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+    /* Accessibility */
+    .skip{position:absolute;left:-9999px;top:0;z-index:200;background:var(--purple);color:#fff;padding:12px 18px;border-radius:0 0 12px 0;font-weight:700}
+    .skip:focus{left:0}
+    :focus-visible{outline:var(--focus-ring-width) solid var(--focus-ring-color);outline-offset:var(--focus-ring-offset)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+    /* Buttons (verbatim subset) */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--radius-pill);padding:0 24px;font:inherit;font-size:var(--fs-16);font-weight:700;line-height:1;letter-spacing:var(--ls-loose);cursor:pointer;text-decoration:none;white-space:nowrap;color:var(--color-text-primary);transition:transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out);min-height:48px}
+    .btn svg{width:20px;height:20px;flex:none}
+    .btn:active{transform:scale(.97)}
+    .btn-primary{color:var(--color-on-accent);background:var(--grad-accent);box-shadow:var(--glow-accent)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:var(--glow-accent-strong)}
+    .btn-secondary{color:var(--color-text-primary);background:var(--color-surface-3);border:1px solid var(--color-border-strong)}
+    .btn-secondary:hover{transform:translateY(-2px);background:rgba(255,255,255,.14);border-color:rgba(139,92,246,.5)}
+    .btn-wa{color:var(--color-on-success);background:var(--grad-wa)}
+    .btn-wa:hover{transform:translateY(-2px);box-shadow:var(--glow-success)}
+    .btn-ghost{background:var(--color-surface-2);border:1px solid var(--color-border-strong)}
+    .btn-ghost:hover{transform:translateY(-2px);background:rgba(255,255,255,.12)}
+
+    /* Header (verbatim subset) */
+    .header{position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);background:rgba(7,7,12,.72);border-bottom:1px solid var(--border);transition:background .25s ease,box-shadow .25s ease,border-color .25s ease}
+    @media (max-width:600px){.header{backdrop-filter:blur(8px) saturate(130%);-webkit-backdrop-filter:blur(8px) saturate(130%);background:rgba(7,7,12,.82)}}
+    .header.scrolled{background:rgba(7,7,12,.86);border-bottom-color:var(--border-2);box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
+    .header-in{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);min-height:var(--header-h)}
+    .brand{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--text);font-size:clamp(1.18rem,1rem + 1vw,1.4rem);line-height:1;flex:none}
+    .brand-sprite{position:absolute;width:0;height:0;overflow:hidden}
+    .brand-mark{height:1.6em;width:1.6em;flex:none;display:block}
+    .brand-name{font-weight:700;letter-spacing:var(--track-tight);white-space:nowrap}
+    .brand-name .t{color:var(--cyan)}
+    .header .btn{padding:var(--space-2) var(--space-3);min-height:44px;font-size:.92rem}
+    @media (max-width:999.98px){.header .btn{margin-left:auto}}
+    @media (max-width:599.98px){.header .btn-wa .cta-label{display:none}.header .btn-wa{padding:10px 13px}}
+    .hnav{display:none;gap:var(--space-2);margin-left:auto}
+    .hnav a{color:#cdd6e8;text-decoration:none;font-weight:600;font-size:.92rem;padding:var(--space-2) var(--space-2);border-radius:999px;transition:background .15s,color .15s}
+    .hnav a:hover{background:var(--panel-2);color:#fff}
+    .hnav a[aria-current=page]{color:#fff;background:rgba(139,92,246,.2)}
+    @media (min-width:1000px){.hnav{display:flex}}
+    .hburger{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-2);color:var(--text);cursor:pointer}
+    .hburger svg{width:22px;height:22px}
+    .hburger:focus-visible{outline:none;box-shadow:var(--ring)}
+    @media (min-width:1000px){.hburger{display:none}}
+    .mobile-nav{position:absolute;top:calc(var(--header-h) + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-2) clamp(16px,4vw,28px) var(--space-3);border-top:1px solid var(--border);background:rgba(7,7,12,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+    .mobile-nav[hidden]{display:none}
+    .mobile-nav a{color:#e7ecf7;text-decoration:none;font-weight:700;padding:var(--space-3) var(--space-2);border-radius:12px;min-height:46px;display:flex;align-items:center}
+    .mobile-nav a:hover{background:var(--panel-2)}
+
+    /* Footer (verbatim subset) */
+    footer{border-top:1px solid var(--border);margin-top:40px;padding:48px 0 80px;color:var(--muted)}
+    .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1.3fr;gap:32px;align-items:start}
+    .foot-col{min-width:0}
+    .foot-brand .brand{font-size:1.08rem;margin-bottom:10px}
+    .foot-h{margin:0 0 12px;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+    footer a{color:#cdd6e8;text-decoration:none}
+    footer a:hover{color:#fff;text-decoration:underline}
+    .foot-links{display:flex;flex-direction:column;gap:9px;font-size:.92rem}
+    .foot-loc{display:inline-flex;align-items:center;gap:7px}
+    .foot-loc svg{width:15px;height:15px;color:var(--cyan);flex:none}
+    .foot-bottom{margin-top:32px;font-size:.84rem;opacity:.75}
+    @media (max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:520px){.foot-grid{grid-template-columns:1fr}}
+
+    /* ===================== Brand Book page ===================== */
+    .bb-main{padding-bottom:var(--space-9)}
+    .bb-hero{padding-block:clamp(40px,8vw,90px) clamp(20px,4vw,40px)}
+    .bb-hero h1{font-size:var(--fs-display);font-weight:var(--fw-display);letter-spacing:-.045em;line-height:var(--lh-display);margin:14px 0 var(--space-3);text-wrap:balance}
+    .bb-hero .grad-text{display:inline-block;padding-bottom:.06em;filter:drop-shadow(0 3px 26px rgba(139,92,246,.32))}
+    .bb-lead{font-size:var(--fs-lead);color:#d7deee;max-width:66ch;margin:0}
+    .bb-lead strong{color:#fff}
+    .bb-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:var(--space-4)}
+    .bb-tag{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--radius-pill);background:var(--panel-2);border:1px solid var(--border);color:#dbe3f4;font-size:.84rem;font-weight:600}
+    .bb-tag .sw{width:12px;height:12px;border-radius:4px;background:var(--c,#8b5cf6);flex:none}
+
+    /* Sticky in-page nav */
+    .bb-subnav{position:sticky;top:calc(var(--header-h) + env(safe-area-inset-top));z-index:40;padding:10px 0;margin-bottom:var(--space-4)}
+    .bb-subnav-inner{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:8px;border-radius:var(--radius-pill);background:rgba(10,11,20,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border)}
+    .bb-subnav-inner::-webkit-scrollbar{display:none}
+    .bb-subnav a{flex:none;white-space:nowrap;text-decoration:none;color:#cdd6e8;font-weight:700;font-size:.85rem;padding:8px 14px;border-radius:var(--radius-pill);transition:background .15s,color .15s}
+    .bb-subnav a:hover{background:var(--panel-2);color:#fff}
+    .bb-subnav a[aria-current=true]{background:linear-gradient(90deg,rgba(139,92,246,.32),rgba(34,211,238,.2));color:#fff}
+
+    .bb-section{padding-block:clamp(30px,5vw,58px);border-top:1px solid var(--border)}
+    .bb-section:first-of-type{border-top:0}
+    .bb-section-head{max-width:72ch}
+    .bb-section h2{font-size:var(--fs-h2);letter-spacing:var(--track-h2);line-height:var(--lh-display);margin:12px 0 10px}
+    .bb-note{color:var(--muted);max-width:72ch;margin:0;line-height:1.6}
+    .bb-note + .bb-note{margin-top:12px}
+
+    .bb-callout{display:flex;gap:14px;padding:16px 18px;border-radius:var(--radius-16);background:rgba(139,92,246,.08);border:1px solid var(--border-2);max-width:80ch}
+    .bb-callout svg{width:22px;height:22px;color:var(--purple-lt);flex:none;margin-top:2px}
+    .bb-callout p{margin:0;color:#dbe3f4;line-height:1.55;font-size:.92rem}
+    .bb-callout b{color:#fff}
+
+    /* Palette swatches */
+    .bb-group{margin-top:var(--space-5)}
+    .bb-group h3{margin:0 0 4px;font-size:1.06rem;letter-spacing:-.01em}
+    .bb-group .bb-group-sub{margin:0;color:var(--muted);font-size:.86rem}
+    .bb-swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:var(--space-3)}
+    .bb-swatch{display:flex;flex-direction:column;text-align:left;border:1px solid var(--border);border-radius:var(--radius-16);background:linear-gradient(180deg,var(--panel-2),var(--panel));overflow:hidden;cursor:pointer;color:inherit;font:inherit;padding:0;transition:transform var(--dur-fast) var(--ease-out),border-color var(--dur-base),box-shadow var(--dur-base)}
+    .bb-swatch:hover{transform:translateY(-3px);border-color:rgba(139,92,246,.5);box-shadow:0 18px 40px -22px rgba(0,0,0,.7)}
+    .bb-swatch:active{transform:scale(.99)}
+    .bb-swatch:focus-visible{outline:none;box-shadow:var(--ring)}
+    .bb-swatch-chip{height:84px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+    .bb-swatch-body{padding:13px 15px 15px}
+    .bb-swatch-name{display:block;font-weight:700;letter-spacing:-.01em}
+    .bb-swatch-token{display:block;margin-top:3px;font-family:var(--font-mono);font-size:.74rem;color:var(--purple-lt)}
+    .bb-swatch-vals{display:flex;flex-direction:column;gap:2px;margin-top:10px;font-size:.79rem;color:var(--muted);font-variant-numeric:tabular-nums}
+    .bb-swatch-vals b{color:var(--text);font-weight:700}
+    .bb-copyhint{display:inline-flex;align-items:center;gap:6px;margin-top:11px;font-size:.74rem;font-weight:700;color:var(--faint)}
+    .bb-copyhint svg{width:13px;height:13px}
+    .bb-swatch:hover .bb-copyhint{color:var(--purple-lt)}
+
+    /* Gradient */
+    .bb-gradient{height:120px;border-radius:var(--radius-16);background:var(--grad-accent);box-shadow:var(--shadow-1),inset 0 0 0 1px rgba(255,255,255,.08);margin-top:var(--space-4)}
+    .bb-codebar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding:12px 14px;border-radius:var(--radius-12);background:var(--panel-2);border:1px solid var(--border)}
+    .bb-codebar code{font-family:var(--font-mono);font-size:.8rem;color:#dbe3f4;overflow-wrap:anywhere;min-width:0}
+    .bb-copybtn{display:inline-flex;align-items:center;gap:7px;flex:none;padding:8px 14px;min-height:40px;border-radius:var(--radius-pill);background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.4);color:#d6c6ff;font:inherit;font-weight:700;font-size:.82rem;cursor:pointer;transition:background .15s,border-color .15s}
+    .bb-copybtn svg{width:15px;height:15px}
+    .bb-copybtn:hover{background:rgba(139,92,246,.26)}
+    .bb-copybtn:focus-visible{outline:none;box-shadow:var(--ring)}
+
+    /* Contrast checker */
+    .bb-contrast{display:grid;gap:22px;margin-top:var(--space-4);grid-template-columns:1fr;align-items:start}
+    @media (min-width:760px){.bb-contrast{grid-template-columns:1.1fr .9fr}}
+    .bb-pick{border:1px solid var(--border);border-radius:var(--radius-16);padding:16px 18px;margin:0}
+    .bb-pick + .bb-pick{margin-top:14px}
+    .bb-pick legend{padding:0 6px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .bb-pick-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+    .bb-pick-row button{width:40px;height:40px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--c);position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+    .bb-pick-row button::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid transparent;transition:border-color .15s}
+    .bb-pick-row button[aria-checked=true]::after{border-color:var(--purple-lt)}
+    .bb-pick-row button:focus-visible{outline:none}
+    .bb-pick-row button:focus-visible::after{border-color:#fff}
+    .bb-contrast-result{border:1px solid var(--border-2);border-radius:var(--radius-24);overflow:hidden;background:var(--panel)}
+    .bb-preview{display:grid;place-items:center;min-height:130px;font-size:2.4rem;font-weight:700;letter-spacing:-.02em;background:#07070c;color:#f4f6ff;transition:background .2s ease,color .2s ease}
+    .bb-result-foot{padding:16px 18px}
+    .bb-ratio{font-size:2rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+    .bb-ratio span{font-size:.9rem;color:var(--muted);font-weight:600;margin-left:6px}
+    .bb-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .bb-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:var(--radius-pill);font-size:.78rem;font-weight:700;border:1px solid var(--border-2);background:var(--panel-2);color:#dbe3f4}
+    .bb-badge .s{font-variant-numeric:tabular-nums}
+    .bb-badge.pass{color:#bdf4dd;background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.42)}
+    .bb-badge.fail{color:#f6c9c9;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4)}
+    .bb-pairs{width:100%;border-collapse:collapse;margin-top:var(--space-5);font-size:.9rem}
+    .bb-pairs caption{text-align:left;color:var(--muted);font-size:.84rem;margin-bottom:10px}
+    .bb-pairs th,.bb-pairs td{padding:11px 10px;border-bottom:1px solid var(--border);text-align:left}
+    .bb-pairs th{font-weight:700;color:var(--muted);font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}
+    .bb-pairs td{font-variant-numeric:tabular-nums}
+    .bb-pairs .pair{display:inline-flex;align-items:center;gap:9px}
+    .bb-pairs .pair .dot{width:18px;height:18px;border-radius:5px;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+    .bb-pairs .ok{color:#7ee9c0;font-weight:700}
+
+    /* Logo section */
+    .bb-logo-stage{display:grid;place-items:center;min-height:220px;border-radius:var(--radius-24);border:1px solid var(--border-2);background:#0c0d16;transition:background .25s ease;margin-top:var(--space-4)}
+    .bb-logo-stage .brand-mark{height:110px;width:110px}
+    .bb-stage-controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;align-items:center}
+    .bb-stage-controls .lbl{font-size:.8rem;font-weight:700;color:var(--muted);margin-right:4px}
+    .bb-chipbtn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;min-height:40px;border-radius:var(--radius-pill);border:1px solid var(--border-2);background:var(--panel-2);color:#dbe3f4;font:inherit;font-weight:700;font-size:.82rem;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+    .bb-chipbtn .sw{width:14px;height:14px;border-radius:4px;background:var(--c);flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+    .bb-chipbtn:hover{background:rgba(255,255,255,.1)}
+    .bb-chipbtn[aria-checked=true]{border-color:rgba(139,92,246,.7);background:rgba(139,92,246,.2);color:#fff}
+    .bb-chipbtn:focus-visible{outline:none;box-shadow:var(--ring)}
+    .bb-variants{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:var(--space-4)}
+    .bb-variant{border:1px solid var(--border);border-radius:var(--radius-16);overflow:hidden;background:var(--panel)}
+    .bb-variant .stage{height:120px;display:grid;place-items:center}
+    .bb-variant .stage .brand-mark{height:64px;width:64px}
+    .bb-variant.full .stage{background:#0c0d16}
+    .bb-variant.white .stage{background:#07070c;color:#f4f6ff}
+    .bb-variant.ink .stage{background:#f4f6ff;color:#07070c}
+    .bb-variant.gray .stage{background:#0c0d16;filter:grayscale(1)}
+    .bb-variant .cap{padding:10px 12px;font-size:.8rem;font-weight:700;color:#dbe3f4;border-top:1px solid var(--border)}
+    .bb-variant .cap span{display:block;font-weight:600;color:var(--muted);font-size:.76rem;margin-top:2px}
+    .bb-dl{display:flex;flex-wrap:wrap;gap:10px;margin-top:var(--space-4)}
+    .bb-dl a{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;min-height:42px;border-radius:var(--radius-pill);border:1px solid var(--border-2);background:var(--panel-2);color:#dbe3f4;text-decoration:none;font-weight:700;font-size:.84rem;transition:background .15s,border-color .15s}
+    .bb-dl a:hover{background:rgba(255,255,255,.1);border-color:rgba(139,92,246,.5);color:#fff}
+    .bb-dl a svg{width:16px;height:16px;color:var(--cyan)}
+
+    /* Two-column cards (usage + brief) */
+    .bb-cols{display:grid;gap:16px;margin-top:var(--space-4);grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    .bb-card{border:1px solid var(--border);border-radius:var(--radius-16);padding:20px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
+    .bb-card h3{margin:0 0 10px;font-size:1.06rem;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+    .bb-card h3 svg{width:18px;height:18px;flex:none}
+    .bb-card.do h3 svg{color:var(--green-lt)}
+    .bb-card.dont h3 svg{color:var(--red)}
+    .bb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+    .bb-list li{display:flex;gap:10px;color:#dbe3f4;font-size:.92rem;line-height:1.5}
+    .bb-list li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--purple-lt);flex:none;margin-top:8px}
+    .bb-card.do .bb-list li::before{background:var(--green-lt)}
+    .bb-card.dont .bb-list li::before{background:var(--red)}
+
+    .bb-brief{counter-reset:brief;display:grid;gap:14px;margin-top:var(--space-4)}
+    .bb-brief-item{display:flex;gap:16px;border:1px solid var(--border);border-radius:var(--radius-16);padding:18px 20px;background:var(--panel)}
+    .bb-brief-item::before{counter-increment:brief;content:counter(brief);flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--color-on-accent);background:var(--grad-accent);box-shadow:var(--glow-accent)}
+    .bb-brief-item h3{margin:0 0 6px;font-size:1.02rem;letter-spacing:-.01em}
+    .bb-brief-item p{margin:0;color:#cdd6e8;line-height:1.55;font-size:.92rem}
+    .bb-brief-item .hl{color:#fff;font-weight:700}
+
+    /* Typography specimen */
+    .bb-type{margin-top:var(--space-4);border:1px solid var(--border);border-radius:var(--radius-16);overflow:hidden}
+    .bb-type-row{display:flex;align-items:baseline;justify-content:space-between;gap:18px;padding:16px 20px;border-bottom:1px solid var(--border)}
+    .bb-type-row:last-child{border-bottom:0}
+    .bb-type-sample{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bb-type-meta{flex:none;color:var(--muted);font-size:.78rem;font-family:var(--font-mono);text-align:right}
+    .bb-num{font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+
+    /* Toast */
+    .bb-toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);z-index:120;background:rgba(12,13,22,.96);border:1px solid var(--border-2);color:var(--text);padding:12px 20px;border-radius:var(--radius-pill);font-weight:700;font-size:.9rem;box-shadow:var(--shadow-2);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;backdrop-filter:blur(8px)}
+    .bb-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    .btn,.bb-swatch,.bb-copybtn,.bb-chipbtn,.bb-pick-row button,.hnav a,.mobile-nav a,.hburger,.bb-dl a,.bb-subnav a{touch-action:manipulation}
+
+    /* Reduced-motion safety net (verbatim) */
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .aurora::after{animation:none}
+      *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+      .btn:hover,.bb-swatch:hover{transform:none}
+    }
+  </style>
+
+  <script type="module" src="/assets/js/brand.js"></script>
+</head>
+<body>
+  <!-- Reusable brand marks: full-colour gradient mark + a single-colour (flat) variant for mono use -->
+  <svg class="brand-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="nueraMarkGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#c4b5fd"/>
+        <stop offset=".45" stop-color="#8b5cf6"/>
+        <stop offset="1" stop-color="#22d3ee"/>
+      </linearGradient>
+    </defs>
+    <symbol id="nuera-mark" viewBox="0 0 40 40">
+      <rect width="40" height="40" rx="11" fill="#0f0d18"/>
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="none" stroke="#fff" stroke-opacity=".1"/>
+      <path d="M12 28V12L28 28V12" fill="none" stroke="url(#nueraMarkGrad)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="12" r="2.4" fill="#22d3ee"/>
+    </symbol>
+    <!-- single-colour mark: inherits currentColor, no badge fill — used for the mono/grayscale lockups -->
+    <symbol id="nuera-mark-flat" viewBox="0 0 40 40">
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="none" stroke="currentColor" stroke-opacity=".32"/>
+      <path d="M12 28V12L28 28V12" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="28" cy="12" r="2.4" fill="currentColor"/>
+    </symbol>
+  </svg>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+  <a class="skip" href="#palette">Skip to the palette</a>
+
+  <header class="header">
+    <div class="wrap header-in">
+      <a class="brand" href="/" aria-label="Nuera Tech home">
+        <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
+        <span class="brand-name">Nuera <span class="t">Tech</span></span>
+      </a>
+      <nav class="hnav" aria-label="Primary">
+        <a href="/#finder">Pricing</a>
+        <a href="/#why">Why Nuera</a>
+        <a href="/#reviews">Reviews</a>
+        <a href="/brand" aria-current="page">Brand Book</a>
+        <a href="/brand-concept">Brand Concept</a>
+      </nav>
+      <a class="btn btn-wa" href="https://wa.me/12269784666" target="_blank" rel="noopener" aria-label="Book on WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967z"/></svg>
+        <span class="cta-label">Book on WhatsApp</span>
+      </a>
+      <button class="hburger" id="nav-toggle" type="button" aria-label="Open menu" title="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M21.166 18c.428 0 .78.383.828.883L22 19c0 .552-.373 1-.834 1H2.834C2.374 20 2 19.556 2 19c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 12c0 .552-.373 1-.834 1H2.834C2.374 13 2 12.556 2 12c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 5c0 .552-.373 1-.834 1H2.834C2.374 6 2 5.556 2 5c0-.552.373-1 .834-1h18.332Z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile" hidden>
+      <a href="/">Home</a>
+      <a href="/#finder">Pricing</a>
+      <a href="/brand" aria-current="page">Brand Book</a>
+      <a href="/brand-concept">Brand Concept</a>
+      <a href="https://wa.me/12269784666" target="_blank" rel="noopener">Book on WhatsApp</a>
+    </nav>
+  </header>
+
+  <main class="bb-main" id="main">
+    <div class="wrap">
+
+      <section class="bb-hero">
+        <span class="eyebrow">Nuera Tech · Brand Book</span>
+        <h1>The colours behind <span class="grad-text">always cheaper.</span></h1>
+        <p class="bb-lead">A working reference for designers and developers: the <strong>live colour palette</strong> pulled straight from the product's design tokens — with HEX, RGB and print-ready CMYK estimates — plus usage rules, an interactive contrast checker, and a colour brief for the new logo.</p>
+        <div class="bb-tags">
+          <span class="bb-tag"><span class="sw" style="--c:#07070c"></span> Dark-only UI</span>
+          <span class="bb-tag"><span class="sw" style="--c:#8b5cf6"></span> Purple → cyan signature</span>
+          <span class="bb-tag"><span class="sw" style="--c:#34d399"></span> Action green</span>
+          <span class="bb-tag">Typeface: Inter</span>
+        </div>
+      </section>
+
+      <nav class="bb-subnav" aria-label="Brand book sections">
+        <div class="bb-subnav-inner">
+          <a href="#how-to-use">How to use</a>
+          <a href="#palette">Palette</a>
+          <a href="#gradient">Gradient</a>
+          <a href="#contrast">Contrast</a>
+          <a href="#logo">Logo</a>
+          <a href="#vibe">Vibe</a>
+          <a href="#usage">Usage rules</a>
+          <a href="#brief">Logo brief</a>
+          <a href="#type">Typography</a>
+        </div>
+      </nav>
+
+      <!-- 1 · How to use -->
+      <section class="bb-section" id="how-to-use">
+        <div class="bb-section-head">
+          <span class="eyebrow">01 — How to use this</span>
+          <h2>One source of truth, dark by design</h2>
+          <p class="bb-note">Nuera Tech is a <b>dark-only</b> product: a near-black ink canvas with vivid purple, cyan and green accents. Every value here is the real token shipping in the app, so what you design will match what users see.</p>
+        </div>
+        <div class="bb-callout" style="margin-top:18px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <p><b>About the CMYK values:</b> these are calculated sRGB→CMYK <i>estimates</i> for layout and comps only. For anything going to press, match to a defined ICC profile or a Pantone bridge — and for the near-blacks, specify a proper rich black (≈ C60 M50 Y40 K100) rather than the literal estimate. The neon accents will read brighter on screen than any CMYK build can print.</p>
+        </div>
+      </section>
+
+      <!-- 2 · Palette -->
+      <section class="bb-section" id="palette">
+        <div class="bb-section-head">
+          <span class="eyebrow">02 — The extracted palette</span>
+          <h2>Every colour, grouped by job</h2>
+          <p class="bb-note">Tap any swatch to copy its HEX. The token name (e.g. <code style="font-family:var(--font-mono);color:var(--purple-lt)">--color-accent</code>) is the variable used in code.</p>
+        </div>
+
+        <div class="bb-group">
+          <h3>Brand &amp; accent</h3>
+          <p class="bb-group-sub">The identity. Purple leads; cyan is the co-accent and gradient endpoint.</p>
+          <div class="bb-swatches">
+            <button class="bb-swatch" type="button" data-copy="#8b5cf6" aria-label="Copy Brand Purple, hex #8b5cf6">
+              <span class="bb-swatch-chip" style="--c:#8b5cf6"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Brand Purple</span><code class="bb-swatch-token">--color-accent</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#8b5cf6</b></span><span>RGB <b>139, 92, 246</b></span><span>CMYK <b>44, 63, 0, 4</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#c4b5fd" aria-label="Copy Purple Light, hex #c4b5fd">
+              <span class="bb-swatch-chip" style="--c:#c4b5fd"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Purple Light</span><code class="bb-swatch-token">--color-accent-soft</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#c4b5fd</b></span><span>RGB <b>196, 181, 253</b></span><span>CMYK <b>23, 28, 0, 1</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#22d3ee" aria-label="Copy Brand Cyan, hex #22d3ee">
+              <span class="bb-swatch-chip" style="--c:#22d3ee"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Brand Cyan</span><code class="bb-swatch-token">--color-accent-2</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#22d3ee</b></span><span>RGB <b>34, 211, 238</b></span><span>CMYK <b>86, 11, 0, 7</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bb-group">
+          <h3>Action &amp; status</h3>
+          <p class="bb-group-sub">Functional only — booking, savings, categories and errors. Never decorative.</p>
+          <div class="bb-swatches">
+            <button class="bb-swatch" type="button" data-copy="#34d399" aria-label="Copy Action Green, hex #34d399">
+              <span class="bb-swatch-chip" style="--c:#34d399"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Action Green</span><code class="bb-swatch-token">--color-success</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#34d399</b></span><span>RGB <b>52, 211, 153</b></span><span>CMYK <b>75, 0, 27, 17</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#6ee7b7" aria-label="Copy Green Light, hex #6ee7b7">
+              <span class="bb-swatch-chip" style="--c:#6ee7b7"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Green Light</span><code class="bb-swatch-token">--c-green-300</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#6ee7b7</b></span><span>RGB <b>110, 231, 183</b></span><span>CMYK <b>52, 0, 21, 9</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#fbbf24" aria-label="Copy Amber, hex #fbbf24">
+              <span class="bb-swatch-chip" style="--c:#fbbf24"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Amber</span><code class="bb-swatch-token">--color-warning</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#fbbf24</b></span><span>RGB <b>251, 191, 36</b></span><span>CMYK <b>0, 24, 86, 2</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#ef4444" aria-label="Copy Danger Red, hex #ef4444">
+              <span class="bb-swatch-chip" style="--c:#ef4444"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Danger Red</span><code class="bb-swatch-token">--color-danger</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#ef4444</b></span><span>RGB <b>239, 68, 68</b></span><span>CMYK <b>0, 72, 72, 6</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bb-group">
+          <h3>Ink &amp; backgrounds</h3>
+          <p class="bb-group-sub">The canvas the logo and UI sit on. All near-black.</p>
+          <div class="bb-swatches">
+            <button class="bb-swatch" type="button" data-copy="#07070c" aria-label="Copy Ink 900, hex #07070c">
+              <span class="bb-swatch-chip" style="--c:#07070c"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Ink 900 · page</span><code class="bb-swatch-token">--color-bg</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#07070c</b></span><span>RGB <b>7, 7, 12</b></span><span>CMYK <b>42, 42, 0, 95</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#0c0d16" aria-label="Copy Ink 800, hex #0c0d16">
+              <span class="bb-swatch-chip" style="--c:#0c0d16"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Ink 800 · raised</span><code class="bb-swatch-token">--color-bg-raised</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#0c0d16</b></span><span>RGB <b>12, 13, 22</b></span><span>CMYK <b>45, 41, 0, 91</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#0f0d18" aria-label="Copy Logo Badge, hex #0f0d18">
+              <span class="bb-swatch-chip" style="--c:#0f0d18"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Logo Badge</span><code class="bb-swatch-token">mark background</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#0f0d18</b></span><span>RGB <b>15, 13, 24</b></span><span>CMYK <b>38, 46, 0, 91</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bb-group">
+          <h3>Neutrals &amp; text</h3>
+          <p class="bb-group-sub">Type and structural surfaces. The trust-neutral slate carries credibility cues.</p>
+          <div class="bb-swatches">
+            <button class="bb-swatch" type="button" data-copy="#f4f6ff" aria-label="Copy Text Primary, hex #f4f6ff">
+              <span class="bb-swatch-chip" style="--c:#f4f6ff"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Text Primary</span><code class="bb-swatch-token">--color-text-primary</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#f4f6ff</b></span><span>RGB <b>244, 246, 255</b></span><span>CMYK <b>4, 4, 0, 0</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#9fa9bd" aria-label="Copy Text Secondary, hex #9fa9bd">
+              <span class="bb-swatch-chip" style="--c:#9fa9bd"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Text Secondary</span><code class="bb-swatch-token">--color-text-secondary</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#9fa9bd</b></span><span>RGB <b>159, 169, 189</b></span><span>CMYK <b>16, 11, 0, 26</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#8794ab" aria-label="Copy Text Tertiary, hex #8794ab">
+              <span class="bb-swatch-chip" style="--c:#8794ab"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Text Tertiary</span><code class="bb-swatch-token">--color-text-tertiary</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#8794ab</b></span><span>RGB <b>135, 148, 171</b></span><span>CMYK <b>21, 13, 0, 33</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+            <button class="bb-swatch" type="button" data-copy="#636f88" aria-label="Copy Trust Neutral, hex #636f88">
+              <span class="bb-swatch-chip" style="--c:#636f88"></span>
+              <span class="bb-swatch-body">
+                <span class="bb-swatch-name">Trust Neutral</span><code class="bb-swatch-token">--c-trust-500</code>
+                <span class="bb-swatch-vals"><span>HEX <b>#636f88</b></span><span>RGB <b>99, 111, 136</b></span><span>CMYK <b>27, 18, 0, 47</b></span></span>
+                <span class="bb-copyhint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Click to copy</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 · Gradient -->
+      <section class="bb-section" id="gradient">
+        <div class="bb-section-head">
+          <span class="eyebrow">03 — The signature gradient</span>
+          <h2>Purple → purple → cyan</h2>
+          <p class="bb-note">The single most recognisable Nuera asset. It runs across the logo mark, primary buttons, headline accents and card borders. Keep the stops and angle consistent.</p>
+        </div>
+        <div class="bb-gradient" role="img" aria-label="Brand gradient from light purple to purple to cyan"></div>
+        <div class="bb-codebar">
+          <code id="grad-css">linear-gradient(100deg, #c4b5fd 0%, #8b5cf6 42%, #22d3ee 100%)</code>
+          <button class="bb-copybtn" type="button" data-copy="linear-gradient(100deg, #c4b5fd 0%, #8b5cf6 42%, #22d3ee 100%)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            Copy CSS
+          </button>
+        </div>
+      </section>
+
+      <!-- 4 · Contrast -->
+      <section class="bb-section" id="contrast">
+        <div class="bb-section-head">
+          <span class="eyebrow">04 — Contrast checker</span>
+          <h2>Will it pass on ink?</h2>
+          <p class="bb-note">Pick a foreground and a background to see the live WCAG 2.1 contrast ratio. AA Large needs ≥ 3:1, AA Text ≥ 4.5:1, AAA ≥ 7:1.</p>
+        </div>
+        <div class="bb-contrast">
+          <div>
+            <fieldset class="bb-pick">
+              <legend>Foreground</legend>
+              <div class="bb-pick-row" role="radiogroup" aria-label="Foreground colour">
+                <button type="button" role="radio" aria-checked="true" data-fg="#f4f6ff" style="--c:#f4f6ff" title="Text Primary #f4f6ff" aria-label="Text Primary"></button>
+                <button type="button" role="radio" aria-checked="false" data-fg="#8b5cf6" style="--c:#8b5cf6" title="Brand Purple #8b5cf6" aria-label="Brand Purple"></button>
+                <button type="button" role="radio" aria-checked="false" data-fg="#22d3ee" style="--c:#22d3ee" title="Brand Cyan #22d3ee" aria-label="Brand Cyan"></button>
+                <button type="button" role="radio" aria-checked="false" data-fg="#34d399" style="--c:#34d399" title="Action Green #34d399" aria-label="Action Green"></button>
+                <button type="button" role="radio" aria-checked="false" data-fg="#fbbf24" style="--c:#fbbf24" title="Amber #fbbf24" aria-label="Amber"></button>
+                <button type="button" role="radio" aria-checked="false" data-fg="#9fa9bd" style="--c:#9fa9bd" title="Text Secondary #9fa9bd" aria-label="Text Secondary"></button>
+              </div>
+            </fieldset>
+            <fieldset class="bb-pick">
+              <legend>Background</legend>
+              <div class="bb-pick-row" role="radiogroup" aria-label="Background colour">
+                <button type="button" role="radio" aria-checked="true" data-bg="#07070c" style="--c:#07070c" title="Ink 900 #07070c" aria-label="Ink 900"></button>
+                <button type="button" role="radio" aria-checked="false" data-bg="#0c0d16" style="--c:#0c0d16" title="Ink 800 #0c0d16" aria-label="Ink 800"></button>
+                <button type="button" role="radio" aria-checked="false" data-bg="#8b5cf6" style="--c:#8b5cf6" title="Brand Purple #8b5cf6" aria-label="Brand Purple"></button>
+                <button type="button" role="radio" aria-checked="false" data-bg="#f4f6ff" style="--c:#f4f6ff" title="Text Primary #f4f6ff" aria-label="Text Primary"></button>
+              </div>
+            </fieldset>
+          </div>
+          <div class="bb-contrast-result">
+            <div class="bb-preview" id="bb-preview">Aa</div>
+            <div class="bb-result-foot">
+              <div class="bb-ratio" id="bb-ratio">—<span>contrast ratio</span></div>
+              <div class="bb-badges" aria-live="polite">
+                <span class="bb-badge" id="bb-aa-lg">AA Large · <span class="s">—</span></span>
+                <span class="bb-badge" id="bb-aa">AA Text · <span class="s">—</span></span>
+                <span class="bb-badge" id="bb-aaa">AAA · <span class="s">—</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <table class="bb-pairs">
+          <caption>Key pairings already in the product (measured on Ink 900 #07070c):</caption>
+          <thead><tr><th>Pairing</th><th>Ratio</th><th>Verdict</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pair"><span class="dot" style="background:#f4f6ff"></span> Text Primary on Ink</span></td><td>18.6 : 1</td><td class="ok">AAA</td></tr>
+            <tr><td><span class="pair"><span class="dot" style="background:#9fa9bd"></span> Text Secondary on Ink</span></td><td>8.5 : 1</td><td class="ok">AAA</td></tr>
+            <tr><td><span class="pair"><span class="dot" style="background:#22d3ee"></span> Cyan on Ink</span></td><td>11.1 : 1</td><td class="ok">AAA</td></tr>
+            <tr><td><span class="pair"><span class="dot" style="background:#34d399"></span> Green on Ink</span></td><td>10.5 : 1</td><td class="ok">AAA</td></tr>
+            <tr><td><span class="pair"><span class="dot" style="background:#8b5cf6"></span> Purple on Ink</span></td><td>4.75 : 1</td><td class="ok">AA Text</td></tr>
+            <tr><td><span class="pair"><span class="dot" style="background:#0a0a12"></span> Ink text on Purple fill</span></td><td>4.66 : 1</td><td class="ok">AA Text</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 5 · Logo -->
+      <section class="bb-section" id="logo">
+        <div class="bb-section-head">
+          <span class="eyebrow">05 — The current logo</span>
+          <h2>Reference, not a constraint</h2>
+          <p class="bb-note">The existing mark is a gradient "N" in a rounded badge, with the wordmark <b>Nuera</b> in white and <b>Tech</b> in cyan (Inter, weight 800). Use it as the starting reference — the new logo can evolve it or start fresh, but should keep the purple→cyan DNA.</p>
+        </div>
+
+        <div class="bb-logo-stage" id="bb-logo-stage">
+          <svg class="brand-mark" aria-label="Nuera Tech mark"><use href="#nuera-mark"/></svg>
+        </div>
+        <div class="bb-stage-controls" role="radiogroup" aria-label="Preview background">
+          <span class="lbl">Preview on:</span>
+          <button class="bb-chipbtn" type="button" role="radio" aria-checked="true" data-stage-bg="#0c0d16"><span class="sw" style="--c:#0c0d16"></span> Ink 800</button>
+          <button class="bb-chipbtn" type="button" role="radio" aria-checked="false" data-stage-bg="#07070c"><span class="sw" style="--c:#07070c"></span> Ink 900</button>
+          <button class="bb-chipbtn" type="button" role="radio" aria-checked="false" data-stage-bg="#f4f6ff"><span class="sw" style="--c:#f4f6ff"></span> White</button>
+          <button class="bb-chipbtn" type="button" role="radio" aria-checked="false" data-stage-bg="#8b5cf6"><span class="sw" style="--c:#8b5cf6"></span> Purple</button>
+        </div>
+
+        <div class="bb-variants">
+          <div class="bb-variant full">
+            <div class="stage"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg></div>
+            <div class="cap">Full colour<span>Primary, on ink</span></div>
+          </div>
+          <div class="bb-variant white">
+            <div class="stage"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark-flat"/></svg></div>
+            <div class="cap">White knockout<span>1-colour on dark</span></div>
+          </div>
+          <div class="bb-variant ink">
+            <div class="stage"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark-flat"/></svg></div>
+            <div class="cap">Full ink<span>1-colour on light</span></div>
+          </div>
+          <div class="bb-variant gray">
+            <div class="stage"><svg class="brand-mark" aria-hidden="true"><use href="#nuera-mark"/></svg></div>
+            <div class="cap">Grayscale<span>Tonal check</span></div>
+          </div>
+        </div>
+
+        <div class="bb-dl">
+          <a href="/assets/icons/logo.svg" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg> logo.svg</a>
+          <a href="/assets/icons/favicon.svg" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg> mark.svg</a>
+          <a href="/assets/icons/icon-512.png" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg> icon-512.png</a>
+          <a href="/assets/icons/og-image.png" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg> og-image.png</a>
+        </div>
+      </section>
+
+      <!-- 6 · Vibe -->
+      <section class="bb-section" id="vibe">
+        <div class="bb-section-head">
+          <span class="eyebrow">06 — Brand psychology &amp; vibe</span>
+          <h2>Vibrant, but premium</h2>
+          <p class="bb-note">Neon purple and cyan on a near-black canvas read as <b>tech-forward and app-like</b>; the desaturated trust-slate neutrals and tight Inter hierarchy keep it feeling <b>premium and trustworthy rather than gaming</b>. Green signals trust, savings and the WhatsApp booking action. The personality is confident, honest, fast and hyperlocal to Guelph — matching the promise of transparent, always-cheaper repair.</p>
+          <p class="bb-note">The product's own design note says it best: <i>"the premium, not gaming feel comes from the trust neutral + tighter rhythm + clearer hierarchy + smoother easing, not from desaturation … vibrancy IS the brand."</i></p>
+        </div>
+      </section>
+
+      <!-- 7 · Usage rules -->
+      <section class="bb-section" id="usage">
+        <div class="bb-section-head">
+          <span class="eyebrow">07 — Colour usage rules</span>
+          <h2>What dominates, what highlights</h2>
+          <p class="bb-note">Ink backgrounds and near-white text carry the canvas. Purple is the lead brand accent; cyan is the co-accent and gradient endpoint. Green, amber and red are functional highlights — used sparingly and with meaning.</p>
+        </div>
+        <div class="bb-cols">
+          <div class="bb-card do">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Do</h3>
+            <ul class="bb-list">
+              <li>Let Ink 900 / Ink 800 own most of the surface area.</li>
+              <li>Use the purple→cyan gradient for primary actions and brand moments.</li>
+              <li>Reserve green for booking, savings and success states.</li>
+              <li>Use the trust-neutral slate for icons and credibility cues.</li>
+            </ul>
+          </div>
+          <div class="bb-card dont">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg> Don't</h3>
+            <ul class="bb-list">
+              <li>Don't tint large backgrounds with amber or red.</li>
+              <li>Don't use green as a decorative brand colour.</li>
+              <li>Don't place purple text on ink below ~16px without checking contrast.</li>
+              <li>Don't introduce a light theme — the system is dark-only.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 · Logo brief -->
+      <section class="bb-section" id="brief">
+        <div class="bb-section-head">
+          <span class="eyebrow">08 — Logo designer brief</span>
+          <h2>How to apply colour to the new logo</h2>
+          <p class="bb-note">A targeted colour brief for the new mark. The creative direction is open — evolve the current "N" or start fresh — but the colour rules below keep it unmistakably Nuera.</p>
+        </div>
+        <div class="bb-brief">
+          <div class="bb-brief-item">
+            <div>
+              <h3>Core colours (1–3)</h3>
+              <p>Lead with <span class="hl">Brand Purple #8b5cf6</span> and <span class="hl">Brand Cyan #22d3ee</span>, optionally bridged by Purple Light #c4b5fd, expressed as the signature gradient. Action Green is <b>not</b> a logo colour — it stays reserved for CTAs and booking.</p>
+            </div>
+          </div>
+          <div class="bb-brief-item">
+            <div>
+              <h3>Monochrome &amp; grayscale</h3>
+              <p>The mark must hold up as a single flat colour. The primary one-colour lockup is a <span class="hl">white knockout (#f4f6ff) on dark</span>; use <span class="hl">full ink (#07070c)</span> for light or print. Map grayscale to the neutral ramp (#f4f6ff → #9fa9bd → #8794ab → #07070c). Never rely on the gradient for legibility.</p>
+            </div>
+          </div>
+          <div class="bb-brief-item">
+            <div>
+              <h3>Contrast &amp; placement</h3>
+              <p>The logo lives on near-black UI, so it must pop on Ink 900 / Ink 800: target <span class="hl">≥ 3:1</span> for the graphic mark and <span class="hl">≥ 4.5:1</span> for any wordmark text. Keep clear-space of at least the height of the "N", set a sensible minimum size, and don't drop the bare gradient onto busy aurora areas without the badge container.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 · Typography -->
+      <section class="bb-section" id="type">
+        <div class="bb-section-head">
+          <span class="eyebrow">09 — Typography</span>
+          <h2>Inter, four weights</h2>
+          <p class="bb-note">One self-hosted variable family does everything: light for display, regular for body, medium for labels, bold for buttons and emphasis. Numerals run tabular for pricing.</p>
+        </div>
+        <div class="bb-type">
+          <div class="bb-type-row"><span class="bb-type-sample" style="font-weight:300;font-size:2.2rem;letter-spacing:-.04em">Always cheaper.</span><span class="bb-type-meta">Inter 300<br>Display</span></div>
+          <div class="bb-type-row"><span class="bb-type-sample" style="font-weight:400;font-size:1.05rem">Same-day phone repair in Guelph, Ontario.</span><span class="bb-type-meta">Inter 400<br>Body</span></div>
+          <div class="bb-type-row"><span class="bb-type-sample" style="font-weight:500;font-size:1.05rem">Screen · Battery · Back glass · Charge port</span><span class="bb-type-meta">Inter 500<br>Labels</span></div>
+          <div class="bb-type-row"><span class="bb-type-sample" style="font-weight:700;font-size:1.05rem">Book on WhatsApp</span><span class="bb-type-meta">Inter 700<br>Bold / CTA</span></div>
+          <div class="bb-type-row"><span class="bb-type-sample bb-num" style="font-weight:700;font-size:1.6rem">$129 &nbsp; $189 &nbsp; $249</span><span class="bb-type-meta">Tabular nums<br>Pricing</span></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot-grid">
+      <div class="foot-col foot-brand">
+        <span class="brand">
+          <svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#nuera-mark"/></svg>
+          <span class="brand-name">Nuera <span class="t">Tech</span></span>
+        </span>
+        <p class="lead-muted">Brand book — the live palette, usage rules &amp; logo colour brief for Nuera Tech.</p>
+      </div>
+      <nav class="foot-col foot-links" aria-label="Footer">
+        <h3 class="foot-h">Brand</h3>
+        <a href="/brand">Brand Book</a>
+        <a href="/brand-concept">Brand Concept board</a>
+        <a href="#palette">Palette</a>
+        <a href="#brief">Logo brief</a>
+      </nav>
+      <div class="foot-col foot-links">
+        <h3 class="foot-h">Nuera Tech</h3>
+        <a href="/">Main site</a>
+        <a data-wa="general" href="https://wa.me/12269784666" target="_blank" rel="noopener">WhatsApp: +1 226 978 4666</a>
+        <span class="foot-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Guelph, Ontario, Canada</span>
+      </div>
+    </div>
+    <div class="wrap foot-bottom">© <span id="year">2026</span> Nuera Tech · Brand book · Colours pulled from the live design tokens.</div>
+  </footer>
+
+  <div class="bb-toast" id="bb-toast" role="status" aria-live="polite"></div>
+</body>
+</html>
