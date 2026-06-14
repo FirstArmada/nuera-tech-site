@@ -7,6 +7,8 @@
   <meta name="description" content="Guelph's transparent phone repair shop. iPhone, Samsung, Pixel & iPad screen and battery repair — up to $115 cheaper than other shops. Same-day service, 90-day warranty, book on WhatsApp." />
   <meta name="theme-color" content="#07070c" />
   <meta name="color-scheme" content="dark" />
+  <!-- Theme bootstrap: BLOCKING + same-origin (CSP is script-src 'self'); sets <html data-theme> before first paint so there's no dark↔light flash. -->
+  <script src="/assets/js/theme.js"></script>
   <link rel="canonical" href="https://nuera.talha-k.com/" />
 
   <!-- Open Graph / Twitter -->
@@ -157,6 +159,98 @@
       --ring:0 0 0 3px rgba(139,92,246,.45);
       --grad:var(--grad-accent);
     }
+
+    /* =====================================================================
+       LIGHT THEME — a premium light canvas sharing the purple→cyan DNA.
+       Light is re-tuned, not inverted: a warm-cool off-white canvas, slate
+       (dark-alpha) surfaces, and accent/gradient ramps DARKENED so text clears
+       WCAG AA on light (primary 16.8:1, secondary 8.4:1, tertiary 5.3:1, accent
+       5.6:1, cyan-as-text 5.0:1). Activated by <html data-theme="light"> (set
+       pre-paint by theme.js; the toggle persists it). Mirrored on the brand pages.
+       Overrides outrank the base rules on specificity, so source order is safe. */
+    :root[data-theme="light"]{
+      color-scheme:light;
+      --color-bg:#f6f7fb;--color-bg-raised:#eef0f7;             /* off-white, never pure #fff (glass still refracts) */
+      --color-surface-1:rgba(15,18,40,.03);--color-surface-2:rgba(15,18,40,.05);--color-surface-3:rgba(15,18,40,.09);
+      --color-border:rgba(15,18,40,.12);--color-border-strong:rgba(15,18,40,.2);   /* DARK alpha — white alpha is invisible on light */
+      --color-text-primary:#0e1222;--color-text-secondary:#3f4763;--color-text-tertiary:#5b6480;
+      --color-accent:#7c3aed;--color-accent-soft:#6d28d9;--color-accent-2:#0e7490; /* darkened so they read as TEXT on light */
+      --color-on-accent:#fff;--color-on-success:#053527;--color-on-danger:#fff;--color-on-warning:#3a2a00;
+      --color-success:#0f9d6b;--color-success-text:#0a7d54;--color-danger:#dc2626;--color-warning:#b45309;
+      --color-save:#0a7d54;--color-was:#dc2626;
+      --repair-screen:#6d28d9;--repair-battery:#0a7d54;--repair-backglass:#b45309;--repair-chargeport:#0e7490;
+      --grad-accent:linear-gradient(100deg,#7c3aed 0%,#6d28d9 42%,#0e7490 100%);   /* every stop ≥5:1 as clipped text */
+      --grad-wa:#0f9d6b;
+      --c-trust-400:hsl(220 16% 42%);                          /* trust-neutral icon, darkened for light */
+      --shadow-1:0 6px 16px -10px rgba(20,24,48,.18);--shadow-2:0 18px 40px -18px rgba(20,24,48,.2);--shadow-3:0 34px 80px -24px rgba(20,24,48,.24);
+      --glow-accent:0 12px 30px -10px rgba(124,58,237,.3);--glow-accent-strong:0 16px 38px -10px rgba(124,58,237,.4);--glow-success:0 14px 34px -12px rgba(15,157,107,.34);
+      --focus-ring-color:#7c3aed;--ring:0 0 0 3px rgba(124,58,237,.4);
+    }
+    /* frosted bars: ink → off-white glass */
+    :root[data-theme="light"] .header{background:rgba(246,247,251,.72)}
+    @media (max-width:600px){:root[data-theme="light"] .header{background:rgba(246,247,251,.85)}}
+    :root[data-theme="light"] .header.scrolled{background:rgba(246,247,251,.9);box-shadow:0 10px 30px -18px rgba(20,24,48,.25)}
+    :root[data-theme="light"] .mobile-nav{background:rgba(246,247,251,.98);box-shadow:0 18px 40px -18px rgba(20,24,48,.3)}
+    :root[data-theme="light"] .controls-inner{background:rgba(246,247,251,.78)}
+    @media (max-width:600px){:root[data-theme="light"] .controls-inner{background:rgba(246,247,251,.88)}}
+    @media (max-width:559.98px){:root[data-theme="light"] .actionbar{background:rgba(246,247,251,.9);box-shadow:0 -12px 30px -18px rgba(20,24,48,.25)}}
+    /* aurora + grain: lighter, softer over white */
+    :root[data-theme="light"] .aurora{background:
+      radial-gradient(60% 50% at 18% 12%,rgba(124,58,237,.12),transparent 60%),
+      radial-gradient(55% 45% at 85% 8%,rgba(14,116,144,.1),transparent 60%),
+      radial-gradient(60% 55% at 78% 80%,rgba(124,58,237,.08),transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg2))}
+    :root[data-theme="light"] .aurora::after{background:
+      radial-gradient(35% 35% at 30% 30%,rgba(124,58,237,.1),transparent 60%),
+      radial-gradient(35% 35% at 70% 60%,rgba(14,116,144,.08),transparent 60%)}
+    :root[data-theme="light"] .grain{opacity:.02}
+    /* white-alpha hover/track fills → dark-alpha (white-on-white is invisible on light) */
+    :root[data-theme="light"] .btn-secondary:hover{background:rgba(15,18,40,.1)}
+    :root[data-theme="light"] :is(.btn-ghost:hover,.pill:hover,.spot-pill:hover,.opt:hover,.rgroup-add:hover,.fab-top:hover,.sheet-close:hover,.search .clear:hover,.share-quote:hover){background:rgba(15,18,40,.08)}
+    :root[data-theme="light"] .opts-seg .opt:hover{background:rgba(15,18,40,.05)}
+    :root[data-theme="light"] .bar-track{background:rgba(15,18,40,.06)}
+    :root[data-theme="light"] .skel::after{background:linear-gradient(90deg,transparent,rgba(15,18,40,.06),transparent)}
+    /* pale gray body/nav text → semantic ink (≈1.1:1 on white otherwise) */
+    :root[data-theme="light"] :is(.hpill,.badge,.spot-pill,.pill,.cta-chip,.hnav a,.mobile-nav a,footer a,.rating-chip,.bundle-list li span,.bundle-row>span:last-child){color:var(--color-text-secondary)}
+    :root[data-theme="light"] :is(.hero .lead,.cta p,.review blockquote,.visit-address,.hours td,.trust-strip .ti,.wa-cue b,.cp-type){color:var(--color-text-primary)}
+    :root[data-theme="light"] :is(.hero .lead strong,.rating-chip b,.review-who b,.visit-address b,.hnav a:hover,footer a:hover,.hours tr.today th,.hours tr.today td){color:var(--color-text-primary)}
+    /* search field + sort chevron */
+    :root[data-theme="light"] .search input{background:rgba(15,18,40,.04)}
+    :root[data-theme="light"] .search input:hover{border-color:rgba(15,18,40,.26)}
+    :root[data-theme="light"] .search:focus-within input{background:rgba(15,18,40,.06)}
+    :root[data-theme="light"] .search .clear:hover{color:var(--color-text-primary)}
+    :root[data-theme="light"] .sort-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233f4763' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
+    /* repair-type tint chips/icons: light text → dark accents */
+    :root[data-theme="light"] .rt-chip.screen{color:#6d28d9}
+    :root[data-theme="light"] .rt-chip.battery{color:#0e7490}
+    :root[data-theme="light"] .rt-chip.backglass{color:#b45309}
+    :root[data-theme="light"] .rt-chip.chargeport{color:#0a7d54}
+    :root[data-theme="light"] .card-view{color:#6d28d9}
+    :root[data-theme="light"] .rgroup-ic.battery{color:#0e7490}
+    :root[data-theme="light"] .rgroup-ic.backglass{color:#b45309}
+    :root[data-theme="light"] .rgroup-ic.chargeport{color:#0a7d54}
+    /* selected/active states: keep the gentle tint, force dark text onto the now-pale fill */
+    :root[data-theme="light"] :is(.pill[aria-checked=true],.spot-pill[aria-pressed=true],.opt[aria-checked=true] .opt-price){color:var(--color-text-primary)}
+    :root[data-theme="light"] .pill.rt[aria-checked=true]{background:rgba(15,18,40,.1)}
+    :root[data-theme="light"] .opt[aria-checked=true] .opt-delta{color:#0a7d54}
+    :root[data-theme="light"] .opt-flag{color:#fff}                       /* gradient pill darkened → white text */
+    /* savings / status accents: light tints → dark text */
+    :root[data-theme="light"] .spot-save .save-pct{color:#0a7d54}
+    :root[data-theme="light"] .bar-was{text-decoration-color:rgba(15,18,40,.5)}
+    :root[data-theme="light"] .bar-mk{color:#7f1d1d}                      /* white→dark-red on the pale competitor bar */
+    :root[data-theme="light"] .visit-status[data-state=open]{color:#0a7d54}
+    :root[data-theme="light"] .visit-status[data-state=closed]{color:#b91c1c}
+    :root[data-theme="light"] .save-tag span{color:#5b6480}
+    /* dark text-halo (for light-text-on-glass) would muddy dark text on light → drop it */
+    :root[data-theme="light"] :is(.from b,.rgroup-price .p,.spot-save .save-amt){text-shadow:none}
+    /* device modal sheet + backdrop + fab */
+    :root[data-theme="light"] .sheet{background:linear-gradient(180deg,#fff,#eef0f7);box-shadow:0 40px 100px -20px rgba(20,24,48,.3)}
+    :root[data-theme="light"] .sheet-foot{background:rgba(15,18,40,.02)}
+    :root[data-theme="light"] dialog::backdrop{background:rgba(20,24,48,.42)}
+    :root[data-theme="light"] .fab-top{color:var(--color-text-primary)}
+    /* NOTE: the #nuera-mark badge <rect fill="#0f0d18"> is left DARK on purpose — it reads as an
+       intentional app-icon tile on light, and the gradient "N" + cyan dot still pop. */
+
     *,*::before,*::after{box-sizing:border-box}
     /* Animatable angle for the flowing gradient borders on cards + the search field.
        Falls back gracefully: where @property is unsupported the border is a static gradient. */
@@ -243,6 +337,15 @@
     .hburger svg{width:22px;height:22px}
     .hburger:focus-visible{outline:none;box-shadow:var(--ring)}
     @media (min-width:1000px){.hburger{display:none}}
+    /* Theme toggle — mirrors .hburger; shows the icon for the theme you'd switch TO
+       (dark → sun, light → moon). Icon swap is pure CSS off [data-theme]. */
+    .htheme{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-2);color:var(--text);cursor:pointer;transition:background .15s ease,border-color .15s ease}
+    .htheme svg{width:20px;height:20px}
+    .htheme:hover{border-color:rgba(139,92,246,.5)}
+    .htheme:focus-visible{outline:none;box-shadow:var(--ring)}
+    .htheme .ic-moon{display:none}
+    :root[data-theme="light"] .htheme .ic-sun{display:none}
+    :root[data-theme="light"] .htheme .ic-moon{display:inline-block}
     .mobile-nav{position:absolute;top:calc(var(--header-h) + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-2) clamp(16px,4vw,28px) var(--space-3);border-top:1px solid var(--border);background:rgba(7,7,12,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
     .mobile-nav[hidden]{display:none}
     .mobile-nav a{color:#e7ecf7;text-decoration:none;font-weight:700;padding:var(--space-3) var(--space-2);border-radius:12px;min-height:46px;display:flex;align-items:center}
@@ -261,7 +364,9 @@
     .grad-text{background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
     /* hero-scoped headline polish — bare h1 / .grad-text left untouched */
     .hero h1{font-weight:var(--fw-display);letter-spacing:-.05em;text-wrap:balance}
-    .hero h1 .grad-text{display:inline-block;padding-bottom:.06em;filter:drop-shadow(0 3px 26px rgba(139,92,246,.32))}
+    /* line-height bumped 1.125→1.18 (+padding) so the clipped-gradient line box contains glyph
+       descenders ("p"/"y" in "always cheaper.") — background-clip:text paints glyphs, not padding. */
+    .hero h1 .grad-text{display:inline-block;line-height:1.18;padding-bottom:.08em;filter:drop-shadow(0 3px 26px rgba(139,92,246,.32))}
     .hero .lead{font-size:var(--fs-lead);color:#d7deee;max-width:60ch;margin:0 0 var(--space-5)}
     .hero .lead strong{color:#fff}
     .hero-actions{display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center}
@@ -721,7 +826,7 @@
 
     /* Reviews / social proof */
     .rating-summary{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:14px}
-    .rating-summary .rating-score{font-size:var(--fs-40);font-weight:700;line-height:1;letter-spacing:-.02em;background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .rating-summary .rating-score{font-size:var(--fs-40);font-weight:700;line-height:1.18;letter-spacing:-.02em;display:inline-block;padding-bottom:.06em;background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
     .rating-summary .rating-stars{font-size:1.4rem}
     .rating-summary .rating-meta{color:var(--muted);font-size:.95rem}
     .rating-summary .rating-meta b{color:var(--text);font-weight:700}
@@ -777,16 +882,26 @@
       .header{background:rgba(7,7,12,.92)}
       .controls-inner{background:rgba(10,11,20,.94)}
       .actionbar{background:rgba(7,7,12,.96)}
+      /* light: opaque off-white frosts (must follow the general light .header override above) */
+      :root[data-theme="light"] .header{background:rgba(246,247,251,.94)}
+      :root[data-theme="light"] .controls-inner{background:rgba(246,247,251,.96)}
+      :root[data-theme="light"] .actionbar{background:rgba(246,247,251,.96)}
     }
 
     /* High-contrast strategy (automatic, OS-driven). A subtle dark halo sharpens light text on glass;
        prefers-contrast opaques surfaces + strengthens borders; forced-colors keeps gradient text visible. */
     .from b,.rgroup-price .p,.spot-save .save-amt{text-shadow:0 1px 12px rgba(0,0,0,.55)}
     @media (prefers-contrast:more){
-      :root{--color-text-secondary:#d4dbec;--color-text-tertiary:#c2cbe0;--color-border:rgba(255,255,255,.26);--color-border-strong:rgba(255,255,255,.4)}
-      .card,.feature,.step,.qa,.spot-card,.controls-inner,.cta,.actionbar,.review,.visit-card{background:#0c0d16}
-      .hero .lead,.lead-muted,.cta p,.stat .lbl,.feature p,.step p,.qa .body,.review blockquote,.hours td,.visit-address{color:#eaeefa}
-      .pill,.spot-pill,.opt,.brand-tag,.cta-chip,.badge,.rating-chip,.visit-status,.share-quote{border-color:rgba(255,255,255,.45)}
+      /* dark HCM — scoped so it never forces dark cards onto the light theme */
+      :root:not([data-theme="light"]){--color-text-secondary:#d4dbec;--color-text-tertiary:#c2cbe0;--color-border:rgba(255,255,255,.26);--color-border-strong:rgba(255,255,255,.4)}
+      :root:not([data-theme="light"]) :is(.card,.feature,.step,.qa,.spot-card,.controls-inner,.cta,.actionbar,.review,.visit-card){background:#0c0d16}
+      :root:not([data-theme="light"]) :is(.hero .lead,.lead-muted,.cta p,.stat .lbl,.feature p,.step p,.qa .body,.review blockquote,.hours td,.visit-address){color:#eaeefa}
+      :root:not([data-theme="light"]) :is(.pill,.spot-pill,.opt,.brand-tag,.cta-chip,.badge,.rating-chip,.visit-status,.share-quote){border-color:rgba(255,255,255,.45)}
+      /* light HCM — white cards, ink text, stronger ink borders */
+      :root[data-theme="light"]{--color-text-secondary:#2c3450;--color-text-tertiary:#3f4763;--color-border:rgba(15,18,40,.34);--color-border-strong:rgba(15,18,40,.5)}
+      :root[data-theme="light"] :is(.card,.feature,.step,.qa,.spot-card,.controls-inner,.cta,.actionbar,.review,.visit-card){background:#fff}
+      :root[data-theme="light"] :is(.hero .lead,.lead-muted,.cta p,.stat .lbl,.feature p,.step p,.qa .body,.review blockquote,.hours td,.visit-address){color:#0a0d18}
+      :root[data-theme="light"] :is(.pill,.spot-pill,.opt,.brand-tag,.cta-chip,.badge,.rating-chip,.visit-status,.share-quote){border-color:rgba(15,18,40,.5)}
     }
     @media (forced-colors:active){
       /* gradient/clipped text would otherwise vanish (its painted background is dropped) — force a system colour */
@@ -911,6 +1026,10 @@
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.768-.967zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
         <span class="cta-label">Book on WhatsApp</span>
       </a>
+      <button class="htheme" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to light theme" title="Switch to light theme">
+        <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="ic-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+      </button>
       <button class="hburger" id="nav-toggle" type="button" aria-label="Open menu" title="Open menu" aria-expanded="false" aria-controls="mobile-nav">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M21.166 18c.428 0 .78.383.828.883L22 19c0 .552-.373 1-.834 1H2.834C2.374 20 2 19.556 2 19c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 12c0 .552-.373 1-.834 1H2.834C2.374 13 2 12.556 2 12c0-.552.373-1 .834-1h18.332Zm0-7c.428 0 .78.383.828.883L22 5c0 .552-.373 1-.834 1H2.834C2.374 6 2 5.556 2 5c0-.552.373-1 .834-1h18.332Z" clip-rule="evenodd"/></svg>
       </button>

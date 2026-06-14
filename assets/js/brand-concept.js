@@ -76,6 +76,21 @@ if (copyPromptBtn && promptText) {
   copyPromptBtn.addEventListener('click', () => copyText(promptText.textContent, 'Prompt copied'));
 }
 
+/* Per-section image prompts: any [data-copy-target] copies the textContent of the element it points to */
+$$('[data-copy-target]').forEach((btn) => {
+  const target = $(btn.getAttribute('data-copy-target'));
+  if (target) btn.addEventListener('click', () => copyText(target.textContent, 'Prompt copied'));
+});
+
+/* Image slots: reveal the dropped-in <img> once it has a real src (no src = no network request) */
+$$('[data-slot]').forEach((slot) => {
+  const img = slot.querySelector('img');
+  if (!img) return;
+  const reveal = () => { if (img.getAttribute('src')) slot.classList.add('has-img'); };
+  reveal();
+  img.addEventListener('load', reveal);
+});
+
 /* Scroll-reveal */
 const revealEls = $$('.bc-reveal');
 if (reduceMotion() || !('IntersectionObserver' in window)) {
